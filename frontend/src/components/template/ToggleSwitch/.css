@@ -1,0 +1,32 @@
+.toggle-switch {
+  display: flex;
+  width: var(--toggle-switch-width, 48px);
+  height: var(--toggle-switch-height, 28px);
+  padding: var(--toggle-switch-padding, 2px);
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 150px;
+  background: var(--toggle-switch-off-bg, rgba(60, 60, 67, 0.6));
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 150ms ease-out;
+}
+
+.toggle-switch[data-on='true'] {
+  background: var(--toggle-switch-on-bg, var(--color-main-pink));
+}
+
+.toggle-switch__knob {
+  height: 100%;
+  aspect-ratio: 1;
+  border-radius: 100px;
+  background: var(--toggle-switch-knob-bg, var(--color-main-white));
+  flex-shrink: 0;
+  transform: translateX(0);
+  transition: transform 150ms ease-out;
+}
+
+.toggle-switch[data-on='true'] .toggle-switch__knob {
+  transform: translateX(calc(var(--toggle-switch-width, 48px) - 100% - var(--toggle-switch-padding, 2px) * 2));
+}

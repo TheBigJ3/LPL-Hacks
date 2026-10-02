@@ -1,0 +1,74 @@
+.shimmer {
+  --shimmer-width: 512px;
+  --shimmer-height: 230px;
+  --shimmer-tint: 255, 255, 255;
+
+  position: relative;
+  width: var(--shimmer-width);
+  height: var(--shimmer-height);
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.shimmer__glow,
+.shimmer__beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background-repeat: no-repeat;
+  z-index: 2;
+}
+
+.shimmer__glow {
+  width: 26%;
+  height: 28%;
+  background: radial-gradient(
+    closest-side,
+    rgba(var(--shimmer-tint), 0.45) 0%,
+    rgba(var(--shimmer-tint), 0.2) 12%,
+    rgba(var(--shimmer-tint), 0.07) 28%,
+    rgba(var(--shimmer-tint), 0.02) 50%,
+    rgba(var(--shimmer-tint), 0) 75%
+  );
+}
+
+.shimmer__beam--horizontal {
+  width: 58%;
+  height: 6%;
+  background: radial-gradient(
+    closest-side,
+    rgba(var(--shimmer-tint), 0.35) 0%,
+    rgba(var(--shimmer-tint), 0.27) 8%,
+    rgba(var(--shimmer-tint), 0.18) 18%,
+    rgba(var(--shimmer-tint), 0.11) 30%,
+    rgba(var(--shimmer-tint), 0.06) 45%,
+    rgba(var(--shimmer-tint), 0.025) 62%,
+    rgba(var(--shimmer-tint), 0.01) 80%,
+    rgba(var(--shimmer-tint), 0) 100%
+  );
+}
+
+.shimmer__beam--vertical {
+  width: 4%;
+  height: 18%;
+  background: radial-gradient(
+    closest-side,
+    rgba(var(--shimmer-tint), 0.35) 0%,
+    rgba(var(--shimmer-tint), 0.27) 8%,
+    rgba(var(--shimmer-tint), 0.18) 18%,
+    rgba(var(--shimmer-tint), 0.11) 30%,
+    rgba(var(--shimmer-tint), 0.06) 45%,
+    rgba(var(--shimmer-tint), 0.025) 62%,
+    rgba(var(--shimmer-tint), 0.01) 80%,
+    rgba(var(--shimmer-tint), 0) 100%
+  );
+}
+
+@media (min-width: 768px) {
+  .shimmer {
+    --shimmer-width: 700px;
+    --shimmer-height: 300px;
+  }
+}

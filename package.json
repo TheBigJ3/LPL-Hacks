@@ -1,0 +1,25 @@
+{
+  "name": "lpl-hacks",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "build:shared": "npm run build --workspace=shared",
+    "dev": "npm run build:shared && concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
+    "build": "npm run build:shared && npm run build --workspace=backend && npm run build --workspace=frontend",
+    "ngrok": "ngrok http 5173"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "concurrently": "^10.0.4",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@clickhouse/client": "^1.23.1",
+    "stripe": "^22.6.0",
+    "twilio": "^6.1.0"
+  }
+}

@@ -1,0 +1,14 @@
+# Rules
+- `tests/` mirrors the source tree 1:1: `tests/api/<same path>.test.ts`, `tests/services/<system>/<file>.test.ts`, `tests/mq/jobs/<system>/<file>.test.ts`, `tests/loaders/<file>.test.ts`. Since `services/` and `mq/` are organized one-folder-per-system (`services/agent.md`, `mq/agent.md`), their tests inherit that same grouping automatically by mirroring the path — don't flatten them into one folder or regroup by "test type."
+- A test targets its unit directly — import the route's `handler`, the service function, the job's `handler`/`producer` — and mocks what it depends on (`loaders/` singletons, other `services/` calls) with `vi.mock`. It does not spin up a real DB/Redis/HTTP server; that's what keeps the suite fast enough to run on every change.
+- Test what's *unpredictable* about the feature: the branches, conditions, and edge cases unique to the code being written, that could plausibly be gotten wrong. Do not spend a test proving something already guaranteed elsewhere:
+  - Don't test that zod rejects a wrong type, or that Drizzle produces correct SQL, or that Express dispatches to the right handler — those are the library's own guarantees, not this feature's. Don't test a straight pass-through with no branch in it.
+  - Do test every branch the unit actually has: each `AppError` path and which code it throws, each boundary the business logic itself imposes (zero, negative, exactly-at-a-limit), and — per `services/agent.md`/`mq/agent.md` — every CAS outcome: the write applies when the expected prior state matches, and no-ops (no side effect fires) when it doesn't, e.g. a replayed job or a duplicate request.
+  - If TypeScript already makes the bad state unrepresentable, a runtime test re-proving that is noise, not coverage.
+
+# Specifics
+- One `describe` per unit under test, named for the exported function; one `it` per distinct scenario, named for the behavior being asserted, not the input (`"no-ops when the CAS matches zero rows"`, not `"test with empty array"`).
+- Assert on a side effect's exact arguments (`expect(applyPetDelete).toHaveBeenCalledWith(...)`), not just that it fired — a mock called with the wrong payload is exactly the kind of unpredictable bug this file exists to catch.
+- When the unit under test calls another `services/` function as a side effect (a metrics hook, a next-job `producer`), mock that dependency and assert on it directly rather than asserting on the DB state it would eventually produce — keeps the test scoped to this unit's own decisions, not its dependency's implementation.
+- If a dependency is documented as "must not fail the caller" (a fire-and-forget hook), test that contract explicitly: the unit still resolves/throws the same way whether that dependency succeeds or rejects.
+- A new route, service function, or job gets its test in the same PR, at the mirrored path. A change with no new branch (rename, comment, type-only edit) doesn't need one.

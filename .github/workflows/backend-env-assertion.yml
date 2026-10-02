@@ -1,0 +1,53 @@
+name: Assert backend config
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-env-assertion.yml'
+  pull_request:
+    branches:
+      - dev
+      - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-env-assertion.yml'
+  workflow_dispatch:
+
+jobs:
+  env-keys:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # .env is gitignored, so the keys the backend reads (requireEnv("X") / process.env.X) are the
+      # source of truth. Every one of them must be declared in .env.example, which is the list of
+      # App Settings the Azure Web App needs — a key missing there crashes the app at startup.
+      - name: Assert every env key the backend reads is in .env.example
+        working-directory: backend
+        run: |
+          IGNORED="NODE_ENV"
+
+          used=$(grep -rhoE \
+              "requireEnv\([[:space:]]*['\"][A-Za-z_][A-Za-z0-9_]*['\"]|process\.env\.[A-Za-z_][A-Za-z0-9_]*|process\.env\[['\"][A-Za-z_][A-Za-z0-9_]*['\"]\]" \
+              --include='*.ts' --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=tests . \
+            | grep -oE "\b[A-Z][A-Z0-9_]+\b" | sort -u)
+
+          declared=$(sed -nE 's/^[[:space:]]*(export[[:space:]]+)?([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*=.*/\2/p' .env.example | sort -u)
+
+          missing=$(comm -23 <(echo "$used") <(echo "$declared") | grep -vxF -f <(tr ' ' '\n' <<< "$IGNORED") || true)
+
+          if [ -n "$missing" ]; then
+            for key in $missing; do
+              echo "::error file=backend/.env.example::$key is read by the backend but missing from .env.example"
+            done
+            exit 1
+          fi
+
+          echo "All $(grep -c . <<< "$used") env keys read by the backend are declared in .env.example"

@@ -1,0 +1,29 @@
+.popup-host {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.popup-host__overlay {
+  --popup-host-overlay-padding: 10px;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: safe center;
+  justify-content: safe center;
+  padding: var(--popup-host-overlay-padding);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+}
+
+@media (min-width: 768px) {
+  .popup-host__overlay {
+    --popup-host-overlay-padding: 35px;
+  }
+}
+
+.popup-host__overlay[data-visible="false"] {
+  display: none;
+}

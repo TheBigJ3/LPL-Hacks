@@ -1,0 +1,113 @@
+.not-found {
+  --not-found-padding-top: 50px;
+  --not-found-padding-bottom: 96px;
+  --not-found-padding-inline: 24px;
+  --not-found-code-size: clamp(180px, 38vw, 661px);
+
+  --not-found-code-offset-y: 0%;
+
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  width: 100%;
+  min-height: 100dvh;
+  padding-top: var(--not-found-padding-top);
+  padding-bottom: var(--not-found-padding-bottom);
+  padding-inline: var(--not-found-padding-inline);
+}
+
+.not-found::after {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: radial-gradient(85.37% 100% at 50% 0%, #09090b 73.08%, rgba(9, 9, 11, 0.8) 88.94%, rgba(9, 9, 11, 0.4) 100%);
+}
+
+.not-found .not-found__code {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  font-family: "Arimo", sans-serif;
+  font-weight: 700;
+  font-size: var(--not-found-code-size);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, var(--not-found-code-offset-y));
+  background: linear-gradient(180deg, rgba(250, 250, 250, 0) 18%, rgba(250, 250, 250, 0.05) 70%, rgba(250, 250, 250, 0.1) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.not-found .not-found__content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 620px;
+  margin-inline: auto;
+}
+
+.not-found h2 {
+  font-size: clamp(18px, 0.5vw + 0.875rem, 22px);
+  line-height: 1.2;
+}
+
+.not-found .not-found__description {
+  font-size: 16px;
+}
+
+.not-found .not-found__description p {
+  margin: 0;
+  font-size: inherit;
+}
+
+.not-found .not-found__action {
+  display: flex;
+  min-width: 131px;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border-radius: 100px;
+  font: 400 14px/1 "Arimo", sans-serif;
+  letter-spacing: -0.28px;
+  text-align: center;
+  white-space: nowrap;
+  transition: opacity 180ms ease;
+}
+
+.not-found .not-found__action:hover {
+  opacity: 0.85;
+}
+
+.not-found .not-found__action--primary {
+  background: var(--color-main-white);
+  color: var(--color-main-black);
+}
+
+.not-found .not-found__action--secondary {
+  background: rgba(250, 250, 250, 0.2);
+  color: var(--color-main-white);
+}
+
+.not-found .not-found__help {
+  font-size: 16px;
+  color: #6f6f72;
+}
+
+.not-found .not-found__help-link {
+  color: #08f;
+  text-underline-offset: 2px;
+  text-decoration: underline;
+}
+
+@media (min-width: 761px) {
+  .not-found {
+    --not-found-padding-top: 0px;
+    --not-found-code-offset-y: -45%;
+  }
+}

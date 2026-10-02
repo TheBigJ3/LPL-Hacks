@@ -1,0 +1,22 @@
+.splash-loader {
+  --splash-loader-glow-radius: 210px;
+
+  background: var(--color-main-black);
+}
+
+.splash-loader__glow {
+  background: radial-gradient(circle var(--splash-loader-glow-radius) at 50% 50%,
+    rgba(0, 20, 128, 0.5) 0%,
+    rgba(1, 14, 86, 0.5) 27.16%,
+    rgba(2, 9, 44, 0.5) 54.33%,
+    rgba(6, 9, 27, 0.5) 70.67%,
+    rgba(9, 9, 11, 0.5) 87.02%,
+    rgba(9, 9, 11, 0) 100%);
+  will-change: transform, opacity;
+}
+
+@media (min-width: 1024px) {
+  .splash-loader {
+    --splash-loader-glow-radius: 334px;
+  }
+}

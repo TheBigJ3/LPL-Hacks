@@ -1,0 +1,37 @@
+# Rules
+- `services/` is where functionality actually lives — both what an `api/` route calls and what an `mq/` job calls. Route and job files stay thin (validate, call service, shape response/ack); the DB/queue/business logic goes here, not there.
+- Organize by feature/system: one folder per system under `services/`, e.g. `services/documents/`, `services/extraction/`, `services/retrieval/`. That folder name is the system's name and is also how it finds its types — it mirrors the same feature folder in `types/native/<system>` and `types/zod/<system>` (per `types/agent.md`). No separate name/id needs to be declared anywhere; the path is the link.
+- One file = one thing the system acts on, holding every operation on it, named `<thing>Methods.ts`: `services/extraction/extractedFieldMethods.ts` owns saving Textract fields, flagging the low-confidence ones, verifying and correcting a field. Split a system by what's being acted on, not by action — a second file appears when a second thing does (`documentTagMethods.ts` beside `extractedFieldMethods.ts`), never because one thing accumulated too many verbs. The one companion file is `<thing>Checks.ts` for that thing's pure checks (see Data access).
+- Grouping that way is what lets the shared, unexported helper exist: `extractedFieldWriteWithProvenance` is private to `extractedFieldMethods.ts` and reused by every export that writes a field, because everything that can write a field lives in that one file. Spread those exports across three files and the helper has to be exported to be shared, which makes an internal step look like part of the system's surface.
+- The file name doesn't shorten the function names inside it — `extractedFieldMethods.ts` still exports `extractedFieldVerify`, not `verify`. The `{system}{Type}{Context}` rule in `.agents/ProgrammingStyle.md` exists so a name carries on its own in a stack trace or an import list, where the file name isn't there to complete it.
+- No global types here. If a type or zod schema is needed by more than this one file (another service, an `api/` route, an `mq/` job), it doesn't belong locally — it goes in `backend/types` (or `shared/src/types` if the frontend needs it too, per `types/agent.md`), then gets imported back in. A type or zod schema used only within its own file is fine to keep inline.
+
+# Specifics
+- A service function receives plain, already-validated arguments — the caller (`api/` handler or `mq/` job) validates with zod before calling in. Don't re-validate the same shape again here; a service only defines its own zod schema when it needs an internal-only shape the caller doesn't already provide, and that schema stays local to the file unless a second caller needs it too.
+- Keep service signatures free of `req`/`res` and queue/job objects — take the specific fields needed as arguments and return plain data. That's what lets the same service be called from an `api/` handler and an `mq/` job without adapting it.
+- Import DB/cache/AWS access via `loaders/` singletons (e.g. `redis_client` from `redisLoader`, an S3/Textract/Bedrock/DynamoDB client from its own loader) — never instantiate a client inline (see `loaders/agent.md`).
+- On a domain failure (not found, invalid state, etc.), throw `AppError` from the system's error catalog rather than returning an error shape — same convention as `api/agent.md`, so it formats consistently regardless of whether the caller is a route or a job.
+- Audit logging for sensitive mutations (verifying/correcting a field, deleting a document) stays out of services — that's logged explicitly by the caller after the service call succeeds, per `api/agent.md`.
+- Job-triggered functionality lives in the same file as its api-triggered counterpart when they act on the same thing (`documentCreate` and `documentMarkExtracted` both in `services/documents/documentMethods.ts`) — group by what's acted on, not by which layer calls it.
+
+# Pipeline rules
+- Provenance is part of the data, not decoration: every extracted field a service writes or returns carries its `confidence`, source `documentId` and `page`. A service that drops any of them is wrong, even if the caller doesn't use them yet.
+- `verified` is stored state, set only by an advisor's confirm/correct action. Never derive it from confidence at read time; the confidence threshold (default 90%, from config) only decides what gets *flagged* for review.
+- Tagging is deterministic rules first, LLM second: a rule match (form title "W-2" → `Tax`, `Earnings`) is applied without calling Bedrock; the LLM only fills in what rules couldn't decide.
+- Retrieval is "filter first, then search": resolve the request to metadata filters (household, tags, tax year, family member), narrow to those documents, and only then run semantic search inside that subset. Never semantic-search the whole corpus and filter afterwards.
+- An answer service returns citations as structured data (`documentId`, `page`, `verified`) next to the text, not baked into the prose, so the UI can render and link them.
+
+# Data access
+Latency is set by how many sequential trips a request makes to DynamoDB, Redis and external APIs (Textract, Bedrock, S3), not by how many files the code spans — every `await` on one of them is a network round trip.
+
+- The function a route or job calls is the entry point, and it owns the request's query plan: it decides every trip and keeps them within budget — a read ≤ 2 sequential trips, a write ≤ 3, not counting middleware.
+- What an entry point calls is either another export of its own system's file, or a pure function that takes data and returns values or throws. Pure checks live in `<thing>Checks.ts` beside the methods file (`extractedFieldChecks.ts`): `extractedFieldCheckNeedsReview(field, threshold)` checks the field it's handed rather than fetching one.
+- An exported getter that runs its own query is for callers that need only that. Never chain several of them in one request — fetch what the flow needs in one query (a DynamoDB `Query` on the right key, `BatchGetItem`) instead.
+- Independent reads against different backends (DynamoDB + S3 + Bedrock) go in `Promise.all`; don't serialize them.
+- Filter in the datastore, not in JS: query DynamoDB by key/index, and pass metadata filters into the Knowledge Base/vector search call rather than loading everything and `.filter()`-ing it.
+- Several Redis commands in a row go in one pipeline, `MULTI`, or Lua script — never `await` Redis in a loop.
+- Long-running AWS work (Textract async jobs, bulk tagging, indexing into the Knowledge Base) goes to an `mq/` job, not the request path. The request records the document and enqueues; the client hears back over a socket event.
+- Data that rarely changes may be cached through `services/cache/cacheMethods.ts`. A cache declares itself with `cacheDefine` in the file that reads it — there is no central list of caches, and adding one never means registering it anywhere else.
+- Every service that writes data a cache holds calls `cacheBust` with that entry's `key` after the write commits, in the same function as the write.
+- A cached value is the JSON-safe shape the route returns (dates as ISO strings). Bump the cache's `shape` whenever that shape changes, so a deploy never serves an entry the old code wrote.
+- Field values, verification state and review flags are never cached — the review UI and answers always read them fresh.
