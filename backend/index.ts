@@ -7,7 +7,6 @@ import express from "express";
 import requireEnv from "./modules/requireEnv.js";
 import "./loaders/postgresLoader.js";
 import "./loaders/redisLoader.js";
-import { metric_house } from "./loaders/metricHouseLoader.js";
 import { loadRoutes } from "./loaders/routeLoader.js";
 import { loadSockets } from "./loaders/socketLoader.js";
 import { startWorkers } from "./mq/workers.js";
@@ -54,15 +53,10 @@ if (isMain) {
     server.listen(port, () => {
       console.log(`Backend listening on http://localhost:${port}`);
     });
-    metric_house.start();
   });
 
-  // The house's final flush ships every closed window still held in Redis before the process exits.
   const shutdown = () => {
-    server.close();
-    metric_house.stop()
-      .catch((error) => console.error("[shutdown] Final metrics flush failed:", error))
-      .finally(() => process.exit(0));
+    server.close(() => process.exit(0));
   };
   process.once("SIGTERM", shutdown);
   process.once("SIGINT", shutdown);

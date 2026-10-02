@@ -2,7 +2,7 @@
 
 Each folder under `src/` (`api/`, `components/`, `features/`, `hooks/`, `stores/`, `types/`) has its own `agent.md` with rules specific to that folder. Read it (per the root `agent.md` cascade) before reading or editing any file inside that folder.
 
-**Status:** not built yet. Only the template's plumbing is here (`apiLayer`, `queryClient`, `stripe`, layer stores, generic hooks, template components). `components/template/App/App.tsx` and its `.ts` still reference removed template pages and auth — rewrite them when frontend work starts.
+**Status:** not built yet. Only base plumbing is here (`apiLayer`, `queryClient`, `socketStore`, `useElementWidth`/`useElementHeight`). `components/template/App/App.tsx` is a bare router with one route rendering an empty `<div />`.
 
 What the demo UI needs to show, per the root `agent.md` pipeline: uploading documents into a household, a review queue of low-confidence fields (confirm/correct → verified), each document's tags, and an assistant whose answers cite document + page and show verified/unverified per number.
 
@@ -17,7 +17,7 @@ The frontend mirrors the backend's layering — keep each concern in its layer:
 | `api/`         | `api/`                                           | route definitions only, one per backend route                  |
 | `services/`    | a component's `.ts`, `features/`                 | the logic — display (`.tsx`) never contains it                  |
 | `modules/`     | `features/`                                      | small reusable functions, one concern per file                 |
-| `loaders/`     | `features/` (client singletons), `main.tsx`      | clients created once (`queryClient`, `stripePromise`)          |
+| `loaders/`     | `features/` (client singletons), `main.tsx`      | clients created once (`queryClient`)          |
 | `types/`       | `types/`                                         | frontend-only types and error catalogs, per system             |
 | —              | `hooks/`                                         | generic, system-agnostic React hooks                           |
 | —              | `stores/`                                        | state that outlives any one component                          |

@@ -25,6 +25,7 @@ vi.mock("pg", () => {
 vi.mock("drizzle-orm/node-postgres", () => ({ drizzle: vi.fn(() => ({})) }));
 vi.mock("../../modules/postgresPoolConfig.js", () => ({ postgresPoolConfig: vi.fn(() => ({})) }));
 vi.mock("../../loaders/jobPostgresLoader.js", () => ({ job_postgres_pool: jobPool }));
+vi.mock("../../loaders/rdsSignerLoader.js", () => ({ rds_signer: { getAuthToken: vi.fn(async () => "iam-token") } }));
 
 const { postgres_pool } = await import("../../loaders/postgresLoader.js");
 const { jobScope } = await import("../../modules/jobScope.js");

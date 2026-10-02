@@ -27,65 +27,9 @@ const dotfileTypeScript = {
   },
 }
 
-const BACKEND_TARGET = 'http://localhost:3001'
-const APPLE_CALLBACK_PATH = '/v1/authentication/signup/apple/callback'
-
-// Apple's Sign in with Apple redirect uses response_mode=form_post: it POSTs the
-// result to the OAuth redirect URI (the SPA /auth-redirect route). The dev
-// server would 404 that POST (SPA fallback only serves GET), so intercept it
-// and forward the raw body to the backend callback, then relay the backend's
-// 302 (back to /auth-redirect on a GET) to the browser. Keeps the registered
-// redirect URI on /auth-redirect rather than pointing Apple at the backend.
-const appleFormPostRedirect = {
-  name: 'apple-form-post-redirect',
-  configureServer(server: import('vite').ViteDevServer) {
-    server.middlewares.use('/auth-redirect', (req, res, next) => {
-      if (req.method !== 'POST') return next()
-
-      const chunks: Buffer[] = []
-      req.on('data', (chunk) => chunks.push(chunk as Buffer))
-      req.on('end', async () => {
-        try {
-          const body = Buffer.concat(chunks).toString('utf8')
-          const upstream = await fetch(BACKEND_TARGET + APPLE_CALLBACK_PATH, {
-            method: 'POST',
-            headers: {
-              'content-type':
-                req.headers['content-type'] ?? 'application/x-www-form-urlencoded',
-              // Preserve the public host so the callback redirects back to the
-              // same origin the browser used (where the oauth sessionStorage lives).
-              'x-forwarded-host': (req.headers['x-forwarded-host'] as string) ?? (req.headers.host ?? ''),
-              'x-forwarded-proto': (req.headers['x-forwarded-proto'] as string) ?? 'https',
-            },
-            body,
-            redirect: 'manual',
-          })
-
-          const location = upstream.headers.get('location')
-          if (location) {
-            res.statusCode = 302
-            res.setHeader('location', location)
-            res.end()
-            return
-          }
-          res.statusCode = upstream.status
-          res.end(await upstream.text())
-        } catch (error) {
-          res.statusCode = 502
-          res.end('Apple callback proxy failed')
-        }
-      })
-      req.on('error', () => {
-        res.statusCode = 400
-        res.end('Bad request')
-      })
-    })
-  },
-}
-
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [dotfileTypeScript, appleFormPostRedirect, react(), tailwindcss()],
+  plugins: [dotfileTypeScript, react(), tailwindcss()],
 
   resolve: {
     alias: {
@@ -97,11 +41,6 @@ export default defineConfig({
       '@stores': srcPath('stores'),
       '@typings': srcPath('types'),
     },
-  },
-
-  // maplibre-gl ships its own web worker that the dep optimizer can't pre-bundle.
-  optimizeDeps: {
-    exclude: ['maplibre-gl'],
   },
 
   server: {

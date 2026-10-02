@@ -6,7 +6,7 @@
 - Dependencies flow one direction: `components/`, `stores/`, `hooks/` import from `features/`. A feature may import `api/` definitions, `types/`, shared types, and other features — never a component, and never a component's `.ts`.
 
 # Specifics
-- Client singletons (`queryClient`, `stripePromise`) are created once as a top-level export, same as a backend resource loader — import that export everywhere, never construct a second client inline.
+- Client singletons (`queryClient`) are created once as a top-level export, same as a backend resource loader — import that export everywhere, never construct a second client inline.
 - Env config is read with `import.meta.env.VITE_*` once at the top of the file that owns that integration, as a SNAKE_CASE const — don't scatter reads of the same env var across files.
 - All HTTP goes through `apiLayer.ts` (`apiGetRequest`, `apiPostRequest`, `useApiGetQuery`) per `api/agent.md`. A third-party integration file (e.g. a future `pdfPreview.ts`) wraps its calls and returns our own shape, so callers never touch the vendor's raw response.
 - Functions follow `{system}{Type}{Context}` naming from `ProgrammingStyle.md`, with the file's concern as the system (`indexedDbStorageGet`, `confidenceFormatPercent`).

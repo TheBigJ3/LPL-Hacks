@@ -1,6 +1,6 @@
 @.agents/ProgrammingStyle.md
 
-Each top-level folder (`api/`, `services/`, `mq/`, `sockets/`, `loaders/`, `modules/`, `types/`, `schemas/`, `clickhouse/`, `metrics/`, `tests/`) has its own `agent.md` with rules specific to that folder. Read it (per the root `agent.md` cascade) before reading or editing any file inside that folder.
+Each top-level folder (`api/`, `services/`, `mq/`, `sockets/`, `loaders/`, `modules/`, `types/`, `schemas/`, `tests/`) has its own `agent.md` with rules specific to that folder. Read it (per the root `agent.md` cascade) before reading or editing any file inside that folder.
 
 # Platform-agnostic
 

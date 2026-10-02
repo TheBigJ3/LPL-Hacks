@@ -6,6 +6,7 @@ import * as schema from "../schemas/index.js";
 import { jobScope } from "../modules/jobScope.js";
 import { postgresPoolConfig } from "../modules/postgresPoolConfig.js";
 import { job_postgres_pool } from "./jobPostgresLoader.js";
+import { rds_signer } from "./rdsSignerLoader.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ class JobRoutedPool extends pg.Pool {
 export const postgres_pool = new JobRoutedPool(postgresPoolConfig(
     parseInt(process.env.POSTGRES_POOL_MAX ?? "10"),
     parseInt(process.env.POSTGRES_POOL_MIN ?? "1"),
+    () => rds_signer.getAuthToken(),
 ));
 
 export const db = drizzle({ client: postgres_pool, schema });

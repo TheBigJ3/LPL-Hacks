@@ -1,8 +1,8 @@
 # Rules
 - `stores/` holds state that outlives a single component tree or must be shared between unrelated trees — the popup stack, the splash overlay, the socket connection, a multi-step upload flow. State used by one component and its children stays in that component's `.ts` hook (`useState`/`useReducer`), not here.
-- One store per file, named `<thing>Store.ts` (`popupStore.ts`, `socketStore.ts`).
+- One store per file, named `<thing>Store.ts` (`socketStore.ts`).
 - Two shapes, pick based on what the state is:
-  - **Layer store** (`popupStore.ts`, `splashStore.ts`, `socketStore.ts`): app infrastructure with its own lifecycle (init, async refresh, open/close). A private class (`PopupLayer`, `SocketLayer`) holding state + a listener `Set`, exported as a single instance (`popupLayer`, `socketLayer`), exposing `getSnapshot`/`subscribe` and a `use...` hook built on `useSyncExternalStore`. Plain function exports (`popup(...)`, `close(...)`) wrap the instance for call sites.
+  - **Layer store** (`socketStore.ts`): app infrastructure with its own lifecycle (init, async refresh, open/close). A private class (`SocketLayer`) holding state + a listener `Set`, exported as a single instance (`socketLayer`), exposing `getSnapshot`/`subscribe` and a `use...` hook built on `useSyncExternalStore`. Plain function exports (`socketOn(...)`, `socketAwait(...)`) wrap the instance for call sites.
   - **Zustand store** (`zustand/<thing>Store.ts`, e.g. a multi-file upload queue): user-driven form/flow data that several pages fill in over time. Lives under `stores/zustand/` (none exist yet), exported as a `use<Thing>Store` hook from `create(...)`.
 
 # Specifics

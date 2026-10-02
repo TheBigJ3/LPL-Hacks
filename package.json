@@ -16,10 +16,5 @@
     "@types/node": "^26.2.0",
     "concurrently": "^10.0.4",
     "typescript": "^7.0.2"
-  },
-  "dependencies": {
-    "@clickhouse/client": "^1.23.1",
-    "stripe": "^22.6.0",
-    "twilio": "^6.1.0"
   }
 }

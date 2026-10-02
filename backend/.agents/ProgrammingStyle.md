@@ -1,6 +1,6 @@
 # Before editing
 
-Before editing any file, check which top-level folder it lives in (`api/`, `services/`, `mq/`, `sockets/`, `loaders/`, `modules/`, `types/`, `schemas/`, `clickhouse/`, `metrics/`, `tests/`) and follow that folder's `agent.md`. That file is the authority on structure and conventions specific to that folder — this file only covers what's common across all of them (errors, naming, comments).
+Before editing any file, check which top-level folder it lives in (`api/`, `services/`, `mq/`, `sockets/`, `loaders/`, `modules/`, `types/`, `schemas/`, `tests/`) and follow that folder's `agent.md`. That file is the authority on structure and conventions specific to that folder — this file only covers what's common across all of them (errors, naming, comments).
 
 # Errors
 

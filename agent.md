@@ -19,7 +19,7 @@ A document intelligence and data layer for wealth management platforms. We are *
 2. **Extraction** — AWS Textract extracts text, forms (key-value pairs) and tables. Every extracted field keeps its confidence score, source document and page number.
 3. **Confidence review** — fields below a confidence threshold (default 90%, configurable) are flagged in the UI as "please review". When an advisor confirms or corrects a field, it's marked verified.
 4. **Tagging** — each document gets predetermined tags: deterministic rules for obvious cases (form title "W-2" → Tax, Earnings) plus an LLM on Bedrock for fuzzy tags. The tagging tool "jev" is TBD — verify it exists and fits before depending on it.
-5. **Storage** — structured metadata and extracted fields in DynamoDB; document text indexed in a Bedrock Knowledge Base (or vector store) with metadata attached.
+5. **Storage** — structured metadata and extracted fields in Postgres (Amazon RDS, via Drizzle); document text indexed in a Bedrock Knowledge Base (or vector store) with metadata attached.
 6. **Retrieval ("filter first, then search")** — parse the advisor's request into metadata filters (client, tags, tax year, family member), filter to the relevant documents, then run semantic search only within that subset.
 7. **Answer** — an LLM on Bedrock answers from the retrieved content. Every number and claim cites its source document and page, and says whether the underlying fields are verified or unverified.
 
@@ -31,9 +31,9 @@ A document intelligence and data layer for wealth management platforms. We are *
 ## Template origin
 This repo was scaffolded from the team's in-house template: the workspace layout, the `agent.md` rules and the framework plumbing (route loader, socket loader, `mq/` job system, loaders, `modules/`, `apiLayer`, stores, template components). The template's own features (events, tickets, checkout, auth, …) were removed. **Auth was intentionally cut** for the demo — routes and sockets are public, protected only by rate limiting. In its place every API request acts as one **default advisor** (`req.user`, from the `DEFAULT_USER_*` env vars; `GET /v1/user/getUser` returns it), so real sign-in can later replace `backend/apiMiddleware/currentUser.ts` without touching routes.
 
-The template's stack (Express + Postgres/Drizzle + Redis/BullMQ + Socket.IO, React + Vite) is what's wired today. The pipeline above adds AWS (S3, Textract, Bedrock, DynamoDB) — each new AWS client is a resource loader in `backend/loaders/` per `backend/loaders/agent.md`, never constructed inline. Postgres, Stripe, Twilio, R2 and ClickHouse/MetricHouse came with the template and aren't needed by the pipeline; don't build on them without a reason.
+The stack is Express + Postgres on Amazon RDS (Drizzle, IAM auth) + Redis/BullMQ + Socket.IO, React + Vite. The pipeline adds AWS (S3, Textract, Bedrock) — each new AWS client is a resource loader in `backend/loaders/` per `backend/loaders/agent.md`, never constructed inline. The template's Stripe, Twilio, R2 and ClickHouse/MetricHouse integrations have been removed; don't reintroduce them.
 
-**Frontend status:** only the template's plumbing was brought over (`apiLayer`, `queryClient`, layer stores, generic hooks, template components). No pages exist yet, and `components/template/App/App.tsx` + its `.ts` still reference the removed template pages/auth — rewrite them when the frontend work starts.
+**Frontend status:** only the base plumbing exists (`apiLayer`, `queryClient`, `socketStore`, `useElementWidth`/`useElementHeight`). `components/template/App/App.tsx` is a bare router with one route rendering an empty `<div />`; there are no pages or template components yet.
 
 # Structure
 
@@ -138,7 +138,7 @@ Before starting a change that is big enough to deserve its own branch, stop and 
 
 - it's a new feature, page, or system (not a tweak to an existing one);
 - it touches more than one system, or both `frontend/` and `backend/`;
-- it changes `shared/src/types`, a DB/DynamoDB schema, an API contract, the extraction/retrieval pipeline, or other shared infrastructure (`apiLayer`, stores, loaders, `mq/`);
+- it changes `shared/src/types`, a DB schema (Drizzle/Postgres), an API contract, the extraction/retrieval pipeline, or other shared infrastructure (`apiLayer`, stores, loaders, `mq/`);
 - it renames/moves many files or is a large refactor;
 - it would likely span multiple commits.
 

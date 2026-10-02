@@ -1,5 +1,5 @@
 # Rules
-- Postgres came with the template; the pipeline stores documents and fields in DynamoDB. No tables exist yet — only add a Drizzle table if something genuinely needs relational storage. DynamoDB table/key design is documented next to its loader/service, not here.
+- Postgres on Amazon RDS is the primary datastore: documents, households, extracted fields, tags and verification state all live in Drizzle tables defined here. Add tables as the pipeline needs them.
 - Drizzle ORM schema definitions only (tables, columns, relations) — this is the DB schema, nothing else.
 - Zod schemas and TS types go in `backend/types`, not here.
 

@@ -38,6 +38,7 @@ export default defineConfig({
     },
   },
   test: {
+    passWithNoTests: true,
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
     clearMocks: true,

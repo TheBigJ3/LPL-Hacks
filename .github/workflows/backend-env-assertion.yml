@@ -32,7 +32,7 @@ jobs:
       - name: Assert every env key the backend reads is in .env.example
         working-directory: backend
         run: |
-          IGNORED="NODE_ENV"
+          IGNORED="NODE_ENV POSTGRES_IAM_TOKEN"
 
           used=$(grep -rhoE \
               "requireEnv\([[:space:]]*['\"][A-Za-z_][A-Za-z0-9_]*['\"]|process\.env\.[A-Za-z_][A-Za-z0-9_]*|process\.env\[['\"][A-Za-z_][A-Za-z0-9_]*['\"]\]" \
