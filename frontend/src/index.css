@@ -34,6 +34,7 @@
   --color-navy-muted: #7D8BB0;
   --color-accent-blue: #062C7E;
   --color-accent-blue-light: #BBCFFC;
+  --color-focus-ring: #062C7E;
 
   --spacing: 4px;
   --spacing-gutter: clamp(16px, 1.5vw + 10px, 24px);
@@ -95,6 +96,30 @@
 
 html {
   overscroll-behavior: none;
+}
+
+:root[data-theme="dark"] {
+  --color-main-white: #09090B;
+  --color-main-black: #FAFAFA;
+  --color-main-gray: #5C5C63;
+  --color-paragraph-off-white: #5C5C63;
+  --color-dark-gray: #A1A1AA;
+  --color-surface: #131316;
+  --color-surface-hover: #1F1F23;
+  --color-border: #2C2C31;
+  --color-text-default: #E4E4E7;
+  --color-accent-blue: #183E8F;
+  --color-accent-blue-light: #CCDCFD;
+  --color-focus-ring: #BBCFFC;
+  --shadow-100: 0 1px 4px #00000066;
+  --shadow-200: 0 1px 4px #00000080, 0 1px 4px #00000066;
+  color-scheme: dark;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-panel);
+  animation-timing-function: ease;
 }
 
 :root {

@@ -50,7 +50,7 @@
 
 .sidebar-client-switcher__trigger:focus-visible,
 .sidebar-client-switcher__exit:focus-visible {
-  outline: 2px solid var(--color-accent-blue);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: -2px;
 }
 

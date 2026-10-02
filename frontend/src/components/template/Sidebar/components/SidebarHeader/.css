@@ -1,10 +1,19 @@
 .sidebar-header {
   --sidebar-header-padding-left: 24px;
+  --sidebar-header-logo-filter: none;
   padding: 12px 12px 12px var(--sidebar-header-padding-left);
 }
 
 .sidebar-header[data-open="false"] {
   --sidebar-header-padding-left: 12px;
+}
+
+:root[data-theme="dark"] .sidebar-header {
+  --sidebar-header-logo-filter: invert(1);
+}
+
+.sidebar-header img {
+  filter: var(--sidebar-header-logo-filter);
 }
 
 .sidebar-header__logo {
@@ -30,7 +39,7 @@
 }
 
 .sidebar-header__logo:focus-visible, .sidebar-header__button:focus-visible {
-  outline: 2px solid var(--color-accent-blue);
+  outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
