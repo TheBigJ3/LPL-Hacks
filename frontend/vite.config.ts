@@ -47,7 +47,8 @@ export default defineConfig({
     allowedHosts: [
       'thumb-cheek-another.ngrok-free.dev',
       'flavorful-waltz-magenta.ngrok-free.dev',
-      'payments-serve-lang-boats.trycloudflare.com'
+      'payments-serve-lang-boats.trycloudflare.com',
+      'dvrucdzrftfur.cloudfront.net'
     ],
     proxy: {
       '/v1': {
