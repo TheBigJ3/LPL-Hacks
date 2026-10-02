@@ -1,0 +1,97 @@
+.sidebar-client-picker__search {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-main-black);
+  transition: border-color 150ms ease;
+}
+
+.sidebar-client-picker__search:focus-within {
+  border-color: var(--color-text-default);
+}
+
+.sidebar-client-picker__search-icon {
+  color: var(--color-dark-gray);
+  font-size: 18px;
+}
+
+.sidebar-client-picker__input {
+  background: transparent;
+  color: var(--color-main-black);
+  font-size: 14px;
+  outline: none;
+}
+
+.sidebar-client-picker__input::placeholder {
+  color: var(--color-main-gray);
+}
+
+.sidebar-client-picker__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.sidebar-client-picker__heading {
+  padding: 4px 8px 0;
+  color: var(--color-dark-gray);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.sidebar-client-picker__option {
+  color: var(--color-text-default);
+  transition: background-color 150ms ease;
+}
+
+.sidebar-client-picker__option:hover,
+.sidebar-client-picker__option[data-active="true"] {
+  background: var(--color-surface-hover);
+}
+
+.sidebar-client-picker__option:focus-visible {
+  outline: 2px solid var(--color-accent-blue);
+  outline-offset: -2px;
+}
+
+.sidebar-client-picker__avatar {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-default);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.sidebar-client-picker__avatar[data-kind="individual"] {
+  border-radius: 9999px;
+}
+
+.sidebar-client-picker__name {
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.sidebar-client-picker__detail {
+  color: var(--color-dark-gray);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.sidebar-client-picker__check {
+  color: var(--color-main-black);
+  font-size: 18px;
+}
+
+.sidebar-client-picker__empty {
+  padding: 8px 8px 4px;
+  color: var(--color-dark-gray);
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-client-picker__search, .sidebar-client-picker__option { transition: none; }
+}
