@@ -13,7 +13,7 @@ const config: RouteConfig = {
   rateLimitPoints: 10,
 };
 
-// Textract's async API reads multi-page PDFs and TIFFs from S3; it caps PNG and JPEG lower, at 10 MB.
+// Textract's sync API takes 10 MB per call. PDFs are analyzed a page at a time, so only images and TIFFs hit that cap.
 const UPLOAD_RULES = {
   mimeTypes: ["application/pdf", "image/png", "image/jpeg", "image/tiff"],
   maxBytes: 50 * 1024 * 1024,

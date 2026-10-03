@@ -16,10 +16,8 @@
     "db:studio": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts studio"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1137.0",
     "@aws-sdk/client-textract": "^3.1146.0",
     "@aws-sdk/rds-signer": "3.1146.0",
-    "@aws-sdk/s3-request-presigner": "^3.1137.0",
     "@lpl-hacks/shared": "*",
     "@socket.io/redis-adapter": "^8.3.0",
     "bullmq": "^6.3.8",
@@ -30,6 +28,7 @@
     "drizzle-zod": "^0.8.3",
     "express": "^4.21.2",
     "ioredis": "^6.0.0",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.23.0",
     "socket.io": "^4.8.3"
   },

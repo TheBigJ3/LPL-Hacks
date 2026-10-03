@@ -16,7 +16,7 @@ import { EXTRACTION_ERRORS } from '@typings/native/extraction/errors'
 export const EXTRACTION_UPLOAD_MIME_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/tiff']
 export const EXTRACTION_UPLOAD_MAX_BYTES = 50 * 1024 * 1024
 export const EXTRACTION_UPLOAD_IMAGE_MAX_BYTES = 10 * 1024 * 1024
-const EXTRACTION_UPLOAD_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg']
+const EXTRACTION_UPLOAD_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg', 'image/tiff']
 export const EXTRACTION_EMPTY_VALUE_LABEL = '—'
 export const EXTRACTION_EDITOR_DOM_ID = 'extraction-review-editor'
 export const EXTRACTION_PANEL_DOM_ID = 'extraction-review-panel'

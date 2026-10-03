@@ -1,46 +1,34 @@
-import { randomUUID } from "crypto";
-import type { Readable } from "stream";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, getTableColumns, inArray } from "drizzle-orm";
 import type { Document } from "@lpl-hacks/shared/src/types/native/documents/document.js";
 import type { ExtractedAnalysis } from "@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis.js";
 import documentsExtractionSettled from "@lpl-hacks/shared/src/types/native/sockets/documents/extractionSettled.js";
 import { db } from "../../loaders/postgresLoader.js";
-import { S3_DOCUMENTS_BUCKET, s3_client } from "../../loaders/s3Loader.js";
 import { AppError } from "../../modules/AppError.js";
+import { readUploadBody, type UploadRequest } from "../../modules/readUploadRequest.js";
 import { socketRoom } from "../../modules/socketRoom.js";
 import { documents } from "../../schemas/documents.js";
 import { DOCUMENT_ERRORS } from "../../types/native/documents/errors.js";
 import { EXTRACTION_ERRORS } from "../../types/native/extraction/errors.js";
-import { extractedFieldAnalyzeCollect, extractedFieldAnalyzeStart } from "../extraction/extractedFieldMethods.js";
+import { extractedFieldAnalyze, type ExtractedFieldResult } from "../extraction/extractedFieldMethods.js";
 import { realtimeNotifyRooms } from "../realtime/realtimeMethods.js";
 
-type DocumentUpload = {
+type DocumentUpload = UploadRequest & {
   fileName: string;
-  contentType: string;
-  contentLength: number;
-  body: Readable;
 };
 
-type DocumentRecord = typeof documents.$inferSelect;
+// The file itself is only read by the extraction worker, so every other query leaves it behind.
+const { content: _content, ...DOCUMENT_COLUMNS } = getTableColumns(documents);
 
-export type DocumentExtractCollectOutcome = "pending" | "settled";
+type DocumentRecord = Omit<typeof documents.$inferSelect, "content">;
+
+export type DocumentExtractOutcome = "skipped" | "extracted" | "failed";
 
 export async function documentCreate(upload: DocumentUpload): Promise<Document> {
-  const id = randomUUID();
-  const s3Key = `documents/${id}`;
-
-  await s3_client.send(new PutObjectCommand({
-    Bucket: S3_DOCUMENTS_BUCKET,
-    Key: s3Key,
-    Body: upload.body,
-    ContentType: upload.contentType,
-    ContentLength: upload.contentLength,
-  }));
+  const content = await readUploadBody(upload);
 
   const [record] = await db.insert(documents)
-    .values({ id, fileName: upload.fileName, contentType: upload.contentType, s3Key })
-    .returning();
+    .values({ fileName: upload.fileName, contentType: upload.contentType, content })
+    .returning(DOCUMENT_COLUMNS);
 
   return documentToView(record!);
 }
@@ -53,41 +41,28 @@ export async function documentGet(documentId: string): Promise<{ document: Docum
 }
 
 export async function documentGetRecord(documentId: string): Promise<DocumentRecord | null> {
-  const [record] = await db.select().from(documents).where(eq(documents.id, documentId)).limit(1);
+  const [record] = await db.select(DOCUMENT_COLUMNS).from(documents).where(eq(documents.id, documentId)).limit(1);
   return record ?? null;
 }
 
-export async function documentExtractStart(documentId: string): Promise<boolean> {
-  const record = await documentGetRecord(documentId);
-  if (!record || record.status === "extracted" || record.status === "failed") return false;
-  if (record.status === "extracting") return true;
+export async function documentExtract(documentId: string): Promise<DocumentExtractOutcome> {
+  const [record] = await db.select({ status: documents.status, contentType: documents.contentType, content: documents.content })
+    .from(documents)
+    .where(eq(documents.id, documentId))
+    .limit(1);
+  if (!record || record.status === "extracted" || record.status === "failed") return "skipped";
 
-  let textractJobId: string;
+  await db.update(documents)
+    .set({ status: "extracting" })
+    .where(and(eq(documents.id, documentId), eq(documents.status, "uploaded")));
+
+  let result: ExtractedFieldResult;
   try {
-    textractJobId = await extractedFieldAnalyzeStart(documentId, { bucket: S3_DOCUMENTS_BUCKET, key: record.s3Key });
+    result = await extractedFieldAnalyze(record.content, record.contentType);
   } catch (err) {
     if (!(err instanceof AppError) || err._status === EXTRACTION_ERRORS.EXTRACTION_BUSY.STATUS) throw err;
     await documentMarkFailed(documentId, err.message);
-    return false;
-  }
-
-  await db.update(documents)
-    .set({ status: "extracting", textractJobId })
-    .where(and(eq(documents.id, documentId), eq(documents.status, "uploaded")));
-
-  return true;
-}
-
-export async function documentExtractCollect(documentId: string): Promise<DocumentExtractCollectOutcome> {
-  const record = await documentGetRecord(documentId);
-  if (!record || record.status !== "extracting" || !record.textractJobId) return "settled";
-
-  const result = await extractedFieldAnalyzeCollect(record.textractJobId);
-  if (result.status === "pending") return "pending";
-
-  if (result.status === "failed") {
-    await documentMarkFailed(documentId, result.message);
-    return "settled";
+    return "failed";
   }
 
   const updated = await db.update(documents)
@@ -96,7 +71,7 @@ export async function documentExtractCollect(documentId: string): Promise<Docume
     .returning({ id: documents.id });
 
   if (updated.length > 0) documentNotifySettled(documentId);
-  return "settled";
+  return "extracted";
 }
 
 export async function documentMarkFailed(documentId: string, failureMessage: string): Promise<boolean> {

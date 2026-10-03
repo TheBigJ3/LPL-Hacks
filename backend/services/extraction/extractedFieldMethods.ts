@@ -1,15 +1,15 @@
 import {
+  AnalyzeDocumentCommand,
   BadDocumentException,
   DocumentTooLargeException,
-  GetDocumentAnalysisCommand,
   LimitExceededException,
   ProvisionedThroughputExceededException,
-  StartDocumentAnalysisCommand,
   ThrottlingException,
   UnsupportedDocumentException,
   type Block,
   type BoundingBox,
 } from "@aws-sdk/client-textract";
+import { PDFDocument } from "pdf-lib";
 import type { ExtractedAnalysis } from "@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis.js";
 import type { ExtractedBox } from "@lpl-hacks/shared/src/types/native/extraction/extractedBox.js";
 import type { ExtractedField, ExtractedLine } from "@lpl-hacks/shared/src/types/native/extraction/extractedField.js";
@@ -27,50 +27,72 @@ import {
 
 const CELL_FIELD_OVERLAP = 0.3;
 const CELL_LABEL_OVERLAP = 0.25;
+// AnalyzeDocument allows 10 calls a second per account, so the pages of every document being analyzed share these slots.
+const TEXTRACT_MAX_IN_FLIGHT = 8;
 
-type ExtractedFieldDocumentLocation = {
-  bucket: string;
-  key: string;
+let textractInFlight = 0;
+const textractWaiting: (() => void)[] = [];
+
+export type ExtractedFieldResult = {
+  pageCount: number;
+  analysis: ExtractedAnalysis;
 };
 
-export type ExtractedFieldCollectResult =
-  | { status: "pending" }
-  | { status: "failed"; message: string }
-  | { status: "succeeded"; pageCount: number; analysis: ExtractedAnalysis };
+// Textract's sync API reads only single-page documents, so a PDF is split and its pages analyzed side by side.
+export async function extractedFieldAnalyze(content: Uint8Array, contentType: string): Promise<ExtractedFieldResult> {
+  const pages = contentType === "application/pdf" ? await extractedFieldSplitPdf(content) : [content];
+  const abort = new AbortController();
 
-export async function extractedFieldAnalyzeStart(documentId: string, location: ExtractedFieldDocumentLocation): Promise<string> {
+  let pageBlocks: Block[][];
   try {
-    const result = await textract_client.send(new StartDocumentAnalysisCommand({
-      DocumentLocation: { S3Object: { Bucket: location.bucket, Name: location.key } },
-      FeatureTypes: ["FORMS", "TABLES"],
-      // Textract returns the same JobId for a repeated token, so a replayed job never starts a second analysis.
-      ClientRequestToken: documentId,
-    }));
-    return result.JobId!;
+    pageBlocks = await Promise.all(pages.map((page) => extractedFieldAnalyzePage(page, abort)));
   } catch (err) {
     throw extractedFieldTranslateError(err);
+  }
+
+  const blocks = pageBlocks.flatMap((blocks, index) => blocks.map((block) => ({ ...block, Page: index + 1 })));
+  return { pageCount: pages.length, analysis: extractedFieldParse(blocks) };
+}
+
+async function extractedFieldAnalyzePage(page: Uint8Array, abort: AbortController): Promise<Block[]> {
+  if (textractInFlight < TEXTRACT_MAX_IN_FLIGHT) textractInFlight++;
+  else await new Promise<void>((resolve) => textractWaiting.push(resolve));
+
+  try {
+    abort.signal.throwIfAborted();
+    const result = await textract_client.send(new AnalyzeDocumentCommand({
+      Document: { Bytes: page },
+      FeatureTypes: ["FORMS", "TABLES"],
+    }));
+    return result.Blocks ?? [];
+  } catch (err) {
+    // Aborted before the slot is handed on, so a page still queued behind this one is never sent.
+    abort.abort();
+    throw err;
+  } finally {
+    const next = textractWaiting.shift();
+    if (next) next();
+    else textractInFlight--;
   }
 }
 
-export async function extractedFieldAnalyzeCollect(textractJobId: string): Promise<ExtractedFieldCollectResult> {
-  const blocks: Block[] = [];
-  let nextToken: string | undefined;
-  let pageCount = 0;
-
+async function extractedFieldSplitPdf(content: Uint8Array): Promise<Uint8Array[]> {
+  let source: PDFDocument;
   try {
-    do {
-      const result = await textract_client.send(new GetDocumentAnalysisCommand({ JobId: textractJobId, NextToken: nextToken }));
-      if (result.JobStatus === "IN_PROGRESS") return { status: "pending" };
-      if (result.JobStatus === "FAILED") return { status: "failed", message: EXTRACTION_ERRORS.DOCUMENT_UNREADABLE.MESSAGE };
-      blocks.push(...(result.Blocks ?? []));
-      pageCount = result.DocumentMetadata?.Pages ?? pageCount;
-      nextToken = result.NextToken;
-    } while (nextToken);
-  } catch (err) {
-    throw extractedFieldTranslateError(err);
+    source = await PDFDocument.load(content);
+  } catch {
+    throw new AppError(EXTRACTION_ERRORS.DOCUMENT_UNREADABLE);
   }
 
-  return { status: "succeeded", pageCount: Math.max(pageCount, 1), analysis: extractedFieldParse(blocks) };
+  if (source.getPageCount() === 0) throw new AppError(EXTRACTION_ERRORS.DOCUMENT_UNREADABLE);
+  if (source.getPageCount() === 1) return [content];
+
+  return Promise.all(source.getPageIndices().map(async (index) => {
+    const page = await PDFDocument.create();
+    const [copied] = await page.copyPages(source, [index]);
+    page.addPage(copied!);
+    return page.save();
+  }));
 }
 
 function extractedFieldParse(blocks: Block[]): ExtractedAnalysis {
