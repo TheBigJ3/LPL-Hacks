@@ -8,24 +8,22 @@ import {
   answerCheckToolInput,
 } from "../../../services/answer/answerChecks.js";
 
-const TAGS = ["Tax", "Earnings", "Investments"];
-
-function chunk(documentId: string, page: number, fieldIds: string[]) {
-  const text = JSON.stringify({ documentId, page, fileName: `${documentId}.pdf`, fields: fieldIds.map((fieldId) => ({ fieldId, value: "1" })) });
-  return { text, score: 0.5, citation: { documentId, page }, clientId: "h-1", tags: [], taxYear: 2025, familyMember: null };
+function chunk(documentId: string, sectionId: string, quote: string) {
+  const text = JSON.stringify({ documentId, sectionId, text: quote });
+  return { text, score: 0.5, citation: { documentId, sectionId, page: null }, clientId: "h-1", fileName: `${documentId}.pdf`, docType: "w2", tags: [], familyMembers: [], taxYear: 2025 };
 }
 
 describe("answerCheckFilters", () => {
-  it("always keeps the caller's client and adds the model's year and known tags", () => {
-    expect(answerCheckFilters("h-1", { taxYear: 2025, tags: ["Tax", "Made Up", "Tax"] }, TAGS)).toEqual({ clientId: "h-1", taxYear: 2025, tags: ["Tax"] });
+  it("always keeps the caller's client and adds the model's year", () => {
+    expect(answerCheckFilters("h-1", { taxYear: 2025 })).toEqual({ clientId: "h-1", taxYear: 2025 });
   });
 
-  it("drops a null year and an empty tag list", () => {
-    expect(answerCheckFilters("h-1", { taxYear: null, tags: [] }, TAGS)).toEqual({ clientId: "h-1" });
+  it("drops a null year", () => {
+    expect(answerCheckFilters("h-1", { taxYear: null })).toEqual({ clientId: "h-1" });
   });
 
   it("falls back to the client alone when the model's input is malformed", () => {
-    expect(answerCheckFilters("h-1", { taxYear: "2025", clientId: "h-2" }, TAGS)).toEqual({ clientId: "h-1" });
+    expect(answerCheckFilters("h-1", { taxYear: "2025", clientId: "h-2" })).toEqual({ clientId: "h-1" });
   });
 });
 
@@ -37,10 +35,12 @@ describe("answerCheckFiltersNarrowed", () => {
 });
 
 describe("answerCheckSources", () => {
-  it("numbers sources and reads the file name and field ids from the page body", () => {
-    expect(answerCheckSources([chunk("doc-1", 1, ["f-1", "f-2"]), chunk("doc-2", 3, [])]).map(({ sourceId, fileName, fieldIds }) => ({ sourceId, fileName, fieldIds }))).toEqual([
-      { sourceId: "S1", fileName: "doc-1.pdf", fieldIds: ["f-1", "f-2"] },
-      { sourceId: "S2", fileName: "doc-2.pdf", fieldIds: [] },
+  it("numbers sources and quotes the section's own text, not the indexed wrapper", () => {
+    const sources = answerCheckSources([chunk("doc-1", "document", "Wages: 1.00"), { ...chunk("doc-2", "s", "x"), text: "not json" }]);
+
+    expect(sources.map(({ sourceId, quote }) => ({ sourceId, quote }))).toEqual([
+      { sourceId: "S1", quote: "Wages: 1.00" },
+      { sourceId: "S2", quote: "not json" },
     ]);
   });
 });
@@ -52,48 +52,39 @@ describe("answerCheckToolInput", () => {
 });
 
 describe("answerCheckStatements", () => {
-  const sources = answerCheckSources([chunk("doc-1", 1, ["f-1"]), chunk("doc-2", 2, ["f-2"])]);
-  const verified = new Map([["f-1", true], ["f-2", false]]);
+  const sources = answerCheckSources([chunk("doc-1", "document", "Wages: 100.00"), chunk("doc-2", "section-002", "Box 2: 5.00")]);
 
-  it("turns source and field ids into citations carrying stored verified state", () => {
-    const result = answerCheckStatements({ answerable: true, statements: [{ text: "Wages were 100.", sourceIds: ["S1"], fieldIds: ["f-1"] }] }, sources, verified);
-
-    expect(result).toEqual({
+  it("turns source ids into section citations with the quote, unverified", () => {
+    expect(answerCheckStatements({ answerable: true, statements: [{ text: "Wages were 100.", sourceIds: ["S1"] }] }, sources)).toEqual({
       answerable: true,
-      statements: [{ text: "Wages were 100.", citations: [{ documentId: "doc-1", page: 1, fileName: "doc-1.pdf", fieldId: "f-1", verified: true }] }],
+      statements: [{ text: "Wages were 100.", citations: [{ documentId: "doc-1", sectionId: "document", page: null, fileName: "doc-1.pdf", quote: "Wages: 100.00", verified: false }] }],
     });
-  });
-
-  it("cites the page alone when the field id belongs to a different source", () => {
-    const result = answerCheckStatements({ answerable: true, statements: [{ text: "See page.", sourceIds: ["S1"], fieldIds: ["f-2"] }] }, sources, verified);
-
-    expect(result.statements[0]!.citations).toEqual([{ documentId: "doc-1", page: 1, fileName: "doc-1.pdf", fieldId: null, verified: false }]);
   });
 
   it("drops a statement whose only source id was invented", () => {
     const result = answerCheckStatements({
       answerable: true,
       statements: [
-        { text: "Real.", sourceIds: ["S2"], fieldIds: ["f-2"] },
-        { text: "Invented 500.", sourceIds: ["S9"], fieldIds: [] },
+        { text: "Real.", sourceIds: ["S2"] },
+        { text: "Invented 500.", sourceIds: ["S9"] },
       ],
-    }, sources, verified);
+    }, sources);
 
     expect(result.statements.map((statement) => statement.text)).toEqual(["Real."]);
   });
 
   it("becomes unanswerable when every statement is dropped", () => {
-    expect(answerCheckStatements({ answerable: true, statements: [{ text: "Uncited 5.", sourceIds: [], fieldIds: [] }] }, sources, verified))
+    expect(answerCheckStatements({ answerable: true, statements: [{ text: "Uncited 5.", sourceIds: [] }] }, sources))
       .toEqual({ answerable: false, statements: [{ text: ANSWER_NOT_FOUND_TEXT, citations: [] }] });
   });
 
   it("keeps the model's explanation when unanswerable and number-free", () => {
-    expect(answerCheckStatements({ answerable: false, statements: [{ text: "No mortgage statement is on file.", sourceIds: [], fieldIds: [] }] }, sources, verified).statements)
+    expect(answerCheckStatements({ answerable: false, statements: [{ text: "No mortgage statement is on file.", sourceIds: [] }] }, sources).statements)
       .toEqual([{ text: "No mortgage statement is on file.", citations: [] }]);
   });
 
   it("replaces an unanswerable explanation that states a number", () => {
-    expect(answerCheckStatements({ answerable: false, statements: [{ text: "Probably about 4000.", sourceIds: [], fieldIds: [] }] }, sources, verified).statements)
+    expect(answerCheckStatements({ answerable: false, statements: [{ text: "Probably about 4000.", sourceIds: [] }] }, sources).statements)
       .toEqual([{ text: ANSWER_NOT_FOUND_TEXT, citations: [] }]);
   });
 });

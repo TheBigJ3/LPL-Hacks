@@ -11,9 +11,6 @@ export default  {
     CONFIDENCE_HIGH: 95,
     CONFIDENCE_MEDIUM: 85,
   },
-  DOCUMENTS: {
-    _TAGS: ["Tax", "Earnings", "Investments", "Retirement", "Banking", "Insurance", "Estate", "Identity"],
-  },
   ANSWER: {
     MAX_SOURCES: 8,
   },

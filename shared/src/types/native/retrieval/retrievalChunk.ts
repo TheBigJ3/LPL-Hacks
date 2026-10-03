@@ -1,6 +1,7 @@
 export type RetrievalCitation = {
   documentId: string;
-  page: number;
+  sectionId: string;
+  page: number | null;
 };
 
 export type RetrievalChunk = {
@@ -8,7 +9,9 @@ export type RetrievalChunk = {
   score: number | null;
   citation: RetrievalCitation;
   clientId: string;
+  fileName: string | null;
+  docType: string | null;
   tags: string[];
+  familyMembers: string[];
   taxYear: number | null;
-  familyMember: string | null;
 };

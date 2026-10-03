@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { s3Send, bedrockSend } = vi.hoisted(() => ({ s3Send: vi.fn(), bedrockSend: vi.fn() }));
 
-vi.mock("../../../loaders/s3Loader.js", () => ({ s3_client: { send: s3Send } }));
+vi.mock("../../../loaders/s3Loader.js", () => ({ s3_client: { send: s3Send }, S3_DOCUMENTS_BUCKET: "documents-bucket" }));
 vi.mock("../../../loaders/bedrockAgentLoader.js", () => ({
   bedrock_agent_client: { send: bedrockSend },
   BEDROCK_KNOWLEDGE_BASE_ID: "KB123",
@@ -10,56 +10,79 @@ vi.mock("../../../loaders/bedrockAgentLoader.js", () => ({
   BEDROCK_KNOWLEDGE_BASE_BUCKET: "kb-bucket",
 }));
 
-const { knowledgeBaseDocumentWrite, knowledgeBaseDocumentSyncStart } = await import("../../../services/knowledgeBase/knowledgeBaseDocumentMethods.js");
+const { knowledgeBaseDocumentIngestDecision, knowledgeBaseDocumentRemove, knowledgeBaseDocumentSyncStart } = await import("../../../services/knowledgeBase/knowledgeBaseDocumentMethods.js");
+const { knowledgeBaseDocumentCheckId } = await import("../../../services/knowledgeBase/knowledgeBaseDocumentChecks.js");
 
-const DOCUMENT = {
-  documentId: "doc-1",
-  clientId: "household-1",
-  fileName: "w2.pdf",
-  formType: "W-2",
-  tags: ["Tax", "Earnings"],
-  taxYear: 2025,
-  pages: [
-    { page: 1, text: "page one", fields: [{ fieldId: "f-1", key: "Wages", value: "100", confidence: 97.5 }] },
-    { page: 2, text: "page two", fields: [] },
-  ],
-};
+const RAW = `{"answers":{"docType":{"type":"choice","choice":"w2","probabilities":{"w2":0.89},"confidence":0.73,"evidence":[{"id":"document","text":"W-2 2025. Wages: 110,000.00."}]},"tag_earnings":{"answer":true,"status":"confirmed","binary":{"confidence":0.98},"evidence":[{"id":"document","text":"W-2 2025. Wages: 110,000.00."}]}}}`;
+const DOCUMENT_ID = knowledgeBaseDocumentCheckId("HH006", "taylor_w2_2025.pdf");
 
-function putInputs() {
-  return s3Send.mock.calls.map(([command]) => command.input);
+function sent(name: string) {
+  return s3Send.mock.calls.map(([command]) => command).filter((command) => command.constructor.name === name).map((command) => command.input);
 }
 
 beforeEach(() => {
   vi.clearAllMocks();
-  s3Send.mockResolvedValue({});
+  s3Send.mockImplementation(async (command) => (command.constructor.name === "ListObjectsV2Command" ? { Contents: [] } : {}));
 });
 
-describe("knowledgeBaseDocumentWrite", () => {
-  it("writes one body and one metadata sidecar per page", async () => {
-    await expect(knowledgeBaseDocumentWrite(DOCUMENT)).resolves.toEqual(["documents/doc-1/page-1.json", "documents/doc-1/page-2.json"]);
+describe("knowledgeBaseDocumentIngestDecision", () => {
+  it("stores the original bytes untouched outside the knowledge base bucket", async () => {
+    const raw = Buffer.from(RAW);
 
-    expect(putInputs().map((input) => input.Key)).toEqual([
-      "documents/doc-1/page-1.json",
-      "documents/doc-1/page-1.json.metadata.json",
-      "documents/doc-1/page-2.json",
-      "documents/doc-1/page-2.json.metadata.json",
-    ]);
-    expect(putInputs().every((input) => input.Bucket === "kb-bucket")).toBe(true);
+    await knowledgeBaseDocumentIngestDecision("HH006", "taylor_w2_2025.pdf", raw);
+
+    const original = sent("PutObjectCommand").find((input) => input.Bucket === "documents-bucket");
+    expect(original).toMatchObject({ Key: "decisions/HH006/taylor_w2_2025.pdf.json" });
+    expect(original!.Body).toBe(raw);
   });
 
-  it("keeps confidence, document id and page on every field in the indexed body", async () => {
-    await knowledgeBaseDocumentWrite(DOCUMENT);
+  it("indexes each section with filter metadata and none of the raw scores", async () => {
+    await knowledgeBaseDocumentIngestDecision("HH006", "taylor_w2_2025.pdf", Buffer.from(RAW));
 
-    const body = JSON.parse(putInputs()[0].Body);
-    expect(body.fields).toEqual([{ fieldId: "f-1", key: "Wages", value: "100", confidence: 97.5, documentId: "doc-1", page: 1 }]);
-  });
-
-  it("puts the page's filter attributes in its sidecar and leaves out ones the document lacks", async () => {
-    await knowledgeBaseDocumentWrite(DOCUMENT);
-
-    expect(JSON.parse(putInputs()[3].Body)).toEqual({
-      metadataAttributes: { documentId: "doc-1", page: 2, clientId: "household-1", tags: ["Tax", "Earnings"], taxYear: 2025 },
+    const indexed = sent("PutObjectCommand").filter((input) => input.Bucket === "kb-bucket");
+    expect(indexed.map((input) => input.Key)).toEqual([`documents/${DOCUMENT_ID}/document.json`, `documents/${DOCUMENT_ID}/document.json.metadata.json`]);
+    expect(JSON.parse(indexed[1]!.Body)).toEqual({
+      metadataAttributes: {
+        documentId: DOCUMENT_ID,
+        clientId: "HH006",
+        fileName: "taylor_w2_2025.pdf",
+        sectionId: "document",
+        tags: ["tag_earnings"],
+        familyMembers: [],
+        docType: "w2",
+        taxYear: 2025,
+      },
     });
+    expect(indexed.map((input) => input.Body).join("")).not.toMatch(/probabilities|confidence|0\.89|0\.73|0\.98/);
+  });
+
+  it("deletes indexed objects the new decision no longer has", async () => {
+    s3Send.mockImplementation(async (command) => (command.constructor.name === "ListObjectsV2Command"
+      ? { Contents: [{ Key: `documents/${DOCUMENT_ID}/document.json` }, { Key: `documents/${DOCUMENT_ID}/section-009.json` }, { Key: `documents/${DOCUMENT_ID}/section-009.json.metadata.json` }] }
+      : {}));
+
+    const result = await knowledgeBaseDocumentIngestDecision("HH006", "taylor_w2_2025.pdf", Buffer.from(RAW));
+
+    expect(result.removedKeys).toEqual([`documents/${DOCUMENT_ID}/section-009.json`, `documents/${DOCUMENT_ID}/section-009.json.metadata.json`]);
+    expect(sent("DeleteObjectsCommand")).toEqual([{ Bucket: "kb-bucket", Delete: { Objects: result.removedKeys.map((Key) => ({ Key })), Quiet: true } }]);
+  });
+
+  it("writes nothing when the decision is invalid", async () => {
+    await expect(knowledgeBaseDocumentIngestDecision("HH006", "x.pdf", Buffer.from("{}"))).rejects.toMatchObject({ _statusCode: 422 });
+    expect(s3Send).not.toHaveBeenCalled();
+  });
+});
+
+describe("knowledgeBaseDocumentRemove", () => {
+  it("removes the document's indexed objects and its stored original", async () => {
+    s3Send.mockImplementation(async (command) => (command.constructor.name === "ListObjectsV2Command" ? { Contents: [{ Key: `documents/${DOCUMENT_ID}/document.json` }] } : {}));
+
+    await knowledgeBaseDocumentRemove("HH006", "taylor_w2_2025.pdf");
+
+    expect(sent("DeleteObjectsCommand")).toEqual(expect.arrayContaining([
+      { Bucket: "kb-bucket", Delete: { Objects: [{ Key: `documents/${DOCUMENT_ID}/document.json` }], Quiet: true } },
+      { Bucket: "documents-bucket", Delete: { Objects: [{ Key: "decisions/HH006/taylor_w2_2025.pdf.json" }], Quiet: true } },
+    ]));
   });
 });
 
@@ -68,9 +91,6 @@ describe("knowledgeBaseDocumentSyncStart", () => {
     bedrockSend.mockResolvedValue({ ingestionJob: { ingestionJobId: "job-1" } });
 
     await expect(knowledgeBaseDocumentSyncStart(42)).resolves.toBe("job-1");
-
-    const input = bedrockSend.mock.calls[0]![0].input;
-    expect(input).toEqual({ knowledgeBaseId: "KB123", dataSourceId: "DS123", clientToken: "knowledge-base-sync-window-0000000042" });
-    expect(input.clientToken.length).toBeGreaterThanOrEqual(33);
+    expect(bedrockSend.mock.calls[0]![0].input).toEqual({ knowledgeBaseId: "KB123", dataSourceId: "DS123", clientToken: "knowledge-base-sync-window-0000000042" });
   });
 });

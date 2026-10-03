@@ -15,7 +15,8 @@
     "db:migrate": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts migrate",
     "db:studio": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts studio",
     "kb:seed": "dotenv -e .env.development -- tsx scripts/knowledgeBaseSeed.ts",
-    "kb:unseed": "dotenv -e .env.development -- tsx scripts/knowledgeBaseSeed.ts --remove"
+    "kb:unseed": "dotenv -e .env.development -- tsx scripts/knowledgeBaseSeed.ts --remove",
+    "kb:ingest": "dotenv -e .env.development -- tsx scripts/knowledgeBaseIngest.ts"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-agent": "3.1146.0",

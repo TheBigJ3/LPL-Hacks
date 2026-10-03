@@ -1,8 +1,9 @@
 export type AnswerCitation = {
   documentId: string;
-  page: number;
+  sectionId: string;
+  page: number | null;
   fileName: string | null;
-  fieldId: string | null;
+  quote: string;
   verified: boolean;
 };
 

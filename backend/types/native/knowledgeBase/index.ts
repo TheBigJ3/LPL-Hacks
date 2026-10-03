@@ -1,23 +1,16 @@
-export type KnowledgeBaseField = {
-  fieldId: string;
-  key: string;
-  value: string;
-  confidence: number;
-};
-
-export type KnowledgeBasePage = {
-  page: number;
+export type KnowledgeBaseSection = {
+  sectionId: string;
+  page: number | null;
   text: string;
-  fields: KnowledgeBaseField[];
 };
 
 export type KnowledgeBaseDocument = {
   documentId: string;
   clientId: string;
   fileName: string;
-  formType?: string;
+  docType: string | null;
   tags: string[];
-  taxYear?: number;
-  familyMember?: string;
-  pages: KnowledgeBasePage[];
+  familyMembers: string[];
+  taxYear: number | null;
+  sections: KnowledgeBaseSection[];
 };

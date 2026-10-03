@@ -24,7 +24,6 @@ import {
   type AnswerSource,
 } from "./answerChecks.js";
 
-const { _TAGS: DOCUMENT_TAGS } = requireSettings("DOCUMENTS");
 const { MAX_SOURCES } = requireSettings("ANSWER");
 
 export type AnswerResult = {
@@ -36,15 +35,14 @@ export type AnswerResult = {
 const FILTER_TOOL: Tool = {
   toolSpec: {
     name: "set_filters",
-    description: "Record which document filters the question implies.",
+    description: "Record which tax year the question is about, if any.",
     inputSchema: {
       json: {
         type: "object",
         properties: {
           taxYear: { type: ["integer", "null"], description: "The tax or calendar year the question is about, only if it names or clearly implies one." },
-          tags: { type: "array", items: { type: "string", enum: DOCUMENT_TAGS }, description: "Document categories the answer must come from. Leave empty unless the question clearly limits itself to them." },
         },
-        required: ["taxYear", "tags"],
+        required: ["taxYear"],
       },
     },
   },
@@ -66,9 +64,8 @@ const ANSWER_TOOL: Tool = {
               properties: {
                 text: { type: "string", description: "One sentence of the answer. No source ids or brackets in the text." },
                 sourceIds: { type: "array", items: { type: "string" }, description: "Ids of the sources that support this sentence, e.g. S1." },
-                fieldIds: { type: "array", items: { type: "string" }, description: "fieldId of every extracted field whose value this sentence states." },
               },
-              required: ["text", "sourceIds", "fieldIds"],
+              required: ["text", "sourceIds"],
             },
           },
         },
@@ -79,15 +76,15 @@ const ANSWER_TOOL: Tool = {
 };
 
 const FILTER_SYSTEM_PROMPT = [
-  "You turn a financial advisor's question about one client into document filters.",
-  "Only set a filter when the question makes it clear; when unsure, leave it out so no relevant document is excluded.",
+  "You read a financial advisor's question about one client and record the tax year it is about.",
+  "Only set taxYear when the question names or clearly implies one; otherwise use null so no relevant document is excluded.",
 ].join(" ");
 
 const ANSWER_SYSTEM_PROMPT = [
-  "You answer a financial advisor's question about one client using only the numbered sources provided, which are pages extracted from that client's documents.",
+  "You answer a financial advisor's question about one client using only the numbered sources provided, which are quoted excerpts from that client's documents.",
   "Never use outside knowledge. Only state values that appear in the sources; if the question needs a total or difference, compute it only from source values and cite every one of them.",
-  "Every sentence must list the sourceIds it relies on, and the fieldId of every extracted field whose value it states.",
-  "Each field's confidence is the extraction confidence; mention it when it is below 90.",
+  "Every sentence must list the sourceIds it relies on.",
+  "A source's members and tags come from automated classification; trust the quoted text over them when they disagree.",
   "If the sources do not answer the question, set answerable to false and say briefly what is missing, without stating any numbers.",
   "Be brief: one to four sentences.",
 ].join(" ");
@@ -117,9 +114,9 @@ async function answerConverseTool(modelId: string, system: string, messages: Mes
 }
 
 function answerSourcesPrompt(question: string, sources: AnswerSource[]): string {
-  const blocks = sources.map(({ sourceId, chunk, fileName }) => [
-    `<source id="${sourceId}" file="${fileName ?? "unknown"}" page="${chunk.citation.page}" taxYear="${chunk.taxYear ?? "unknown"}" familyMember="${chunk.familyMember ?? "unknown"}">`,
-    chunk.text,
+  const blocks = sources.map(({ sourceId, chunk, quote }) => [
+    `<source id="${sourceId}" file="${chunk.fileName ?? "unknown"}" docType="${chunk.docType ?? "unknown"}" taxYear="${chunk.taxYear ?? "unknown"}" members="${chunk.familyMembers.join(" ") || "unknown"}">`,
+    quote,
     "</source>",
   ].join("\n"));
 
@@ -128,7 +125,7 @@ function answerSourcesPrompt(question: string, sources: AnswerSource[]): string 
 
 export async function answerAsk(question: string, clientId: string): Promise<AnswerResult> {
   const filterInput = await answerConverseTool(BEDROCK_FILTER_MODEL_ID, FILTER_SYSTEM_PROMPT, [{ role: "user", content: [{ text: question }] }], FILTER_TOOL);
-  const filters = answerCheckFilters(clientId, filterInput, DOCUMENT_TAGS);
+  const filters = answerCheckFilters(clientId, filterInput);
 
   let chunks = await retrievalChunkSearch(question, filters, MAX_SOURCES);
 
@@ -149,6 +146,5 @@ export async function answerAsk(question: string, clientId: string): Promise<Ans
     throw new ServerError(undefined, "[answer] submit_answer input did not match its schema");
   }
 
-  // Nothing is advisor-verified until a verification store exists, so every citation reads unverified.
-  return { ...answerCheckStatements(toolInput, sources, new Map()), filters };
+  return { ...answerCheckStatements(toolInput, sources), filters };
 }

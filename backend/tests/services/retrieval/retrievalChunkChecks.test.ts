@@ -6,43 +6,40 @@ describe("retrievalChunkBuildFilter", () => {
     expect(retrievalChunkBuildFilter({ clientId: "h-1" })).toEqual({ equals: { key: "clientId", value: "h-1" } });
   });
 
-  it("ands every given attribute and ors multiple tags", () => {
-    expect(retrievalChunkBuildFilter({ clientId: "h-1", taxYear: 2025, familyMember: "Spouse", tags: ["Tax", "Earnings"] })).toEqual({
+  it("ands every given attribute and ors multiple values of a list attribute", () => {
+    expect(retrievalChunkBuildFilter({ clientId: "h-1", taxYear: 2025, docType: "w2", tags: ["tag_tax"], familyMembers: ["member_a", "member_b"] })).toEqual({
       andAll: [
         { equals: { key: "clientId", value: "h-1" } },
         { equals: { key: "taxYear", value: 2025 } },
-        { equals: { key: "familyMember", value: "Spouse" } },
-        { orAll: [{ listContains: { key: "tags", value: "Tax" } }, { listContains: { key: "tags", value: "Earnings" } }] },
+        { equals: { key: "docType", value: "w2" } },
+        { listContains: { key: "tags", value: "tag_tax" } },
+        { orAll: [{ listContains: { key: "familyMembers", value: "member_a" } }, { listContains: { key: "familyMembers", value: "member_b" } }] },
       ],
-    });
-  });
-
-  it("does not wrap a single tag in orAll", () => {
-    expect(retrievalChunkBuildFilter({ clientId: "h-1", tags: ["Tax"] })).toEqual({
-      andAll: [{ equals: { key: "clientId", value: "h-1" } }, { listContains: { key: "tags", value: "Tax" } }],
     });
   });
 });
 
 describe("retrievalChunkFromResult", () => {
-  const METADATA = { documentId: "doc-1", page: 2, clientId: "h-1", tags: ["Tax", 7], taxYear: 2025 };
+  const METADATA = { documentId: "doc-1", sectionId: "document", clientId: "h-1", fileName: "w2.pdf", docType: "w2", tags: ["tag_tax", 7], familyMembers: ["member_a"], taxYear: 2025 };
 
-  it("maps a citable result", () => {
+  it("maps a citable result, with no page when none was stored", () => {
     expect(retrievalChunkFromResult({ content: { text: "body" }, score: 0.4, metadata: METADATA })).toEqual({
       text: "body",
       score: 0.4,
-      citation: { documentId: "doc-1", page: 2 },
+      citation: { documentId: "doc-1", sectionId: "document", page: null },
       clientId: "h-1",
-      tags: ["Tax"],
+      fileName: "w2.pdf",
+      docType: "w2",
+      tags: ["tag_tax"],
+      familyMembers: ["member_a"],
       taxYear: 2025,
-      familyMember: null,
     });
   });
 
   it.each([
     ["documentId", { ...METADATA, documentId: undefined }],
-    ["page", { ...METADATA, page: "2" }],
-    ["clientId", { ...METADATA, clientId: "" }],
+    ["sectionId", { ...METADATA, sectionId: "" }],
+    ["clientId", { ...METADATA, clientId: 3 }],
   ])("drops a result missing %s", (_field, metadata) => {
     expect(retrievalChunkFromResult({ content: { text: "body" }, metadata })).toBeNull();
   });

@@ -16,7 +16,7 @@ describe("retrievalChunkSearch", () => {
   it("sends the filter inside the managed search call and drops uncitable chunks", async () => {
     send.mockResolvedValue({
       retrievalResults: [
-        { content: { text: "cited" }, score: 0.5, metadata: { documentId: "doc-1", page: 1, clientId: "h-1" } },
+        { content: { text: "cited" }, score: 0.5, metadata: { documentId: "doc-1", sectionId: "document", clientId: "h-1" } },
         { content: { text: "uncited" }, score: 0.9, metadata: { clientId: "h-1" } },
       ],
     });
