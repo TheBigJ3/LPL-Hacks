@@ -19,6 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LOG = ROOT / "docs" / "CHECKPOINTS.md"
 METRICS = ROOT / "logs" / "smoke_metrics.json"
+PERF_METRICS = ROOT / "logs" / "perf_metrics.json"
 HEADER = (
     "# Checkpoints\n\n"
     "Appended by `scripts/checkpoint.py`. One row per checkpoint run; never edited by hand.\n\n"
@@ -40,8 +41,9 @@ def main() -> int:
     parser.add_argument("phase")
     parser.add_argument("pytest_args", nargs="*")
     parser.add_argument("--notes", default="")
-    parser.add_argument("--metrics", action="store_true", help="append logs/smoke_metrics.json to notes")
-    args = parser.parse_args()
+    parser.add_argument("--metrics", action="store_true", help="append logs/*_metrics.json to notes")
+    args, passthrough = parser.parse_known_args()
+    args.pytest_args = [*args.pytest_args, *passthrough]  # e.g. -m "not model" goes to pytest
 
     command = [sys.executable, "-m", "pytest", "-q", *args.pytest_args]
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
@@ -50,9 +52,11 @@ def main() -> int:
     counts = summary_counts(result.stdout)
 
     notes = args.notes
-    if args.metrics and METRICS.exists():
-        metrics = json.loads(METRICS.read_text())
-        notes = (notes + " " if notes else "") + ", ".join(f"{k}={v}" for k, v in metrics.items())
+    if args.metrics:
+        for path in (METRICS, PERF_METRICS):
+            if path.exists():
+                metrics = json.loads(path.read_text())
+                notes = (notes + " " if notes else "") + ", ".join(f"{k}={v}" for k, v in metrics.items())
     failed = counts["failed"] + counts["error"]
     if counts["xpassed"]:
         notes += " STOP: strict xfail XPASSed."

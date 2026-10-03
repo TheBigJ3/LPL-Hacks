@@ -11,7 +11,12 @@ _ENGINE_STATE = ("_engine", "_load_attempted", "_load_error", "_load_seconds", "
 
 @pytest.fixture
 def isolated_engine(monkeypatch):
-    """Blank engine state for this test; the real loaded engine is restored afterwards."""
+    """Blank engine state for this test; the real loaded engine is restored afterwards.
+
+    Clears DECISION_BACKEND so tests that inject a fake engine run the same under `-m "not model"`
+    with DECISION_BACKEND=none set for the whole run.
+    """
+    monkeypatch.delenv("DECISION_BACKEND", raising=False)
     for name in _ENGINE_STATE:
         monkeypatch.setattr(engine_module, name, getattr(engine_module, name))
     monkeypatch.setattr(engine_module, "_engine", None)
