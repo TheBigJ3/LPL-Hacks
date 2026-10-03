@@ -17,16 +17,20 @@ const DocumentSection = ({ section, mode, columns, wide }: DocumentSectionProps)
 
   return <motion.section className="document-section flex flex-col" aria-label={section.title} variants={DOCUMENT_SECTION_VARIANTS}>
     <header className="flex flex-col gap-3">
-      <div className="flex items-start justify-between gap-4">
-        <h2 className="document-section__title">{section.title}</h2>
-        <div className="flex flex-none items-center gap-4">
-          {view.seeAllHref &&
-            <Link to={view.seeAllHref} className="document-section__see-all flex items-center gap-1 rounded-md">
-              See all
-              <span className="material-symbols-outlined document-section__see-all-icon" aria-hidden="true">arrow_forward</span>
-            </Link>}
-          <span className="document-section__count">{section.total}</span>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <h2 className="document-section__title">{section.title}</h2>
+          {view.showCount &&
+            <span className="document-section__count flex h-6 flex-none items-center rounded-full px-2">
+              {section.total}
+              <span className="sr-only"> {view.countLabel}</span>
+            </span>}
         </div>
+        {view.seeAllHref &&
+          <Link to={view.seeAllHref} className="document-section__see-all flex flex-none items-center gap-1 rounded-md">
+            See all
+            <span className="material-symbols-outlined document-section__see-all-icon" aria-hidden="true">arrow_forward</span>
+          </Link>}
       </div>
       <div className="document-section__divider" />
     </header>

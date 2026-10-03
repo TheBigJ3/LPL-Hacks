@@ -139,6 +139,11 @@ const documentMatchesQuery = (record: DocumentRecord, needle: string) => {
   return record.name.toLowerCase().includes(needle) || !!tag?.label.toLowerCase().includes(needle)
 }
 
+const documentFormatCount = (count: number) => `${count} ${count === 1 ? 'document' : 'documents'}`
+
+const documentFormatSummary = (shown: number, total: number) =>
+  shown === total ? documentFormatCount(total) : `${shown} of ${documentFormatCount(total)}`
+
 const documentToCard = (record: DocumentRecord, memberSearch: string): DocumentCardView => ({
   id: record.id,
   name: record.name,
@@ -203,6 +208,8 @@ export function useDocumentLibrary() {
       })
       .filter((section) => section.total > 0)
 
+  const shownCount = mode === 'list' ? listRecords.length : searched.length
+
   return {
     clientSelected: !!clientId,
     measureRef,
@@ -213,6 +220,7 @@ export function useDocumentLibrary() {
     viewKey,
     tagOptions,
     sections,
+    summary: shownCount ? documentFormatSummary(shownCount, scoped.length) : null,
     empty: query
       ? { title: `No documents match “${query}”`, subtitle: 'Try a different search or tag' }
       : { title: 'No documents yet', subtitle: 'Upload one to get started' },

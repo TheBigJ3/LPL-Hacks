@@ -20,6 +20,17 @@
   margin-top: 24px;
 }
 
+.document-library__view {
+  gap: 20px;
+}
+
+.document-library__summary {
+  color: var(--color-dark-gray);
+  font-size: 14px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
 .document-library__sections {
   gap: var(--document-library-sections-gap);
 }

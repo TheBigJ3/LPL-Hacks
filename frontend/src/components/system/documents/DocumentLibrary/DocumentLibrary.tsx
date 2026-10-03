@@ -21,16 +21,19 @@ const DocumentLibrary = () => {
       <AnimatePresence mode="wait">
         <motion.div
           key={library.viewKey}
-          className="document-library__sections flex flex-col"
+          className="document-library__view flex flex-col"
           variants={DOCUMENT_LIBRARY_VIEW_VARIANTS}
           initial="enter"
           animate="center"
           exit="exit"
         >
+          {library.summary && <p className="document-library__summary" aria-live="polite">{library.summary}</p>}
           {library.sections.length
-            ? library.sections.map((section) =>
-              <DocumentSection key={section.key} section={section} mode={library.mode} columns={library.columns} wide={library.wide} />
-            )
+            ? <div className="document-library__sections flex flex-col">
+              {library.sections.map((section) =>
+                <DocumentSection key={section.key} section={section} mode={library.mode} columns={library.columns} wide={library.wide} />
+              )}
+            </div>
             : <DocumentEmptyState title={library.empty.title} subtitle={library.empty.subtitle} />}
         </motion.div>
       </AnimatePresence>

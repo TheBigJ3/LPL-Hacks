@@ -10,9 +10,11 @@
 }
 
 .document-section__count {
+  border: 1px solid var(--color-border);
   color: var(--color-dark-gray);
-  font-size: 20px;
-  line-height: normal;
+  font-size: 13px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .document-section__see-all {

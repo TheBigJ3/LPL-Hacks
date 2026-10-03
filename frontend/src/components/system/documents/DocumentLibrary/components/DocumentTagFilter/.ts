@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import type { Transition, Variants } from 'motion/react'
+import type { DocumentTagOption } from '../../.ts'
 
 export const DOCUMENT_TAG_FILTER_TRANSITION: Transition = { duration: 0.18, ease: [0.16, 1, 0.3, 1] }
 
@@ -8,7 +9,7 @@ export const DOCUMENT_TAG_FILTER_MENU_VARIANTS: Variants = {
   open: { opacity: 1, y: 0, scale: 1, transition: DOCUMENT_TAG_FILTER_TRANSITION },
 }
 
-export function useDocumentTagFilter() {
+export function useDocumentTagFilter(options: DocumentTagOption[]) {
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -29,8 +30,13 @@ export function useDocumentTagFilter() {
     buttonRef.current?.focus()
   }
 
+  const all = options.find((option) => option.key === 'all')
+  const selected = options.find((option) => option.selected && option.key !== 'all') ?? null
+
   return {
     open,
+    selected,
+    clearHref: all?.href ?? '?',
     rootRef,
     buttonRef,
     toggle: () => setOpen((value) => !value),

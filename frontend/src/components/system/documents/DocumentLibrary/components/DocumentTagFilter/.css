@@ -1,3 +1,7 @@
+.document-tag-filter[data-active="true"] {
+  background: var(--color-surface-hover);
+}
+
 .document-tag-filter__button {
   max-width: 160px;
   color: var(--color-dark-gray);
@@ -15,6 +19,29 @@
 
 .document-tag-filter__button[data-active="true"] {
   color: var(--color-main-black);
+}
+
+.document-tag-filter[data-active="true"] .document-tag-filter__button {
+  padding-right: 2px;
+}
+
+.document-tag-filter__clear {
+  color: var(--color-dark-gray);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.document-tag-filter__clear:hover {
+  color: var(--color-main-black);
+}
+
+.document-tag-filter[data-active="true"] .document-tag-filter__button:hover,
+.document-tag-filter[data-active="true"] .document-tag-filter__button[aria-expanded="true"],
+.document-tag-filter__clear:hover {
+  background: var(--color-border);
+}
+
+.document-tag-filter__clear-icon {
+  font-size: 16px;
 }
 
 .document-tag-filter__icon {
@@ -62,11 +89,12 @@
 }
 
 .document-tag-filter__button:focus-visible,
+.document-tag-filter__clear:focus-visible,
 .document-tag-filter__option:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: -2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .document-tag-filter__button, .document-tag-filter__option { transition: none; }
+  .document-tag-filter__button, .document-tag-filter__clear, .document-tag-filter__option { transition: none; }
 }
