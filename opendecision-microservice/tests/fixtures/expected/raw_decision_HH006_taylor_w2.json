@@ -3,19 +3,19 @@
     "type": "choice",
     "choice": "w2",
     "probabilities": {
-      "w2": 0.6817067265510559,
-      "1099_int": 0.012720483355224133,
-      "1099_r": 0.17334006167948246,
-      "1099_div": 0.004132211091928184,
-      "1099_nec": 0.032696180045604706,
-      "1040": 0.011055113980546594,
-      "1098": 0.002743263030424714,
-      "5498_sa": 0.014791377354413271,
-      "1095": 0.0047845367807894945,
-      "account_statement": 0.015946093248203397,
-      "unknown": 0.04608391597867012
+      "w2": 0.7944625616073608,
+      "1099_int": 0.0022999451030045748,
+      "1099_r": 0.024759125895798206,
+      "1099_div": 0.0030672510620206594,
+      "1099_nec": 0.017458645161241293,
+      "1040": 0.008081268751993775,
+      "1098": 0.002229183097369969,
+      "5498_sa": 0.004932240932248533,
+      "1095": 0.004402105580084026,
+      "account_statement": 0.011162342736497521,
+      "unknown": 0.12714539840817451
     },
-    "confidence": 0.5343025326674815,
+    "confidence": 0.6697930578290954,
     "evidence": [
       {
         "id": "document",
@@ -25,40 +25,6 @@
     ]
   },
   "tags": {
-    "tag_tax": {
-      "type": "document_noul",
-      "mode": "both",
-      "answer": true,
-      "status": "tentative",
-      "binary": {
-        "answer": true,
-        "probabilities": {
-          "true": 0.8028648495674133,
-          "false": 0.19713515043258667
-        },
-        "confidence": 0.8028648495674133
-      },
-      "three_way": {
-        "answer": null,
-        "relation": "unknown",
-        "scores": {
-          "supports": 0.3144714832305908,
-          "contradicts": 0.02615562081336975
-        }
-      },
-      "compiler": "generic_yes_no",
-      "compiled": {
-        "proposition": "The answer to the question \"This document is tax-related.\" is yes.",
-        "contradiction": "The answer to the question \"This document is tax-related.\" is no."
-      },
-      "evidence": [
-        {
-          "id": "document",
-          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
-          "relevance": 1.0
-        }
-      ]
-    },
     "tag_income": {
       "type": "document_noul",
       "mode": "both",
@@ -67,29 +33,877 @@
       "binary": {
         "answer": true,
         "probabilities": {
-          "true": 0.9826908707618713,
-          "false": 0.017309129238128662
+          "true": 0.9925393462181091,
+          "false": 0.007460653781890869
         },
-        "confidence": 0.9826908707618713
+        "confidence": 0.9925393462181091
       },
       "three_way": {
         "answer": true,
         "relation": "supports",
         "scores": {
-          "supports": 0.9738444089889526,
-          "contradicts": 0.011777843348681927
+          "supports": 0.9755768775939941,
+          "contradicts": 0.002217013156041503
         }
       },
-      "compiler": "generic_yes_no",
+      "compiler": "explicit_criteria",
       "compiled": {
-        "proposition": "The answer to the question \"This document reports employment earnings or wages.\" is yes.",
-        "contradiction": "The answer to the question \"This document reports employment earnings or wages.\" is no."
+        "proposition": "This document reports employment earnings or wages.",
+        "contradiction": "This document does not report employment earnings or wages."
       },
       "evidence": [
         {
           "id": "document",
           "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
           "relevance": 1.0
+        }
+      ],
+      "basis": "confirmed",
+      "checks": [
+        {
+          "statement": "This document reports employment earnings or wages.",
+          "status": "confirmed",
+          "answer": true
+        },
+        {
+          "statement": "This document shows wages paid to an employee.",
+          "status": "confirmed",
+          "answer": true
+        },
+        {
+          "statement": "This document shows interest income.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows dividend income.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows interest earned.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows benefits paid to a person.",
+          "status": "tentative",
+          "answer": true
+        }
+      ]
+    },
+    "tag_retirement": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": true,
+      "status": "confirmed",
+      "binary": {
+        "answer": true,
+        "probabilities": {
+          "true": 0.9843363761901855,
+          "false": 0.015663623809814453
+        },
+        "confidence": 0.9843363761901855
+      },
+      "three_way": {
+        "answer": true,
+        "relation": "supports",
+        "scores": {
+          "supports": 0.961243748664856,
+          "contradicts": 0.005060332361608744
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows a 401(k) contribution.",
+        "contradiction": "This document does not show a 401(k) contribution."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": "confirmed",
+      "checks": [
+        {
+          "statement": "This document shows a 401(k) contribution.",
+          "status": "confirmed",
+          "answer": true
+        },
+        {
+          "statement": "This document shows a distribution from a retirement plan.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions an IRA.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows that the employee is covered by a retirement plan.",
+          "status": "confirmed",
+          "answer": true
+        }
+      ]
+    },
+    "tag_tax": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": true,
+      "status": "confirmed",
+      "binary": {
+        "answer": true,
+        "probabilities": {
+          "true": 0.9975656270980835,
+          "false": 0.002434372901916504
+        },
+        "confidence": 0.9975656270980835
+      },
+      "three_way": {
+        "answer": true,
+        "relation": "supports",
+        "scores": {
+          "supports": 0.9939963817596436,
+          "contradicts": 0.0009547316003590822
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows federal income tax withheld.",
+        "contradiction": "This document does not show federal income tax withheld."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": "confirmed",
+      "checks": [
+        {
+          "statement": "This document shows federal income tax withheld.",
+          "status": "confirmed",
+          "answer": true
+        },
+        {
+          "statement": "This document shows state income tax withheld.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document is a tax return.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows amounts for tax reporting.",
+          "status": "tentative",
+          "answer": true
+        }
+      ]
+    },
+    "tag_self_employment": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": true,
+      "status": "confirmed",
+      "binary": {
+        "answer": true,
+        "probabilities": {
+          "true": 0.8688268065452576,
+          "false": 0.13117319345474243
+        },
+        "confidence": 0.8688268065452576
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 0.28140559792518616,
+          "contradicts": 0.007460643537342548
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows payment to an independent contractor.",
+        "contradiction": "This document does not show payment to an independent contractor."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": "probability",
+      "checks": [
+        {
+          "statement": "This document shows self-employment income.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document shows payment to an independent contractor.",
+          "status": "tentative",
+          "answer": true
+        },
+        {
+          "statement": "This document shows freelance income.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows business income from Schedule C.",
+          "status": "confirmed",
+          "answer": false
+        }
+      ]
+    },
+    "tag_health_savings": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "tentative",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.0838903859257698,
+          "false": 0.9161096140742302
+        },
+        "confidence": 0.9161096140742302
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 0.0007793661206960678,
+          "contradicts": 0.15102779865264893
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document mentions a health savings account (HSA).",
+        "contradiction": "This document does not mention a health savings account (HSA)."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document mentions a health savings account (HSA).",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document shows contributions to a health savings account.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document shows an HSA-eligible health plan.",
+          "status": "tentative",
+          "answer": false
+        }
+      ]
+    },
+    "tag_banking_cash": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "confirmed",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.003429603762924671,
+          "false": 0.9965703962370753
+        },
+        "confidence": 0.9965703962370753
+      },
+      "three_way": {
+        "answer": false,
+        "relation": "contradicts",
+        "scores": {
+          "supports": 5.829126894241199e-05,
+          "contradicts": 0.9416541457176208
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows a bank account balance.",
+        "contradiction": "This document does not show a bank account balance."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document shows a bank account balance.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows a cash balance.",
+          "status": "confirmed",
+          "answer": false
+        }
+      ]
+    },
+    "tag_investments": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "confirmed",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.02522682398557663,
+          "false": 0.9747731760144234
+        },
+        "confidence": 0.9747731760144234
+      },
+      "three_way": {
+        "answer": false,
+        "relation": "contradicts",
+        "scores": {
+          "supports": 0.0005442132824100554,
+          "contradicts": 0.671901285648346
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows dividends.",
+        "contradiction": "This document does not show dividends."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document shows dividends.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows capital gains.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows the market value of securities.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document is a brokerage account statement.",
+          "status": "confirmed",
+          "answer": false
+        }
+      ]
+    },
+    "tag_mortgage_housing": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "tentative",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.029201291501522064,
+          "false": 0.9707987084984779
+        },
+        "confidence": 0.9707987084984779
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 0.00016603847325313836,
+          "contradicts": 0.3090237081050873
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows mortgage interest.",
+        "contradiction": "This document does not show mortgage interest."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document shows mortgage interest.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document shows a home loan.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document shows property taxes.",
+          "status": "tentative",
+          "answer": false
+        }
+      ]
+    },
+    "tag_insurance": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "tentative",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.034100428223609924,
+          "false": 0.9658995717763901
+        },
+        "confidence": 0.9658995717763901
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 0.00023413581948261708,
+          "contradicts": 0.3132096230983734
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows health insurance coverage.",
+        "contradiction": "This document does not show health insurance coverage."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document shows health insurance coverage.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions life insurance.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions disability insurance.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document shows insurance premiums.",
+          "status": "tentative",
+          "answer": false
+        }
+      ]
+    },
+    "tag_estate": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "confirmed",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.042562730610370636,
+          "false": 0.9574372693896294
+        },
+        "confidence": 0.9574372693896294
+      },
+      "three_way": {
+        "answer": false,
+        "relation": "contradicts",
+        "scores": {
+          "supports": 0.002323162741959095,
+          "contradicts": 0.6374822854995728
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document mentions a will.",
+        "contradiction": "This document does not mention a will."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document mentions a will.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions a living trust.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions estate planning.",
+          "status": "confirmed",
+          "answer": false
+        }
+      ]
+    },
+    "tag_education": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "tentative",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.054853200912475586,
+          "false": 0.9451467990875244
+        },
+        "confidence": 0.9451467990875244
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 0.0008559006964787841,
+          "contradicts": 0.3789186477661133
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document mentions a 529 college savings plan.",
+        "contradiction": "This document does not mention a 529 college savings plan."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document mentions a 529 college savings plan.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document shows tuition paid.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions education costs.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions a student loan for college.",
+          "status": "tentative",
+          "answer": false
+        }
+      ]
+    },
+    "tag_life_event": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "tentative",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.06198946014046669,
+          "false": 0.9380105398595333
+        },
+        "confidence": 0.9380105398595333
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 0.002115703420713544,
+          "contradicts": 0.3752484619617462
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document mentions a birth.",
+        "contradiction": "This document does not mention a birth."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document mentions a new child.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions a birth.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions a marriage or divorce.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions buying a new home.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions a new job.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions a new dependent.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions a change in the family.",
+          "status": "tentative",
+          "answer": false
+        }
+      ]
+    },
+    "tag_equity_compensation": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "tentative",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.4073334336280823,
+          "false": 0.5926665663719177
+        },
+        "confidence": 0.5926665663719177
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 0.02595735527575016,
+          "contradicts": 0.07004895806312561
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document mentions an employee stock purchase plan.",
+        "contradiction": "This document does not mention an employee stock purchase plan."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document mentions restricted stock units.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions employee stock options.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions an employee stock purchase plan.",
+          "status": "tentative",
+          "answer": false
+        }
+      ]
+    },
+    "tag_debt": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "tentative",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.028007522225379944,
+          "false": 0.9719924777746201
+        },
+        "confidence": 0.9719924777746201
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 7.722192094661295e-05,
+          "contradicts": 0.16398026049137115
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows a student loan.",
+        "contradiction": "This document does not show a student loan."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document shows a credit card balance.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows a student loan.",
+          "status": "tentative",
+          "answer": false
+        },
+        {
+          "statement": "This document shows a loan balance.",
+          "status": "confirmed",
+          "answer": false
+        }
+      ]
+    },
+    "tag_charitable_giving": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "confirmed",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.005179712548851967,
+          "false": 0.994820287451148
+        },
+        "confidence": 0.994820287451148
+      },
+      "three_way": {
+        "answer": false,
+        "relation": "contradicts",
+        "scores": {
+          "supports": 2.355261858610902e-05,
+          "contradicts": 0.8164063692092896
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows a charitable donation.",
+        "contradiction": "This document does not show a charitable donation."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document shows a charitable donation.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document mentions a donor-advised fund.",
+          "status": "confirmed",
+          "answer": false
+        }
+      ]
+    },
+    "tag_social_security": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "tentative",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.021125193685293198,
+          "false": 0.9788748063147068
+        },
+        "confidence": 0.9788748063147068
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 7.722192094661295e-05,
+          "contradicts": 0.36026397347450256
+        }
+      },
+      "compiler": "explicit_criteria",
+      "compiled": {
+        "proposition": "This document shows Medicare premiums.",
+        "contradiction": "This document does not show Medicare premiums."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ],
+      "basis": null,
+      "checks": [
+        {
+          "statement": "This document shows Social Security benefits.",
+          "status": "confirmed",
+          "answer": false
+        },
+        {
+          "statement": "This document shows Medicare premiums.",
+          "status": "tentative",
+          "answer": false
         }
       ]
     }

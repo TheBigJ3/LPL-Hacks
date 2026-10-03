@@ -1,4 +1,92 @@
 {
-  "tax": "This document is tax-related.",
-  "income": "This document reports employment earnings or wages."
+  "income": [
+    {"true": "This document reports employment earnings or wages.", "false": "This document does not report employment earnings or wages."},
+    {"true": "This document shows wages paid to an employee.", "false": "This document does not show wages paid to an employee."},
+    {"true": "This document shows interest income.", "false": "This document does not show interest income."},
+    {"true": "This document shows dividend income.", "false": "This document does not show dividend income."},
+    {"true": "This document shows interest earned.", "false": "This document does not show interest earned."},
+    {"true": "This document shows benefits paid to a person.", "false": "This document does not show benefits paid to a person."}
+  ],
+  "retirement": [
+    {"true": "This document shows a 401(k) contribution.", "false": "This document does not show a 401(k) contribution."},
+    {"true": "This document shows a distribution from a retirement plan.", "false": "This document does not show a distribution from a retirement plan."},
+    {"true": "This document mentions an IRA.", "false": "This document does not mention an IRA."},
+    {"true": "This document shows that the employee is covered by a retirement plan.", "false": "This document does not show that the employee is covered by a retirement plan."}
+  ],
+  "tax": [
+    {"true": "This document shows federal income tax withheld.", "false": "This document does not show federal income tax withheld."},
+    {"true": "This document shows state income tax withheld.", "false": "This document does not show state income tax withheld."},
+    {"true": "This document is a tax return.", "false": "This document is not a tax return."},
+    {"true": "This document shows amounts for tax reporting.", "false": "This document does not show amounts for tax reporting."}
+  ],
+  "self_employment": [
+    {"true": "This document shows self-employment income.", "false": "This document does not show self-employment income."},
+    {"true": "This document shows payment to an independent contractor.", "false": "This document does not show payment to an independent contractor."},
+    {"true": "This document shows freelance income.", "false": "This document does not show freelance income."},
+    {"true": "This document shows business income from Schedule C.", "false": "This document does not show business income from Schedule C."}
+  ],
+  "health_savings": [
+    {"true": "This document mentions a health savings account (HSA).", "false": "This document does not mention a health savings account (HSA)."},
+    {"true": "This document shows contributions to a health savings account.", "false": "This document does not show contributions to a health savings account."},
+    {"true": "This document shows an HSA-eligible health plan.", "false": "This document does not show an HSA-eligible health plan."}
+  ],
+  "banking_cash": [
+    {"true": "This document shows a bank account balance.", "false": "This document does not show a bank account balance."},
+    {"true": "This document shows a cash balance.", "false": "This document does not show a cash balance."}
+  ],
+  "investments": [
+    {"true": "This document shows dividends.", "false": "This document does not show dividends."},
+    {"true": "This document shows capital gains.", "false": "This document does not show capital gains."},
+    {"true": "This document shows the market value of securities.", "false": "This document does not show the market value of securities."},
+    {"true": "This document is a brokerage account statement.", "false": "This document is not a brokerage account statement."}
+  ],
+  "mortgage_housing": [
+    {"true": "This document shows mortgage interest.", "false": "This document does not show mortgage interest."},
+    {"true": "This document shows a home loan.", "false": "This document does not show a home loan."},
+    {"true": "This document shows property taxes.", "false": "This document does not show property taxes."}
+  ],
+  "insurance": [
+    {"true": "This document shows health insurance coverage.", "false": "This document does not show health insurance coverage."},
+    {"true": "This document mentions life insurance.", "false": "This document does not mention life insurance."},
+    {"true": "This document mentions disability insurance.", "false": "This document does not mention disability insurance."},
+    {"true": "This document shows insurance premiums.", "false": "This document does not show insurance premiums."}
+  ],
+  "estate": [
+    {"true": "This document mentions a will.", "false": "This document does not mention a will."},
+    {"true": "This document mentions a living trust.", "false": "This document does not mention a living trust."},
+    {"true": "This document mentions estate planning.", "false": "This document does not mention estate planning."}
+  ],
+  "education": [
+    {"true": "This document mentions a 529 college savings plan.", "false": "This document does not mention a 529 college savings plan."},
+    {"true": "This document shows tuition paid.", "false": "This document does not show tuition paid."},
+    {"true": "This document mentions education costs.", "false": "This document does not mention education costs."},
+    {"true": "This document mentions a student loan for college.", "false": "This document does not mention a student loan for college."}
+  ],
+  "life_event": [
+    {"true": "This document mentions a new child.", "false": "This document does not mention a new child."},
+    {"true": "This document mentions a birth.", "false": "This document does not mention a birth."},
+    {"true": "This document mentions a marriage or divorce.", "false": "This document does not mention a marriage or divorce."},
+    {"true": "This document mentions buying a new home.", "false": "This document does not mention buying a new home."},
+    {"true": "This document mentions a new job.", "false": "This document does not mention a new job."},
+    {"true": "This document mentions a new dependent.", "false": "This document does not mention a new dependent."},
+    {"true": "This document mentions a change in the family.", "false": "This document does not mention a change in the family."}
+  ],
+  "equity_compensation": [
+    {"true": "This document mentions restricted stock units.", "false": "This document does not mention restricted stock units."},
+    {"true": "This document mentions employee stock options.", "false": "This document does not mention employee stock options."},
+    {"true": "This document mentions an employee stock purchase plan.", "false": "This document does not mention an employee stock purchase plan."}
+  ],
+  "debt": [
+    {"true": "This document shows a credit card balance.", "false": "This document does not show a credit card balance."},
+    {"true": "This document shows a student loan.", "false": "This document does not show a student loan."},
+    {"true": "This document shows a loan balance.", "false": "This document does not show a loan balance."}
+  ],
+  "charitable_giving": [
+    {"true": "This document shows a charitable donation.", "false": "This document does not show a charitable donation."},
+    {"true": "This document mentions a donor-advised fund.", "false": "This document does not mention a donor-advised fund."}
+  ],
+  "social_security": [
+    {"true": "This document shows Social Security benefits.", "false": "This document does not show Social Security benefits."},
+    {"true": "This document shows Medicare premiums.", "false": "This document does not show Medicare premiums."}
+  ]
 }

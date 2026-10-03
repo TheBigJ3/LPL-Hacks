@@ -550,10 +550,15 @@ const EXTRACTION_TOPIC_LABELS: Record<string, string> = {
   health_savings: 'Health savings',
   banking_cash: 'Cash and banking',
   investments: 'Investments',
-  mortgage_housing: 'Mortgage and housing',
+  mortgage_housing: 'Home and mortgage',
   insurance: 'Insurance',
   estate: 'Estate',
   education: 'Education',
+  life_event: 'Life event',
+  equity_compensation: 'Equity compensation',
+  debt: 'Debt',
+  charitable_giving: 'Charitable giving',
+  social_security: 'Social Security and Medicare',
 }
 
 function extractionFormatTagName(name: string): string {

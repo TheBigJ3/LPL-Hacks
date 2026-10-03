@@ -11,6 +11,7 @@ from rapid_analysis.contract import Enums, FindingEvidence, Overview, OverviewRe
 from tests.support.fixtures import FIXTURE_IDS, fixture_household_documents, fixture_household_raw, fixture_overview_request, fixture_textract
 from rapid_analysis.documents import decision_request, document_decision
 from rapid_analysis.overview import overview_build
+from rapid_analysis.taxonomy import document_tags
 
 FORBIDDEN = ["score", "probabilit", "entail", "backend", "modernbert", "moritzlaurer", "opendecision", "logit"]
 
@@ -363,7 +364,7 @@ def test_raw_decision_groups_answers_by_kind(isolated_engine):
 
     def fake_decide(text, members):
         questions = decision_request(text, members)["questions"]
-        return {"chunks": 1, "answers": {key: {"type": q["type"], "instructions": q["instructions"]} for key, q in questions.items()}}
+        return {"chunks": 1, "answers": {key: {"type": q["type"], "instructions": q.get("instructions")} for key, q in questions.items()}}
 
     isolated_engine.setattr(api_module, "document_decision", lambda n, t, m: document_decision(n, t, m, decide=fake_decide))
     members = [{"first_name": "Taylor", "middle_name": "Ann", "last_name": "Mock", "suffix": "Jr."}, SAM]
@@ -374,7 +375,8 @@ def test_raw_decision_groups_answers_by_kind(isolated_engine):
     out = response.json()
     assert list(out) == ["docType", "tags", "members"]
     assert out["docType"]["type"] == "choice"
-    assert list(out["tags"]) == ["tag_tax", "tag_income"]
+    assert list(out["tags"]) == [f"tag_{name}" for name in document_tags()]
+    assert out["tags"]["tag_income"]["type"] == "noul_any"
     assert list(out["members"]) == ["member_taylor_ann_mock_jr", "member_sam_mock"]
     assert out["members"]["member_taylor_ann_mock_jr"]["instructions"] == "This document concerns Taylor Ann Mock Jr."
 
@@ -383,7 +385,7 @@ def test_raw_decision_groups_answers_by_kind(isolated_engine):
 def test_raw_decision_shape_and_consistency(client, loaded_engine):
     body = client.post("/v1/documents/decision", json=taylor_w2_request()).json()
     assert list(body) == ["docType", "tags", "members"]
-    assert list(body["tags"]) == ["tag_tax", "tag_income"]
+    assert list(body["tags"]) == [f"tag_{name}" for name in document_tags()]
     assert list(body["members"]) == ["member_taylor_mock", "member_sam_mock"]
     assert set(body["docType"]) >= RAW_TEAMMATE_SHAPE["choice"] and body["docType"]["type"] == "choice"
     assert body["docType"]["choice"] == "w2"
@@ -395,9 +397,9 @@ def test_raw_decision_shape_and_consistency(client, loaded_engine):
     # the raw answers are the ones the strict decision used
     overview = overview_of(client, "HH006")["overview"]
     doc = next(d for d in overview["tags"]["documents"] if d["name"] == "taylor_w2_2025.pdf")
-    confirmed = {"tag_tax": "tax", "tag_income": "income"}
-    assert doc["model_tags"] == [t for k, t in confirmed.items()
-                                 if body["tags"][k]["status"] == "confirmed" and body["tags"][k]["answer"] is True]
+    assert doc["model_tags"] == [name for name in document_tags()
+                                 if body["tags"][f"tag_{name}"]["status"] == "confirmed" and body["tags"][f"tag_{name}"]["answer"] is True]
+    assert all(len(body["tags"][f"tag_{name}"]["checks"]) == len(checks) for name, checks in document_tags().items())
     # raw scores stay out of the advisor-facing overview
     assert "probabilit" not in json.dumps(overview).lower()
 

@@ -320,6 +320,7 @@
           "tax"
         ],
         "model_tags": [
+          "retirement",
           "tax"
         ],
         "members": [
@@ -333,7 +334,18 @@
         "attribution_status": "assigned",
         "status": "accepted",
         "review_reasons": [],
-        "notes": []
+        "notes": [
+          "tag_uncertain:income",
+          "tag_uncertain:self_employment",
+          "tag_uncertain:health_savings",
+          "tag_uncertain:mortgage_housing",
+          "tag_uncertain:insurance",
+          "tag_uncertain:estate",
+          "tag_uncertain:education",
+          "tag_uncertain:life_event",
+          "tag_uncertain:equity_compensation",
+          "tag_uncertain:debt"
+        ]
       }
     ]
   }

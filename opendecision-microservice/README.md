@@ -39,27 +39,44 @@ specific types (`1099_int`) before general ones (`account_statement`). (The `//`
 ```jsonc
 "k1": {
   "label": "Schedule K-1",                                  // shown in evidence text and the UI
-  "description": "IRS Schedule K-1 partner's share of income", // what the model chooses between
+  "description": "a Schedule K-1, showing a partner's share of income", // what the model chooses between
   "form_number": "K-1",                                     // optional: the printed form number (hyphen optional)
   "patterns": ["Schedule K-1"],                             // phrases that decide the type, whole words, any case
   "topics": ["income", "tax"]                               // topic ids from config/tags.json
 }
 ```
 
+The model picks a type by checking which `description` the document's text best supports, so write it as the
+document names itself: the printed title plus what it shows ("a Form 1098 Mortgage Interest Statement from a
+lender"). Short abstract descriptions lose: with "IRS Form 1098 mortgage interest statement" the model called a 1098
+an account statement. `unknown` needs a description too ("a letter, note or summary that is not a tax form…").
+
 `patterns` decide; the model's pick is only a suggestion. A type with no matching phrase is never detected, and
 such documents come back `unknown` (`needs_review`). Reading individual values off a new form (wages, amounts)
 still needs a mapping in `rapid_analysis/textract.py`; without one the document is classified and tagged but
 contributes no numbers.
 
-**Tag**: `config/document_tags.json`, tag name → the yes/no statement the model checks for every document.
-It comes back as `tag_<name>` from `/v1/documents/decision` and in an overview document's `model_tags` when the
-model is confident.
+**Tag**: `config/document_tags.json`, topic id (from `config/tags.json`) → the checks the model runs on every
+document. Each check is a statement and its opposite; the tag applies when **any** check says yes (OpenDecision
+confirms it, or it is tentative with binary probability ≥ 0.80). It comes back as `tag_<name>` from
+`/v1/documents/decision` and in an overview document's `model_tags`. Tags share the topic vocabulary on purpose: a
+search filtered on `insurance` finds a 1095 through its doc type's topics and a planning note through the model.
 
 ```json
-"investments": "This document reports investment income."
+"investments": [
+  {"true": "This document shows dividends.", "false": "This document does not show dividends."},
+  {"true": "This document shows capital gains.", "false": "This document does not show capital gains."}
+]
 ```
 
-Each tag adds one model question per document, so keep the list to tags someone uses.
+The statement is the only thing the model sees about the tag, so how it is worded decides what it finds:
+
+- One fact per check, worded the way documents print it ("shows mortgage interest"). For several kinds, add
+  several checks: "such as wages, interest or dividends" in one statement gets a confident *no* on a 1099-DIV.
+- Ask what the page shows, not what the model must know: "is an IRS tax form" gets a confident *no* on every W-2.
+- Watch for words inside other words: "mentions a trust" matched "TRUSTEE" on a 5498-SA.
+- Test a new check against documents that should and should not get the tag before shipping it. A check costs
+  about four model passes per document.
 
 ## Setup
 

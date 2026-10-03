@@ -143,13 +143,14 @@ def test_a_new_doc_type_and_tag_are_one_entry_each(config_files):
         "k1": {"label": "Schedule K-1", "description": "IRS Schedule K-1 partner's share of income", "form_number": "K-1",
                "patterns": ["Schedule K-1"], "topics": ["income", "tax"]},
         "unknown": UNKNOWN,
-    }, document_tags={"investments": "This document reports investment income."})
+    }, document_tags={"investments": [{"true": "This document shows dividends.", "false": "This document does not show dividends."}]})
     assert doc_type_detect("2025 Schedule K-1 (Form 1065)") == ("k1", None)
     assert textract_parse_blocks(TextractFactory().field("Form", "K1").build()).form_type == "k1"
     questions = decision_request("x", [])["questions"]
     assert questions["docType"]["criteria"] == {"k1": "IRS Schedule K-1 partner's share of income",
                                                 "unknown": "None of the listed document types"}
-    assert questions["tag_investments"] == {"type": "noul", "instructions": "This document reports investment income."}
+    assert questions["tag_investments"] == {"type": "noul_any", "checks": [
+        {"true": "This document shows dividends.", "false": "This document does not show dividends."}]}
 
 
 @pytest.mark.parametrize("doc_types,document_tags,message", [
@@ -158,8 +159,12 @@ def test_a_new_doc_type_and_tag_are_one_entry_each(config_files):
     ({"w2": {"label": "W-2"}, "unknown": UNKNOWN}, None, "description must be non-empty"),
     ({"w2": {"label": "W-2", "description": "x", "topics": ["nope"]}, "unknown": UNKNOWN}, None, "topic ids"),
     ({"w2": {"label": "W-2", "description": "x", "pattern": ["W-2"]}, "unknown": UNKNOWN}, None, "unknown keys"),
-    (None, {"tax": ""}, "non-empty text"),
-    (None, {"Tax!": "This document is tax-related."}, "names are lowercase"),
+    (None, {"tax": []}, "non-empty list of checks"),
+    (None, {"tax": "This document is tax-related."}, "non-empty list of checks"),
+    (None, {"tax": [{"true": "This document is a tax return."}]}, "its opposite"),
+    (None, {"tax": [{"true": "This document is a tax return.", "false": ""}]}, "non-empty text"),
+    (None, {"Tax!": [{"true": "a", "false": "b"}]}, "names are lowercase"),
+    (None, {"bonus": [{"true": "a", "false": "b"}]}, "topic ids"),
     (None, "{not json", "not valid JSON"),
 ])
 def test_bad_config_is_rejected_with_a_clear_message(config_files, doc_types, document_tags, message):
