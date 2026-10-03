@@ -1,7 +1,5 @@
 import './.css'
-import { motion } from 'motion/react'
-import { SIDEBAR_SWAP_TRANSITION } from '../../.ts'
-import { SIDEBAR_THEME_HIGHLIGHT_ID, useSidebarThemeSwitcher } from './.ts'
+import { useSidebarThemeSwitcher } from './.ts'
 
 const SidebarThemeSwitcher = ({ open }: { open: boolean }) => {
   const theme = useSidebarThemeSwitcher()
@@ -19,12 +17,7 @@ const SidebarThemeSwitcher = ({ open }: { open: boolean }) => {
             data-selected={option.selected}
             onClick={() => theme.select(option.value)}
           >
-            {option.selected &&
-              <motion.span
-                layoutId={SIDEBAR_THEME_HIGHLIGHT_ID}
-                className="sidebar-theme-switcher__highlight absolute inset-0 rounded-md"
-                transition={SIDEBAR_SWAP_TRANSITION}
-              />}
+            {option.selected && <span className="sidebar-theme-switcher__highlight absolute inset-0 rounded-md" />}
             <span className="material-symbols-outlined sidebar-theme-switcher__icon relative" aria-hidden="true">{option.icon}</span>
             <span className="relative">{option.label}</span>
           </button>
