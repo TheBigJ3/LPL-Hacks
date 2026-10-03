@@ -1,0 +1,21 @@
+# Backbone is a private advisor tool holding client documents. Every page sends
+# noindex, so search crawlers stay allowed here only to read that directive.
+User-agent: *
+Allow: /
+
+# AI training and answer crawlers don't all honor noindex, so they are blocked outright.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: Meta-ExternalAgent
+Disallow: /
