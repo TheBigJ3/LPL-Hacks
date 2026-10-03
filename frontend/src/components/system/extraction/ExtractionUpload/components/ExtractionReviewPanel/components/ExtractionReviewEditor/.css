@@ -1,54 +1,80 @@
 .extraction-review-editor {
   --extraction-review-editor-tone: var(--color-border);
-  --extraction-review-editor-tint: transparent;
-  border: 1px solid var(--color-border);
-  border-top: 3px solid var(--extraction-review-editor-tone);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-100);
 }
 
 .extraction-review-editor[data-status="review"] {
   --extraction-review-editor-tone: var(--color-review);
-  --extraction-review-editor-tint: color-mix(in srgb, var(--color-review-soft) 65%, var(--color-surface));
+}
+
+.extraction-review-editor[data-status="confirmed"] {
+  --extraction-review-editor-tone: var(--color-success);
 }
 
 .extraction-review-editor[data-status="edited"] {
   --extraction-review-editor-tone: var(--color-accent-blue);
-  --extraction-review-editor-tint: color-mix(in srgb, var(--color-accent-blue-light) 18%, var(--color-surface));
 }
 
-.extraction-review-editor[data-status="confirmed"] {
-  --extraction-review-editor-tone: var(--color-accent-blue);
-}
-
-.extraction-review-editor__header {
+.extraction-review-editor__stepper {
   border-bottom: 1px solid var(--color-border);
-  background: var(--extraction-review-editor-tint);
 }
 
-.extraction-review-editor__context {
-  color: var(--color-dark-gray);
-  font-size: 12px;
+.extraction-review-editor__position {
+  color: var(--color-text-default);
+  font-size: 13px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+.extraction-review-editor__arrow {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-default);
+  font-size: 20px;
+  transition: background-color 150ms ease;
+}
+
+.extraction-review-editor__arrow:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+
+.extraction-review-editor__arrow:disabled {
+  color: var(--color-main-gray);
+}
+
+.extraction-review-editor__segment {
+  height: 6px;
+  background: var(--color-border);
+  transition: background-color 150ms ease, box-shadow 150ms ease;
+}
+
+.extraction-review-editor__segment[data-status="review"] {
+  background: color-mix(in srgb, var(--color-review) 55%, var(--color-border));
+}
+
+.extraction-review-editor__segment[data-status="confirmed"] {
+  background: var(--color-success);
+}
+
+.extraction-review-editor__segment[data-status="edited"] {
+  background: var(--color-accent-blue);
+}
+
+.extraction-review-editor__segment[data-selected="true"] {
+  box-shadow: 0 0 0 2px var(--color-surface), 0 0 0 3.5px var(--color-text-default);
 }
 
 .extraction-review-editor__label {
   color: var(--color-text-default);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.35;
 }
 
-.extraction-review-editor__guidance {
-  color: var(--color-text-default);
-  font-size: 13px;
-  line-height: 1.45;
-}
-
 .extraction-review-editor__badge {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--extraction-review-editor-tone);
   background: var(--color-surface);
-  color: var(--color-dark-gray);
+  color: var(--color-text-default);
   font-size: 12px;
   font-weight: 700;
 }
@@ -58,29 +84,38 @@
 }
 
 .extraction-review-editor__badge[data-status="review"] {
-  border-color: var(--color-review);
   background: var(--color-review-soft);
   color: var(--color-review-text);
 }
 
-.extraction-review-editor__badge[data-status="edited"],
 .extraction-review-editor__badge[data-status="confirmed"] {
-  border-color: var(--color-accent-blue);
+  color: var(--color-success);
+}
+
+.extraction-review-editor__badge[data-status="edited"] {
   color: var(--color-heading);
 }
 
 .extraction-review-editor__step {
+  color: var(--color-text-default);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.extraction-review-editor__number {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
   color: var(--color-dark-gray);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 
 .extraction-review-editor__page {
+  color: var(--color-dark-gray);
+  font-size: 12px;
   font-weight: 400;
-  letter-spacing: normal;
-  text-transform: none;
 }
 
 .extraction-review-editor__crop {
@@ -90,7 +125,7 @@
 }
 
 .extraction-review-editor__marker {
-  outline: 2px solid var(--color-review);
+  outline: 2px solid var(--extraction-review-editor-tone);
   outline-offset: 2px;
   box-shadow: 0 0 0 9999px #09090B2E;
 }
@@ -117,22 +152,11 @@
   font-style: italic;
 }
 
-.extraction-review-editor__hint {
-  color: var(--color-dark-gray);
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-.extraction-review-editor__mono {
-  color: var(--color-text-default);
-  font-family: var(--font-mono);
-  overflow-wrap: anywhere;
-}
-
 .extraction-review-editor__confidence {
   border: 1px solid var(--color-border);
   color: var(--color-text-default);
   font-size: 12px;
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
   cursor: help;
 }
@@ -142,7 +166,11 @@
 }
 
 .extraction-review-editor__confidence[data-level="high"] .extraction-review-editor__dot {
-  background: var(--color-heading);
+  background: var(--color-success);
+}
+
+.extraction-review-editor__confidence[data-level="medium"] .extraction-review-editor__dot {
+  background: var(--color-review);
 }
 
 .extraction-review-editor__confidence[data-level="low"] {
@@ -152,7 +180,7 @@
 }
 
 .extraction-review-editor__confidence[data-level="low"] .extraction-review-editor__dot {
-  background: var(--color-review);
+  background: var(--color-error);
 }
 
 .extraction-review-editor__confidence[data-level="unknown"] {
@@ -160,25 +188,39 @@
 }
 
 .extraction-review-editor__issues {
-  border: 1px solid color-mix(in srgb, var(--color-review) 60%, transparent);
   background: var(--color-review-soft);
   color: var(--color-review-text);
   font-size: 13px;
   line-height: 1.45;
 }
 
-.extraction-review-editor__issues-title {
-  font-weight: 700;
+.extraction-review-editor__issues .material-symbols-outlined {
+  padding-top: 2px;
+  font-size: 15px;
 }
 
-.extraction-review-editor__issues-title .material-symbols-outlined {
-  font-size: 16px;
+.extraction-review-editor__guidance,
+.extraction-review-editor__hint {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.extraction-review-editor__mono {
+  color: var(--color-text-default);
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.extraction-review-editor__struck {
+  text-decoration: line-through;
 }
 
 .extraction-review-editor__input {
   border: 1px solid var(--color-border);
   background: var(--color-main-white);
   color: var(--color-main-black);
+  font-family: var(--font-mono);
   font-size: 14px;
   outline: none;
   transition: border-color 150ms ease, box-shadow 150ms ease;
@@ -186,11 +228,16 @@
 
 .extraction-review-editor__input::placeholder {
   color: var(--color-dark-gray);
+  font-family: var(--font-sans);
 }
 
 .extraction-review-editor__input:focus {
   border-color: var(--color-accent-blue);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-blue-light) 60%, transparent);
+}
+
+.extraction-review-editor__input[data-changed="true"] {
+  border-color: var(--color-accent-blue);
 }
 
 .extraction-review-editor__choice {
@@ -216,11 +263,12 @@
 
 .extraction-review-editor__footer {
   border-top: 1px solid var(--color-border);
-  background: var(--color-surface-hover);
+  background: var(--color-surface);
 }
 
 .extraction-review-editor__primary,
 .extraction-review-editor__secondary {
+  min-height: 40px;
   font-size: 14px;
   font-weight: 700;
   transition: background-color 150ms ease, opacity 150ms ease;
@@ -240,6 +288,15 @@
   opacity: 0.9;
 }
 
+.extraction-review-editor__kbd {
+  margin-left: 4px;
+  border: 1px solid #FFFFFF59;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 16px;
+  opacity: 0.8;
+}
+
 .extraction-review-editor__secondary {
   border: 1px solid var(--color-border);
   background: var(--color-surface);
@@ -250,6 +307,8 @@
   background: var(--color-surface-hover);
 }
 
+.extraction-review-editor__arrow:focus-visible,
+.extraction-review-editor__segment:focus-visible,
 .extraction-review-editor__primary:focus-visible,
 .extraction-review-editor__secondary:focus-visible,
 .extraction-review-editor__option:focus-visible {
@@ -258,6 +317,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .extraction-review-editor__arrow,
+  .extraction-review-editor__segment,
   .extraction-review-editor__input,
   .extraction-review-editor__option,
   .extraction-review-editor__primary,
