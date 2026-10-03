@@ -19,12 +19,8 @@
 }
 
 .empty-state__icon {
-  left: 117px;
-  top: 33px;
-  width: 48px;
-  height: 48px;
   color: var(--color-main-gray);
-  font-size: 48px;
+  font-size: 96px;
   line-height: 1;
 }
 
