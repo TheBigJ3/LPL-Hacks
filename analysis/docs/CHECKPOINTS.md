@@ -15,3 +15,4 @@ Appended by `scripts/checkpoint.py`. One row per checkpoint run; never edited by
 | 2026-10-02T19:50:58-07:00 | Phase 7 | `pytest -q tests` | 370 | 0 | 2 | 0 | 0 | full suite after conftest fix, model on (cuda) device=cuda, load_seconds=6.52, warm_latency_ms=50.4 warm_overview_hh001_ms=62.4, cached_get_hh001_ms=1.1, backend_none_10_fixtures_ms=2.9 |
 | 2026-10-02T19:51:18-07:00 | Phase 7 (no model) | `pytest -q tests -m not model` | 256 | 0 | 0 | 0 | 0 | DECISION_BACKEND=none for the whole run |
 | 2026-10-02T20:07:34-07:00 | Phase 8a | `pytest -q tests` | 373 | 0 | 2 | 0 | 0 | handoff: openapi.json drift test, enums-in-contract test; scripts/gate.py live server+seed+GET HH006 == sample: True |
+| 2026-10-02T20:12:16-07:00 | Port 8100 | `pytest -q tests` | 373 | 0 | 2 | 0 | 0 | service default port 8000 -> 8100; gate.py on 8100: HH006 equals sample |

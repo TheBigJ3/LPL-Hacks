@@ -33,9 +33,9 @@ a shared GPU host). Pip can silently replace CUDA torch with a CPU build when in
 ## Run
 
 ```powershell
-.venv\Scripts\python -m uvicorn rapid_analysis.api:app --host 127.0.0.1 --port 8000
+.venv\Scripts\python -m uvicorn rapid_analysis.api:app --host 127.0.0.1 --port 8100
 .venv\Scripts\python scripts\seed.py           # in a second shell: loads HH001-HH010 + their documents
-curl http://127.0.0.1:8000/api/households/HH006/overview
+curl http://127.0.0.1:8100/api/households/HH006/overview
 ```
 
 Or seed at startup: `$env:SEED_FIXTURES="1"` before `uvicorn`. Swagger UI is at `/docs`.
@@ -55,7 +55,7 @@ holds redacted evidence text (TINs, SSNs, account numbers and addresses are remo
 ## Frontend
 
 The `/analysis` page in `frontend/` (system `analysis`) renders the overview. Vite proxies `/api` and
-`/health` to `http://127.0.0.1:8000`, so start this service, seed it, then `npm run dev` from the repo root.
+`/health` to `http://127.0.0.1:8100`, so start this service, seed it, then `npm run dev` from the repo root.
 
 ## Test
 

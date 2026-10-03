@@ -1,6 +1,6 @@
 """Seed a running rapid analysis server with every synthetic fixture (households + Textract documents).
 
-  .venv/Scripts/python scripts/seed.py [--url http://127.0.0.1:8000]
+  .venv/Scripts/python scripts/seed.py [--url http://127.0.0.1:8100]
 
 Goes through the public ingest endpoints, so it exercises the same path the pipeline uses.
 """
@@ -40,7 +40,7 @@ def seed(url: str) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--url", default="http://127.0.0.1:8000")
+    parser.add_argument("--url", default="http://127.0.0.1:8100")
     args = parser.parse_args()
     failures = seed(args.url)
     print("seeded" if not failures else f"{failures} failures")

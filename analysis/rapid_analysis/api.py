@@ -1,6 +1,6 @@
 """FastAPI service for the rapid analysis page (§7).
 
-Run:  uvicorn rapid_analysis.api:app --host 127.0.0.1 --port 8000
+Run:  uvicorn rapid_analysis.api:app --host 127.0.0.1 --port 8100
 No authentication: bind to localhost or put it behind the platform's auth before exposing it.
 """
 

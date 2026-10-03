@@ -1,6 +1,6 @@
 """Final gate: start the server, seed it over HTTP, GET HH006's overview, compare with the committed sample.
 
-  .venv/Scripts/python scripts/gate.py [--port 8000]
+  .venv/Scripts/python scripts/gate.py [--port 8100]
 
 Owns the server process start to finish, so it never leaves one running.
 """
@@ -27,7 +27,7 @@ LOG = ROOT / "logs" / "gate_server.log"
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument("--port", type=int, default=8100)
     args = parser.parse_args()
     url = f"http://127.0.0.1:{args.port}"
     LOG.parent.mkdir(exist_ok=True)
