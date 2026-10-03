@@ -1,0 +1,2185 @@
+{
+  "components": {
+    "schemas": {
+      "CashValue": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "default": "not_checked",
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "months_of_income": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Months Of Income"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "CashValue",
+        "type": "object"
+      },
+      "Change": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "text"
+        ],
+        "title": "Change",
+        "type": "object"
+      },
+      "CheckedValue": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "default": "not_checked",
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "CheckedValue",
+        "type": "object"
+      },
+      "ChecklistItem": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "enum": [
+              "yes",
+              "no",
+              "needs_data",
+              "not_assessed"
+            ],
+            "title": "Answer",
+            "type": "string"
+          },
+          "dollar_impact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dollar Impact"
+          },
+          "finding_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "answer",
+          "reason",
+          "dollar_impact",
+          "finding_ids"
+        ],
+        "title": "ChecklistItem",
+        "type": "object"
+      },
+      "ChecklistQuestion": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question"
+        ],
+        "title": "ChecklistQuestion",
+        "type": "object"
+      },
+      "Conflict": {
+        "additionalProperties": false,
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/SourceCandidate"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          }
+        },
+        "required": [
+          "field",
+          "label",
+          "member",
+          "person_id",
+          "candidates"
+        ],
+        "title": "Conflict",
+        "type": "object"
+      },
+      "DataQuality": {
+        "additionalProperties": false,
+        "properties": {
+          "conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/Conflict"
+            },
+            "title": "Conflicts",
+            "type": "array"
+          },
+          "documents": {
+            "default": 0,
+            "title": "Documents",
+            "type": "integer"
+          },
+          "low_confidence_fields": {
+            "items": {
+              "$ref": "#/components/schemas/LowConfidenceField"
+            },
+            "title": "Low Confidence Fields",
+            "type": "array"
+          },
+          "missing_documents": {
+            "items": {
+              "$ref": "#/components/schemas/MissingDocument"
+            },
+            "title": "Missing Documents",
+            "type": "array"
+          },
+          "unchecked_values": {
+            "default": 0,
+            "title": "Unchecked Values",
+            "type": "integer"
+          }
+        },
+        "title": "DataQuality",
+        "type": "object"
+      },
+      "DocumentIngestResult": {
+        "additionalProperties": false,
+        "properties": {
+          "fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "form_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Form Type"
+          },
+          "household_id": {
+            "title": "Household Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "const": "accepted",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "household_id",
+          "name",
+          "form_type",
+          "fields",
+          "status"
+        ],
+        "title": "DocumentIngestResult",
+        "type": "object"
+      },
+      "Enums": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "items": {
+              "enum": [
+                "yes",
+                "no",
+                "needs_data",
+                "not_assessed"
+              ],
+              "type": "string"
+            },
+            "title": "Answer",
+            "type": "array"
+          },
+          "category": {
+            "items": {
+              "enum": [
+                "retirement",
+                "tax",
+                "hsa",
+                "cash_management",
+                "life_event",
+                "data_quality"
+              ],
+              "type": "string"
+            },
+            "title": "Category",
+            "type": "array"
+          },
+          "change_type": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Change Type",
+            "type": "array"
+          },
+          "check": {
+            "items": {
+              "enum": [
+                "verified",
+                "mismatch",
+                "unconfirmed",
+                "conflicted",
+                "not_checked"
+              ],
+              "type": "string"
+            },
+            "title": "Check",
+            "type": "array"
+          },
+          "check_descriptions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Check Descriptions",
+            "type": "object"
+          },
+          "checklist": {
+            "items": {
+              "$ref": "#/components/schemas/ChecklistQuestion"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "checklist_label": {
+            "title": "Checklist Label",
+            "type": "string"
+          },
+          "filing_status": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Filing Status",
+            "type": "array"
+          },
+          "priority": {
+            "items": {
+              "enum": [
+                "informational",
+                "low",
+                "medium",
+                "high"
+              ],
+              "type": "string"
+            },
+            "title": "Priority",
+            "type": "array"
+          },
+          "severity": {
+            "items": {
+              "enum": [
+                "error",
+                "warning"
+              ],
+              "type": "string"
+            },
+            "title": "Severity",
+            "type": "array"
+          },
+          "status": {
+            "items": {
+              "enum": [
+                "findings",
+                "no_findings",
+                "needs_review"
+              ],
+              "type": "string"
+            },
+            "title": "Status",
+            "type": "array"
+          }
+        },
+        "required": [
+          "check",
+          "check_descriptions",
+          "answer",
+          "priority",
+          "status",
+          "category",
+          "change_type",
+          "severity",
+          "filing_status",
+          "checklist",
+          "checklist_label"
+        ],
+        "title": "Enums",
+        "type": "object"
+      },
+      "ErrorItem": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "severity": {
+            "default": "error",
+            "enum": [
+              "error",
+              "warning"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "path",
+          "message"
+        ],
+        "title": "ErrorItem",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorItem"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "needs_review",
+              "not_found"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "errors"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "EvidenceDocumentCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "document": {
+            "title": "Document",
+            "type": "string"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "document",
+          "page",
+          "value",
+          "check"
+        ],
+        "title": "EvidenceDocumentCheck",
+        "type": "object"
+      },
+      "EvidenceValue": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceDocumentCheck"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "key",
+          "field",
+          "label",
+          "member",
+          "value",
+          "check",
+          "documents"
+        ],
+        "title": "EvidenceValue",
+        "type": "object"
+      },
+      "Finding": {
+        "additionalProperties": false,
+        "properties": {
+          "action_label": {
+            "title": "Action Label",
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "retirement",
+              "tax",
+              "hsa",
+              "cash_management",
+              "life_event",
+              "data_quality"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "dollar_impact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dollar Impact"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          },
+          "priority": {
+            "enum": [
+              "informational",
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Priority",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "category",
+          "priority",
+          "headline",
+          "explanation",
+          "dollar_impact",
+          "member",
+          "person_id",
+          "action_label",
+          "check"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
+      "FindingEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "household_id": {
+            "title": "Household Id",
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceValue"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "household_id",
+          "finding_id",
+          "headline",
+          "check",
+          "values"
+        ],
+        "title": "FindingEvidence",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Health": {
+        "additionalProperties": false,
+        "properties": {
+          "device": {
+            "title": "Device",
+            "type": "string"
+          },
+          "model_loaded": {
+            "title": "Model Loaded",
+            "type": "boolean"
+          },
+          "ruleset_version": {
+            "title": "Ruleset Version",
+            "type": "string"
+          },
+          "schema_version": {
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "const": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "model_loaded",
+          "device",
+          "ruleset_version",
+          "schema_version"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "HouseholdList": {
+        "additionalProperties": false,
+        "properties": {
+          "households": {
+            "items": {
+              "$ref": "#/components/schemas/HouseholdRow"
+            },
+            "title": "Households",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "households"
+        ],
+        "title": "HouseholdList",
+        "type": "object"
+      },
+      "HouseholdRow": {
+        "additionalProperties": false,
+        "properties": {
+          "dollar_impact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Dollar Impact"
+          },
+          "findings": {
+            "title": "Findings",
+            "type": "integer"
+          },
+          "household_id": {
+            "title": "Household Id",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "needs_documents": {
+            "title": "Needs Documents",
+            "type": "boolean"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "enum": [
+                  "informational",
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
+          "status": {
+            "enum": [
+              "findings",
+              "no_findings",
+              "needs_review"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tax_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Year"
+          },
+          "top_finding": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top Finding"
+          }
+        },
+        "required": [
+          "household_id",
+          "tax_year",
+          "members",
+          "status",
+          "priority",
+          "findings",
+          "needs_documents",
+          "top_finding",
+          "dollar_impact"
+        ],
+        "title": "HouseholdRow",
+        "type": "object"
+      },
+      "IngestResult": {
+        "additionalProperties": false,
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorItem"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "household_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Household Id"
+          },
+          "status": {
+            "enum": [
+              "accepted",
+              "needs_review"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "household_id",
+          "status",
+          "errors"
+        ],
+        "title": "IngestResult",
+        "type": "object"
+      },
+      "LowConfidenceField": {
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "textract_confidence": {
+            "title": "Textract Confidence",
+            "type": "number"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "field",
+          "label",
+          "member",
+          "person_id",
+          "value",
+          "textract_confidence",
+          "source_document",
+          "page"
+        ],
+        "title": "LowConfidenceField",
+        "type": "object"
+      },
+      "MemberCard": {
+        "additionalProperties": false,
+        "properties": {
+          "employer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employer"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "numbers": {
+            "items": {
+              "$ref": "#/components/schemas/MemberNumber"
+            },
+            "title": "Numbers",
+            "type": "array"
+          },
+          "person_id": {
+            "title": "Person Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "person_id",
+          "name",
+          "employer",
+          "numbers"
+        ],
+        "title": "MemberCard",
+        "type": "object"
+      },
+      "MemberNumber": {
+        "additionalProperties": false,
+        "properties": {
+          "candidates": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SourceCandidate"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidates"
+          },
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "field",
+          "label",
+          "value",
+          "check"
+        ],
+        "title": "MemberNumber",
+        "type": "object"
+      },
+      "MissingDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "member",
+          "person_id",
+          "description"
+        ],
+        "title": "MissingDocument",
+        "type": "object"
+      },
+      "Overview": {
+        "additionalProperties": false,
+        "properties": {
+          "changes_since_last_year": {
+            "items": {
+              "$ref": "#/components/schemas/Change"
+            },
+            "title": "Changes Since Last Year",
+            "type": "array"
+          },
+          "checklist": {
+            "items": {
+              "$ref": "#/components/schemas/ChecklistItem"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "checklist_label": {
+            "const": "Flags for review, not advice",
+            "default": "Flags for review, not advice",
+            "title": "Checklist Label",
+            "type": "string"
+          },
+          "data_quality": {
+            "$ref": "#/components/schemas/DataQuality"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorItem"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "household_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Household Id"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberCard"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "enum": [
+                  "informational",
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
+          "ruleset_version": {
+            "default": "2025.1",
+            "title": "Ruleset Version",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.0",
+            "default": "1.0",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "findings",
+              "no_findings",
+              "needs_review"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Summary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tax_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Year"
+          }
+        },
+        "required": [
+          "household_id",
+          "tax_year",
+          "status",
+          "priority",
+          "summary",
+          "members",
+          "checklist",
+          "changes_since_last_year",
+          "findings",
+          "data_quality",
+          "errors"
+        ],
+        "title": "Overview",
+        "type": "object"
+      },
+      "SourceCandidate": {
+        "additionalProperties": false,
+        "properties": {
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "source_document",
+          "page"
+        ],
+        "title": "SourceCandidate",
+        "type": "object"
+      },
+      "Stats": {
+        "additionalProperties": false,
+        "properties": {
+          "by_priority": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Priority",
+            "type": "object"
+          },
+          "by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Status",
+            "type": "object"
+          },
+          "checklist_yes": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Checklist Yes",
+            "type": "object"
+          },
+          "conflicts": {
+            "title": "Conflicts",
+            "type": "integer"
+          },
+          "dollar_impact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Dollar Impact"
+          },
+          "findings_by_category": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Findings By Category",
+            "type": "object"
+          },
+          "households": {
+            "title": "Households",
+            "type": "integer"
+          },
+          "needs_documents": {
+            "title": "Needs Documents",
+            "type": "integer"
+          },
+          "values_by_check": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Values By Check",
+            "type": "object"
+          },
+          "values_checked": {
+            "title": "Values Checked",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "households",
+          "by_status",
+          "by_priority",
+          "findings_by_category",
+          "checklist_yes",
+          "needs_documents",
+          "conflicts",
+          "values_checked",
+          "values_by_check",
+          "dollar_impact"
+        ],
+        "title": "Stats",
+        "type": "object"
+      },
+      "Summary": {
+        "additionalProperties": false,
+        "properties": {
+          "agi": {
+            "$ref": "#/components/schemas/CheckedValue"
+          },
+          "cash": {
+            "$ref": "#/components/schemas/CashValue"
+          },
+          "dependents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dependents"
+          },
+          "dependents_check": {
+            "default": "not_checked",
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Dependents Check",
+            "type": "string"
+          },
+          "filing_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filing Status"
+          },
+          "mortgage_interest": {
+            "$ref": "#/components/schemas/CheckedValue"
+          }
+        },
+        "required": [
+          "filing_status",
+          "dependents",
+          "agi",
+          "cash",
+          "mortgage_interest"
+        ],
+        "title": "Summary",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Quick-look overview of a household for advisors. Checklist answers are flags for review, not advice. Every displayed number carries a check: verified / mismatch / unconfirmed / conflicted / not_checked.",
+    "title": "Household Rapid Analysis",
+    "version": "1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/households": {
+      "get": {
+        "operationId": "households_list_api_households_get",
+        "parameters": [
+          {
+            "description": "Matches household id or member name",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Matches household id or member name",
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priority",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "informational",
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Priority"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "findings",
+                    "no_findings",
+                    "needs_review"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "needs_documents",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Needs Documents"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HouseholdList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Households List",
+        "tags": [
+          "households"
+        ]
+      },
+      "post": {
+        "operationId": "household_ingest_api_households_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Household Ingest",
+        "tags": [
+          "ingest"
+        ]
+      }
+    },
+    "/api/households/{household_id}/documents": {
+      "post": {
+        "description": "Body: {\"name\": \"...\", \"textract\": <AnalyzeDocument response>} or {\"name\": \"...\", \"text\": \"...\", \"form_type\": \"W-2\"}.",
+        "operationId": "document_ingest_api_households__household_id__documents_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "household_id",
+            "required": true,
+            "schema": {
+              "title": "Household Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentIngestResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Document Ingest",
+        "tags": [
+          "ingest"
+        ]
+      }
+    },
+    "/api/households/{household_id}/findings/{finding_id}/evidence": {
+      "get": {
+        "operationId": "finding_evidence_api_households__household_id__findings__finding_id__evidence_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "household_id",
+            "required": true,
+            "schema": {
+              "title": "Household Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindingEvidence"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Finding Evidence",
+        "tags": [
+          "households"
+        ]
+      }
+    },
+    "/api/households/{household_id}/members/{person_id}": {
+      "get": {
+        "operationId": "household_member_api_households__household_id__members__person_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "household_id",
+            "required": true,
+            "schema": {
+              "title": "Household Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "person_id",
+            "required": true,
+            "schema": {
+              "title": "Person Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberCard"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Household Member",
+        "tags": [
+          "households"
+        ]
+      }
+    },
+    "/api/households/{household_id}/overview": {
+      "get": {
+        "operationId": "household_overview_api_households__household_id__overview_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "household_id",
+            "required": true,
+            "schema": {
+              "title": "Household Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Overview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Household Overview",
+        "tags": [
+          "households"
+        ]
+      }
+    },
+    "/api/households/{household_id}/refresh": {
+      "post": {
+        "operationId": "household_refresh_api_households__household_id__refresh_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "household_id",
+            "required": true,
+            "schema": {
+              "title": "Household Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Overview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Household Refresh",
+        "tags": [
+          "households"
+        ]
+      }
+    },
+    "/api/meta/enums": {
+      "get": {
+        "operationId": "enums_api_meta_enums_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Enums"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Enums",
+        "tags": [
+          "meta"
+        ]
+      }
+    },
+    "/api/stats/overview": {
+      "get": {
+        "operationId": "stats_overview_api_stats_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stats"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Stats Overview",
+        "tags": [
+          "households"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "meta"
+        ]
+      }
+    }
+  }
+}
