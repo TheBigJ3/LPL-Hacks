@@ -1,0 +1,90 @@
+.document-section {
+  gap: 36px;
+}
+
+.document-section__title {
+  color: var(--color-heading);
+  font-family: var(--font-serif);
+  font-size: 20px;
+  line-height: normal;
+}
+
+.document-section__count {
+  border: 1px solid var(--color-border);
+  color: var(--color-dark-gray);
+  font-size: 13px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.document-section__see-all {
+  padding: 2px 4px;
+  color: var(--color-dark-gray);
+  font-size: 14px;
+  line-height: 24px;
+  transition: color 150ms ease;
+}
+
+.document-section__see-all:hover {
+  color: var(--color-main-black);
+}
+
+.document-section__see-all-icon {
+  font-size: 16px;
+  transition: transform 150ms ease;
+}
+
+.document-section__see-all:hover .document-section__see-all-icon {
+  transform: translateX(2px);
+}
+
+.document-section__divider {
+  height: 1px;
+  background: var(--color-border);
+}
+
+.document-section__grid {
+  --document-section-columns: 5;
+  --document-section-gap: 20px;
+  grid-template-columns: repeat(var(--document-section-columns), minmax(0, 1fr));
+  gap: var(--document-section-gap);
+}
+
+.document-section__grid[data-wide="true"] {
+  --document-section-gap: 36px;
+}
+
+.document-section__grid[data-columns="2"] { --document-section-columns: 2; }
+.document-section__grid[data-columns="3"] { --document-section-columns: 3; }
+.document-section__grid[data-columns="4"] { --document-section-columns: 4; }
+
+.document-section__shown {
+  color: var(--color-dark-gray);
+  font-size: 14px;
+}
+
+.document-section__load-more {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-main-black);
+  font-size: 16px;
+  transition: background-color 150ms ease;
+}
+
+.document-section__load-more:hover {
+  background: var(--color-surface-hover);
+}
+
+.document-section__load-more-icon {
+  font-size: 20px;
+}
+
+.document-section__see-all:focus-visible,
+.document-section__load-more:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .document-section__see-all, .document-section__see-all-icon, .document-section__load-more { transition: none; }
+}

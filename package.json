@@ -10,9 +10,9 @@
     "build:shared": "npm run build --workspace=shared",
     "dev": "npm run build:shared && concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=frontend\"",
     "build": "npm run build:shared && npm run build --workspace=backend && npm run build --workspace=frontend",
-    "redis:up": "docker compose up -d --wait redis",
-    "redis:down": "docker compose down",
-    "ngrok": "ngrok http 5173"
+    "ngrok": "ngrok http 5173",
+    "valkey:up": "docker compose up -d valkey",
+    "valkey:down": "docker compose down"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",

@@ -1,0 +1,31 @@
+.document-empty-state {
+  padding-block: 48px;
+}
+
+.document-empty-state__art {
+  width: 238.808px;
+  height: 204px;
+}
+
+.document-empty-state__trail {
+  left: 65.1px;
+  top: 72.6px;
+}
+
+.document-empty-state__butterfly {
+  left: 118.13px;
+  top: 34.63px;
+  transform: rotate(-40.25deg);
+}
+
+.document-empty-state__title {
+  color: var(--color-dark-gray);
+  font-size: 20px;
+  line-height: normal;
+}
+
+.document-empty-state__subtitle {
+  color: var(--color-main-gray);
+  font-size: 16px;
+  line-height: normal;
+}

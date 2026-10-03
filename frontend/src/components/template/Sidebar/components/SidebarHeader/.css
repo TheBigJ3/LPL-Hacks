@@ -1,0 +1,64 @@
+.sidebar-header {
+  --sidebar-header-padding-left: 24px;
+  /* The panel is navy in both themes, so the dark logo is always inverted. */
+  --sidebar-header-logo-filter: invert(1);
+  padding: 12px 12px 12px var(--sidebar-header-padding-left);
+}
+
+.sidebar-header[data-open="false"] {
+  --sidebar-header-padding-left: 12px;
+}
+
+.sidebar-header img {
+  filter: var(--sidebar-header-logo-filter);
+}
+
+.sidebar-header__logo {
+  display: block;
+  border-radius: var(--radius-sm);
+}
+
+.sidebar-header__button {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  place-items: center;
+  border-radius: var(--radius-md);
+  color: var(--color-dark-gray);
+  font-size: 20px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.sidebar-header__button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-main-black);
+}
+
+.sidebar-header__logo:focus-visible, .sidebar-header__button:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.sidebar-header__expand > * {
+  grid-area: 1 / 1;
+  transition: opacity 150ms ease;
+}
+
+.sidebar-header__expand-icon {
+  opacity: 0;
+}
+
+.sidebar-header__expand:hover .sidebar-header__mark,
+.sidebar-header__expand:focus-visible .sidebar-header__mark {
+  opacity: 0;
+}
+
+.sidebar-header__expand:hover .sidebar-header__expand-icon,
+.sidebar-header__expand:focus-visible .sidebar-header__expand-icon {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-header__button, .sidebar-header__expand > * { transition: none; }
+}

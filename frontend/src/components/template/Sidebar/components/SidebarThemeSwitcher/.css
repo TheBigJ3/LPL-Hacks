@@ -1,0 +1,50 @@
+.sidebar-theme-switcher__track {
+  border: 1px solid var(--color-border);
+  background: var(--color-main-white);
+}
+
+.sidebar-theme-switcher__option {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+  transition: color 150ms ease;
+}
+
+.sidebar-theme-switcher__option:hover,
+.sidebar-theme-switcher__option[data-selected="true"] {
+  color: var(--color-main-black);
+}
+
+.sidebar-theme-switcher__highlight {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-100);
+}
+
+.sidebar-theme-switcher__icon {
+  font-size: 16px;
+}
+
+.sidebar-theme-switcher__toggle {
+  color: var(--color-dark-gray);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.sidebar-theme-switcher__toggle .sidebar-theme-switcher__icon {
+  font-size: 20px;
+}
+
+.sidebar-theme-switcher__toggle:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-main-black);
+}
+
+.sidebar-theme-switcher__option:focus-visible,
+.sidebar-theme-switcher__toggle:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-theme-switcher__option, .sidebar-theme-switcher__toggle { transition: none; }
+}
