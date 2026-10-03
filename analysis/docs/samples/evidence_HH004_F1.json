@@ -1,7 +1,7 @@
 {
   "household_id": "HH004",
   "finding_id": "F1",
-  "headline": "Jordan's wages disagree between documents",
+  "headline": "Documents disagree on wages",
   "check": "conflicted",
   "values": [
     {

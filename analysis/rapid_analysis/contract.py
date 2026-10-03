@@ -86,6 +86,8 @@ class ChecklistItem(_Model):
     reason: str
     dollar_impact: float | int | None
     finding_ids: list[str]
+    metrics: dict[str, Any] = Field(default_factory=dict)  # the exact numbers the rule used
+    rule: str = ""  # the threshold the rule applied, in plain English
 
 
 class Change(_Model):
@@ -105,6 +107,29 @@ class Finding(_Model):
     person_id: str | None
     action_label: str
     check: Check
+    metrics: dict[str, Any] = Field(default_factory=dict)
+    rule: str = ""
+
+
+class PriorYearNumber(_Model):
+    field: str
+    label: str
+    value: Scalar
+
+
+class PriorYearMember(_Model):
+    person_id: str
+    name: str | None
+    numbers: list[PriorYearNumber]
+
+
+class PriorYear(_Model):
+    """Last year's values as received (no documents, so never checked)."""
+
+    tax_year: int | None
+    filing_status: str | None
+    numbers: list[PriorYearNumber]
+    members: list[PriorYearMember]
 
 
 class Conflict(_Model):
@@ -163,6 +188,7 @@ class Overview(_Model):
     findings: list[Finding]
     data_quality: DataQuality
     errors: list[ErrorItem]
+    prior_year: PriorYear | None = None
 
 
 class EvidenceDocumentCheck(_Model):

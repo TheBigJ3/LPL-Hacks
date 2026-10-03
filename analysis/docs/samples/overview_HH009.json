@@ -38,7 +38,7 @@
       "numbers": [
         {
           "field": "retirement_distribution",
-          "label": "Gross distribution",
+          "label": "Retirement distribution",
           "value": 12000,
           "check": "verified",
           "source_document": "pat_1099r_2025.pdf",
@@ -58,7 +58,7 @@
         },
         {
           "field": "federal_tax_withheld",
-          "label": "Federal withholding",
+          "label": "Federal tax withheld",
           "value": 600,
           "check": "verified",
           "source_document": "pat_1099r_2025.pdf",
@@ -68,7 +68,7 @@
         },
         {
           "field": "state_tax_withheld",
-          "label": "State withholding",
+          "label": "State tax withheld",
           "value": 240,
           "check": "verified",
           "source_document": "pat_1099r_2025.pdf",
@@ -116,7 +116,9 @@
       "answer": "not_assessed",
       "reason": "No household member has wages",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority)"
     },
     {
       "id": "tax_savings_possible",
@@ -126,7 +128,18 @@
       "dollar_impact": 1200,
       "finding_ids": [
         "F1"
-      ]
+      ],
+      "metrics": {
+        "members": {
+          "HH009-P1": {
+            "distribution_code": "1",
+            "taxable": 12000,
+            "federal_withheld": 600,
+            "withholding_pct": 5.0
+          }
+        }
+      },
+      "rule": "self-employment income above $0, a 1099-R code 1 early distribution (estimated 10% additional tax), or a code 7 distribution with federal withholding under 10% of the taxable amount flags tax for review"
     },
     {
       "id": "excess_cash",
@@ -134,7 +147,9 @@
       "answer": "needs_data",
       "reason": "Missing cash balance and adjusted gross income",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "cash above 6 months of income (AGI / 12) flags excess cash for review (above 12 months is high priority)"
     },
     {
       "id": "needs_documents",
@@ -142,7 +157,13 @@
       "answer": "no",
       "reason": "No conflicts, missing proof or mismatched values",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {
+        "conflicts": 0,
+        "hsa_without_plan": 0,
+        "mismatches": 0
+      },
+      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value its document contradicts means more documentation is needed"
     },
     {
       "id": "major_changes",
@@ -150,7 +171,9 @@
       "answer": "not_assessed",
       "reason": "No prior year on file",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
     {
       "id": "insurance_review",
@@ -158,7 +181,9 @@
       "answer": "not_assessed",
       "reason": "No insurance data or rules yet",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "not assessed: no data or rules yet"
     },
     {
       "id": "estate_review",
@@ -166,7 +191,9 @@
       "answer": "not_assessed",
       "reason": "No estate planning data or rules yet",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "not assessed: no data or rules yet"
     },
     {
       "id": "education_review",
@@ -174,7 +201,9 @@
       "answer": "not_assessed",
       "reason": "No education savings data or rules yet",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "not assessed: no data or rules yet"
     }
   ],
   "changes_since_last_year": [],
@@ -184,13 +213,22 @@
       "type": "retirement_distribution_review",
       "category": "tax",
       "priority": "high",
-      "headline": "Pat took an early retirement distribution",
+      "headline": "Pat took a retirement distribution",
       "explanation": "Pat's 1099-R shows code 1 (early distribution) on $12,000 taxable; the estimated additional tax is $1,200 unless an exception applies.",
       "dollar_impact": 1200,
       "member": "Pat Rowe",
       "person_id": "HH009-P1",
-      "action_label": "Review early distribution",
-      "check": "verified"
+      "action_label": "Plan for tax bill",
+      "check": "verified",
+      "metrics": {
+        "distribution_code": "1",
+        "taxable": 12000,
+        "federal_withheld": 600,
+        "withholding_pct": 5.0,
+        "additional_tax_rate_pct": 10,
+        "estimated_additional_tax": 1200
+      },
+      "rule": "self-employment income above $0, a 1099-R code 1 early distribution (estimated 10% additional tax), or a code 7 distribution with federal withholding under 10% of the taxable amount flags tax for review"
     }
   ],
   "data_quality": {
@@ -200,5 +238,6 @@
     "unchecked_values": 0,
     "missing_documents": []
   },
-  "errors": []
+  "errors": [],
+  "prior_year": null
 }

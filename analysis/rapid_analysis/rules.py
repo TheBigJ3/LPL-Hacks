@@ -3,28 +3,34 @@
 OpenDecision is never consulted here; the only model output a rule reads is a value's check
 (a `mismatch` makes more documentation necessary).
 
+Ids, checklist questions, finding headlines and action labels come from config/tags.json. Every
+finding and checklist item carries the exact numbers it was decided on (`metrics`) and the
+threshold it applied (`rule`), so downstream text (Ask, RAG) never recomputes anything.
+
 Value keys: household fields are "household.<field>", member fields are "<person_id>.<field>".
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal, Mapping
+from typing import Any, Mapping
 
 from rapid_analysis import RULESET_VERSION
 from rapid_analysis.evidence import Check, money_format
-from rapid_analysis.normalization import FieldValue, Household, Member
+from rapid_analysis.normalization import HOUSEHOLD_FIELDS, MEMBER_FIELDS, FieldValue, Household, Member
+from rapid_analysis.taxonomy import field_label, finding_text, tag_by_id, tag_ids, tags
 
-Answer = Literal["yes", "no", "needs_data", "not_assessed"]
-Priority = Literal["informational", "low", "medium", "high"]
-Category = Literal["retirement", "tax", "hsa", "cash_management", "life_event", "data_quality"]
-Status = Literal["findings", "no_findings", "needs_review"]
+Answer = str
+Priority = str
+Category = str
+Status = str
 
-ANSWER_VALUES: tuple[Answer, ...] = ("yes", "no", "needs_data", "not_assessed")
-PRIORITY_VALUES: tuple[Priority, ...] = ("informational", "low", "medium", "high")
-CATEGORY_VALUES: tuple[Category, ...] = ("retirement", "tax", "hsa", "cash_management", "life_event", "data_quality")
-STATUS_VALUES: tuple[Status, ...] = ("findings", "no_findings", "needs_review")
+ANSWER_VALUES: tuple[str, ...] = tuple(tags()["checklist_answers"])
+PRIORITY_VALUES: tuple[str, ...] = tuple(tags()["priorities"])
+CATEGORY_VALUES: tuple[str, ...] = tuple(tags()["categories"])
+STATUS_VALUES: tuple[str, ...] = tuple(tags()["household_status"])
 PRIORITY_RANK = {p: i for i, p in enumerate(PRIORITY_VALUES)}
+FINDING_CATEGORY = {fid: spec["category"] for fid, spec in tag_by_id("finding_types").items()}
 
 # 401(k) employee elective deferral limit by tax year (IRS). Add a year only from IRS guidance.
 # An unknown year means needs_data. Catch-up contributions are not modeled.
@@ -41,36 +47,46 @@ CASH_MONTHS_HIGH = 12
 AGI_CHANGE_SHARE = 0.25
 LIFE_EVENTS_FOR_HIGH = 3
 
-CHECKLIST_QUESTIONS: dict[str, str] = {
-    "retirement_can_improve": "Can retirement savings be improved?",
-    "tax_savings_possible": "Can tax savings be made?",
-    "excess_cash": "Is there excess cash to put to work?",
-    "needs_documents": "Is more documentation needed?",
-    "major_changes": "Anything major changed since last year?",
-    "insurance_review": "Insurance coverage reviewed?",
-    "estate_review": "Estate plan reviewed?",
-    "education_review": "Education savings reviewed?",
-}
+CHECKLIST_QUESTIONS: dict[str, str] = {c["id"]: c["question"] for c in tags()["checklist"]}
+ASSESSED = [c["id"] for c in tags()["checklist"] if c["assessed"]]
 PLACEHOLDER_REASONS = {
     "insurance_review": "No insurance data or rules yet",
     "estate_review": "No estate planning data or rules yet",
     "education_review": "No education savings data or rules yet",
 }
-CHANGE_TYPES = ("life_event_new_dependent", "life_event_new_employer", "life_event_new_mortgage", "life_event_large_income_increase")
+CHANGE_TYPES = tuple(fid for fid, cat in FINDING_CATEGORY.items() if cat == "life_event")
+FIELD_LABELS: dict[str, str] = {name: field_label(name) for name in [*HOUSEHOLD_FIELDS, *MEMBER_FIELDS]}
 
 
-@dataclass
+def rule_text(item_id: str, limit: float | None = None) -> str:
+    limit_text = money_format(limit) if limit else "the IRS"
+    return {
+        "retirement_can_improve": (f"a 401(k) contribution under 50% of the {limit_text} limit flags retirement for review "
+                                   "(under 15% is high priority)"),
+        "tax_savings_possible": ("self-employment income above $0, a 1099-R code 1 early distribution (estimated 10% additional tax), "
+                                 "or a code 7 distribution with federal withholding under 10% of the taxable amount flags tax for review"),
+        "excess_cash": "cash above 6 months of income (AGI / 12) flags excess cash for review (above 12 months is high priority)",
+        "needs_documents": ("documents that disagree, an HSA contribution with no documented eligible plan, or a value its document "
+                            "contradicts means more documentation is needed"),
+        "major_changes": ("with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more "
+                          "is a major change (3 or more together is high priority)"),
+    }.get(item_id, "not assessed: no data or rules yet")
+
+
+@dataclass(kw_only=True)
 class Finding:
     type: str
-    category: Category
-    priority: Priority
-    headline: str
+    priority: str
     explanation: str
-    dollar_impact: float | None
-    action_label: str
+    dollar_impact: float | int | None
     member: str | None = None
     person_id: str | None = None
     value_keys: list[str] = field(default_factory=list)  # values this finding rests on (for check + evidence drill-down)
+    metrics: dict[str, Any] = field(default_factory=dict)
+    rule: str = ""
+    category: str = ""
+    headline: str = ""
+    action_label: str = ""
     id: str = ""
 
 
@@ -78,10 +94,12 @@ class Finding:
 class ChecklistItem:
     id: str
     question: str
-    answer: Answer
+    answer: str
     reason: str
-    dollar_impact: float | None = None
+    dollar_impact: float | int | None = None
     finding_ids: list[str] = field(default_factory=list)
+    metrics: dict[str, Any] = field(default_factory=dict)
+    rule: str = ""
 
 
 @dataclass
@@ -95,9 +113,18 @@ class RulesResult:
     checklist: list[ChecklistItem]
     findings: list[Finding]
     changes: list[Change]
-    status: Status
-    priority: Priority | None
+    status: str
+    priority: str | None
     ruleset_version: str = RULESET_VERSION
+
+
+@dataclass
+class _Answer:
+    answer: str
+    reason: str
+    impact: float | None = None
+    findings: list[Finding] = field(default_factory=list)
+    metrics: dict[str, Any] = field(default_factory=dict)
 
 
 # ---------------------------------------------------------------- helpers
@@ -109,6 +136,11 @@ def first_name(member: Member) -> str:
 
 def pct(share: float, digits: int = 0) -> str:
     return f"{share * 100:.{digits}f}%"
+
+
+def pct_num(share: float, digits: int = 0) -> float | int:
+    value = round(share * 100, digits)
+    return int(value) if digits == 0 else value
 
 
 def num(value: float | None) -> float | int | None:
@@ -135,27 +167,38 @@ def _join(parts: list[str]) -> str:
     return ", ".join(parts[:-1]) + " and " + parts[-1]
 
 
-def _item(item_id: str, answer: Answer, reason: str, impact: float | None = None, findings: list[Finding] | None = None) -> ChecklistItem:
-    return ChecklistItem(id=item_id, question=CHECKLIST_QUESTIONS[item_id], answer=answer, reason=reason,
-                         dollar_impact=num(impact), finding_ids=[f.id for f in findings or []])
-
-
 def retirement_limit(tax_year: int | None) -> float | None:
     return LIMIT_401K.get(tax_year) if tax_year is not None else None
+
+
+def _fmt(name: str, value: Any) -> str:
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and name not in ("dependents", "distribution_code"):
+        return money_format(float(value))
+    return str(value)
+
+
+def _all_fields(household: Household) -> list[tuple[str, str, FieldValue | None, Member | None]]:
+    out: list[tuple[str, str, FieldValue | None, Member | None]] = [
+        (f"household.{name}", name, fv, None) for name, fv in household.fields.items()
+    ]
+    for m in household.members:
+        out += [(f"{m.person_id}.{name}", name, fv, m) for name, fv in m.fields.items()]
+    return out
 
 
 # ---------------------------------------------------------------- rules
 
 
-def _retirement(household: Household, findings: list[Finding]) -> list:
+def _retirement(household: Household, findings: list[Finding]) -> _Answer:
     earners = [m for m in household.members if _conflicted(m.get("wages")) or (_amount(m.get("wages")) or 0) > 0]
     if not earners:
-        return ["not_assessed", "No household member has wages", None, []]
+        return _Answer("not_assessed", "No household member has wages")
     limit = retirement_limit(household.tax_year)
     if limit is None:
-        return ["needs_data", f"No 401(k) limit on file for tax year {household.tax_year}", None, []]
+        return _Answer("needs_data", f"No 401(k) limit on file for tax year {household.tax_year}",
+                       metrics={"tax_year": household.tax_year})
 
-    low, missing, above = [], [], []
+    low, missing, per_member = [], [], {}
     for m in earners:
         contribution = _amount(m.get("employee_401k_contribution"))
         if _conflicted(m.get("wages")):
@@ -164,49 +207,54 @@ def _retirement(household: Household, findings: list[Finding]) -> list:
         if contribution is None:
             missing.append(f"{first_name(m)}'s 401(k) contribution is missing")
             continue
-        share = contribution / limit
-        (low if share < RETIREMENT_LOW_SHARE else above).append((m, contribution, share))
-
-    created = []
-    for m, contribution, share in low:
         wages = _amount(m.get("wages")) or 0.0
-        room = max(limit - contribution, 0.0)
-        high = share < RETIREMENT_HIGH_SHARE
+        share = contribution / limit
+        facts = {"contribution": num(contribution), "wages": num(wages), "pct_of_pay": pct_num(contribution / wages, 1) if wages else None,
+                 "pct_of_limit": pct_num(share), "room": num(max(limit - contribution, 0.0))}
+        per_member[m.person_id] = facts
+        if share < RETIREMENT_LOW_SHARE:
+            low.append((m, contribution, share, facts))
+
+    base = {"limit": num(limit), "flag_below_pct_of_limit": 50, "high_below_pct_of_limit": 15, "members": per_member}
+    created = []
+    for m, contribution, share, facts in low:
         finding = Finding(
-            type="retirement_contribution_review", category="retirement", priority="high" if high else "medium",
-            headline=f"{first_name(m)} is saving very little for retirement" if high else f"{first_name(m)} could save more for retirement",
-            explanation=(f"{first_name(m)} contributed {money_format(contribution)} to a 401(k), {pct(contribution / wages, 1)} of "
-                         f"{money_format(wages)} wages and {pct(share)} of the {money_format(limit)} limit."),
-            dollar_impact=num(room), action_label="Discuss savings", member=m.name, person_id=m.person_id,
+            type="retirement_contribution_review", priority="high" if share < RETIREMENT_HIGH_SHARE else "medium",
+            explanation=(f"{first_name(m)} contributed {money_format(contribution)} to a 401(k), {pct(facts['pct_of_pay'] / 100, 1)} of "
+                         f"{money_format(facts['wages'])} wages and {facts['pct_of_limit']}% of the {money_format(limit)} limit."),
+            dollar_impact=facts["room"], member=m.name, person_id=m.person_id,
             value_keys=[f"{m.person_id}.employee_401k_contribution", f"{m.person_id}.wages"],
+            metrics={"limit": num(limit), "flag_below_pct_of_limit": 50, "high_below_pct_of_limit": 15, **facts},
+            rule=rule_text("retirement_can_improve", limit),
         )
         findings.append(finding)
         created.append(finding)
 
     if low:
-        reason = _join([f"{first_name(m)} uses {pct(share)}" for m, _, share in low]) + " of the 401(k) limit"
-        return ["yes", reason, sum(max(limit - c, 0.0) for _, c, _ in low), created]
+        reason = _join([f"{first_name(m)} uses {facts['pct_of_limit']}%" for m, _, _, facts in low]) + " of the 401(k) limit"
+        return _Answer("yes", reason, sum(facts["room"] for *_, facts in low), created, base)
     if missing:
-        return ["needs_data", "; ".join(missing), None, []]
-    return ["no", "Every wage earner contributes at least half of the 401(k) limit", None, []]
+        return _Answer("needs_data", "; ".join(missing), metrics=base)
+    return _Answer("no", "Every wage earner contributes at least half of the 401(k) limit", metrics=base)
 
 
-def _tax(household: Household, findings: list[Finding]) -> list:
-    reasons, created, impact, gaps = [], [], [], []
+def _tax(household: Household, findings: list[Finding]) -> _Answer:
+    reasons, created, impact, gaps, per_member = [], [], [], [], {}
+    tax_rule = rule_text("tax_savings_possible")
     for m in household.members:
         se_fv = m.get("self_employment_income")
         se = _amount(se_fv)
         if _conflicted(se_fv):
             gaps.append(f"{first_name(m)}'s self-employment income disagrees between documents")
         elif se is not None and se > 0:
+            facts = {"self_employment_income": num(se), "high_at": num(SELF_EMPLOYMENT_HIGH)}
+            per_member.setdefault(m.person_id, {}).update(facts)
             finding = Finding(
-                type="self_employment_tax_review", category="tax",
-                priority="high" if se >= SELF_EMPLOYMENT_HIGH else "medium",
-                headline=f"{first_name(m)} has self-employment income to plan around",
+                type="self_employment_tax_review", priority="high" if se >= SELF_EMPLOYMENT_HIGH else "medium",
                 explanation=(f"{first_name(m)} reported {money_format(se)} of self-employment income; "
                              "quarterly estimates and self-employed retirement accounts are worth a look."),
-                dollar_impact=None, action_label="Review self-employment taxes", member=m.name, person_id=m.person_id,
-                value_keys=[f"{m.person_id}.self_employment_income"],
+                dollar_impact=None, member=m.name, person_id=m.person_id,
+                value_keys=[f"{m.person_id}.self_employment_income"], metrics=facts, rule=tax_rule,
             )
             findings.append(finding)
             created.append(finding)
@@ -222,17 +270,20 @@ def _tax(household: Household, findings: list[Finding]) -> list:
         taxable = _amount(m.get("retirement_distribution_taxable"))
         withheld = _amount(m.get("federal_tax_withheld"))
         keys = [f"{m.person_id}.distribution_code", f"{m.person_id}.retirement_distribution_taxable"]
+        facts: dict[str, Any] = {"distribution_code": code, "taxable": num(taxable), "federal_withheld": num(withheld)}
+        if taxable and withheld is not None:
+            facts["withholding_pct"] = pct_num(withheld / taxable, 1)
+        per_member.setdefault(m.person_id, {}).update(facts)
         if "1" in code:
             penalty = taxable * EARLY_DISTRIBUTION_RATE if taxable is not None else None
+            facts.update({"additional_tax_rate_pct": 10, "estimated_additional_tax": num(penalty)})
             finding = Finding(
-                type="retirement_distribution_review", category="tax", priority="high",
-                headline=f"{first_name(m)} took an early retirement distribution",
+                type="retirement_distribution_review", priority="high",
                 explanation=(f"{first_name(m)}'s 1099-R shows code 1 (early distribution) on "
                              f"{money_format(taxable) if taxable is not None else 'an unknown'} taxable; "
                              f"the estimated additional tax is {money_format(penalty) if penalty is not None else 'unknown'} "
                              "unless an exception applies."),
-                dollar_impact=num(penalty), action_label="Review early distribution", member=m.name, person_id=m.person_id,
-                value_keys=keys,
+                dollar_impact=num(penalty), member=m.name, person_id=m.person_id, value_keys=keys, metrics=facts, rule=tax_rule,
             )
             findings.append(finding)
             created.append(finding)
@@ -244,96 +295,63 @@ def _tax(household: Household, findings: list[Finding]) -> list:
                 gaps.append(f"{first_name(m)}'s 1099-R taxable amount or federal withholding is missing")
                 continue
             under = withheld < taxable * NORMAL_WITHHOLDING_RATE
-            share = withheld / taxable if taxable else 0.0
+            facts["flag_below_withholding_pct"] = 10
             finding = Finding(
-                type="retirement_distribution_review",
-                category="tax", priority="medium" if under else "low",
-                headline=(f"{first_name(m)}'s retirement distribution may be under-withheld" if under
-                          else f"{first_name(m)} took a normal retirement distribution"),
+                type="retirement_distribution_review", priority="medium" if under else "low",
                 explanation=(f"{first_name(m)}'s 1099-R shows code 7 (normal distribution): {money_format(withheld)} federal "
-                             f"withholding on {money_format(taxable)} taxable ({pct(share, 1)})."),
-                dollar_impact=None, action_label="Check withholding" if under else "Note distribution",
-                member=m.name, person_id=m.person_id, value_keys=keys + [f"{m.person_id}.federal_tax_withheld"],
+                             f"withholding on {money_format(taxable)} taxable ({facts['withholding_pct']}%)."),
+                dollar_impact=None, member=m.name, person_id=m.person_id,
+                value_keys=keys + [f"{m.person_id}.federal_tax_withheld"], metrics=facts, rule=tax_rule,
             )
             findings.append(finding)
             if under:
                 created.append(finding)
-                reasons.append(f"{first_name(m)}'s code 7 distribution has {pct(share, 1)} federal withholding")
-        elif code == "G":
-            findings.append(Finding(
-                type="retirement_distribution_review", category="tax", priority="informational",
-                headline=f"{first_name(m)} rolled over a retirement distribution",
-                explanation=f"{first_name(m)}'s 1099-R shows code G (direct rollover), which is normally not taxed.",
-                dollar_impact=None, action_label="Note rollover", member=m.name, person_id=m.person_id, value_keys=keys,
-            ))
+                reasons.append(f"{first_name(m)}'s code 7 distribution has {facts['withholding_pct']}% federal withholding")
         else:
             findings.append(Finding(
-                type="retirement_distribution_review", category="tax", priority="low",
-                headline=f"{first_name(m)} has a code {code} retirement distribution",
-                explanation=f"{first_name(m)}'s 1099-R shows distribution code {code}.",
-                dollar_impact=None, action_label="Note distribution", member=m.name, person_id=m.person_id, value_keys=keys,
+                type="retirement_distribution_review", priority="informational" if code == "G" else "low",
+                explanation=(f"{first_name(m)}'s 1099-R shows code G (direct rollover), which is normally not taxed." if code == "G"
+                             else f"{first_name(m)}'s 1099-R shows distribution code {code}."),
+                dollar_impact=None, member=m.name, person_id=m.person_id, value_keys=keys, metrics=facts, rule=tax_rule,
             ))
 
+    metrics = {"members": per_member}
     if reasons:
-        return ["yes", "; ".join(reasons), sum(impact) if impact else None, created]
+        return _Answer("yes", "; ".join(reasons), sum(impact) if impact else None, created, metrics)
     if gaps:
-        return ["needs_data", "; ".join(gaps), None, []]
-    return ["no", "No self-employment income, early distribution or under-withheld distribution", None, []]
+        return _Answer("needs_data", "; ".join(gaps), metrics=metrics)
+    return _Answer("no", "No self-employment income, early distribution or under-withheld distribution", metrics=metrics)
 
 
-def _cash(household: Household, findings: list[Finding]) -> list:
-    cash_fv, agi_fv = household.get("cash_balance"), household.get("adjusted_gross_income")
-    cash, agi = _amount(cash_fv), _amount(agi_fv)
+def _cash(household: Household, findings: list[Finding]) -> _Answer:
+    cash, agi = _amount(household.get("cash_balance")), _amount(household.get("adjusted_gross_income"))
     if cash is None or agi is None or agi <= 0:
         missing = [label for label, value in (("cash balance", cash), ("adjusted gross income", agi if agi and agi > 0 else None)) if value is None]
-        return ["needs_data", f"Missing {_join(missing)}", None, []]
+        return _Answer("needs_data", f"Missing {_join(missing)}")
     monthly = agi / 12
     target = CASH_MONTHS_TARGET * monthly
     months = cash / monthly
+    metrics = {"cash": num(cash), "agi": num(agi), "monthly_income": num(monthly), "months_of_income": round(months, 1),
+               "target_months": CASH_MONTHS_TARGET, "target": num(target), "high_above_months": CASH_MONTHS_HIGH}
     if cash <= target:
-        return ["no", f"Cash covers {months:.1f} months of income, within {CASH_MONTHS_TARGET} months", None, []]
+        return _Answer("no", f"Cash covers {months:.1f} months of income, within {CASH_MONTHS_TARGET} months", metrics=metrics)
     excess = cash - target
+    metrics["excess"] = num(excess)
     finding = Finding(
-        type="excess_cash_review", category="cash_management", priority="high" if months > CASH_MONTHS_HIGH else "medium",
-        headline="Cash well above an emergency cushion",
+        type="excess_cash_review", priority="high" if months > CASH_MONTHS_HIGH else "medium",
         explanation=(f"The household holds {money_format(cash)} in cash, {months:.1f} months of income; "
                      f"{money_format(excess)} is above a {CASH_MONTHS_TARGET}-month cushion of {money_format(target)}."),
-        dollar_impact=num(excess), action_label="Discuss putting cash to work",
-        value_keys=["household.cash_balance", "household.adjusted_gross_income"],
+        dollar_impact=num(excess), value_keys=["household.cash_balance", "household.adjusted_gross_income"],
+        metrics=dict(metrics), rule=rule_text("excess_cash"),
     )
     findings.append(finding)
-    return ["yes", f"Cash covers {months:.1f} months of income", excess, [finding]]
+    return _Answer("yes", f"Cash covers {months:.1f} months of income", excess, [finding], metrics)
 
 
-def _all_fields(household: Household) -> list[tuple[str, str, FieldValue | None, Member | None]]:
-    out: list[tuple[str, str, FieldValue | None, Member | None]] = [
-        (f"household.{name}", name, fv, None) for name, fv in household.fields.items()
-    ]
-    for m in household.members:
-        out += [(f"{m.person_id}.{name}", name, fv, m) for name, fv in m.fields.items()]
-    return out
-
-
-FIELD_LABELS = {
-    "adjusted_gross_income": "AGI", "dependents": "Dependents", "mortgage_interest": "Mortgage interest",
-    "cash_balance": "Cash", "employer": "Employer", "wages": "Wages", "employee_401k_contribution": "401(k)",
-    "hsa_contribution": "HSA contribution", "hsa_eligible_health_plan": "HSA-eligible plan",
-    "interest_income": "Interest income", "dividend_income": "Dividend income",
-    "self_employment_income": "Self-employment income", "retirement_distribution": "Gross distribution",
-    "retirement_distribution_taxable": "Taxable distribution", "federal_tax_withheld": "Federal withholding",
-    "state_tax_withheld": "State withholding", "distribution_code": "Distribution code",
-    "distribution_from_ira": "IRA distribution", "distribution_date": "Distribution date",
-}
-
-
-def _fmt(name: str, value: Any) -> str:
-    if isinstance(value, (int, float)) and not isinstance(value, bool) and name not in ("dependents", "distribution_code"):
-        return money_format(float(value))
-    return str(value)
-
-
-def _documents(household: Household, findings: list[Finding], checks: Mapping[str, Check]) -> list:
+def _documents(household: Household, findings: list[Finding], checks: Mapping[str, Check]) -> _Answer:
     created, reasons = [], []
+    counts = {"conflicts": 0, "hsa_without_plan": 0, "mismatches": 0}
+    docs_rule = rule_text("needs_documents")
     for key, name, fv, member in _all_fields(household):
         if not _conflicted(fv):
             continue
@@ -341,14 +359,17 @@ def _documents(household: Household, findings: list[Finding], checks: Mapping[st
         label = FIELD_LABELS.get(name, name).lower() if member else FIELD_LABELS.get(name, name)
         parts = [f"{_fmt(name, c.value)} on {c.source_document or 'an unnamed source'}" for c in fv.candidates]
         finding = Finding(
-            type="source_data_conflict", category="data_quality", priority="high",
-            headline=f"{whose}{label} disagree between documents",
+            type="source_data_conflict", priority="high",
             explanation=f"{whose}{label}: {_join(parts)}. No value is used until this is resolved.",
-            dollar_impact=None, action_label="Resolve conflict", member=member.name if member else None,
+            dollar_impact=None, member=member.name if member else None,
             person_id=member.person_id if member else None, value_keys=[key],
+            metrics={"field": name, "candidates": [{"value": num(c.value) if isinstance(c.value, float) else c.value,
+                                                     "source_document": c.source_document} for c in fv.candidates]},
+            rule=docs_rule,
         )
         findings.append(finding)
         created.append(finding)
+        counts["conflicts"] += 1
         reasons.append(f"{whose}{label} disagree between documents")
 
     for m in household.members:
@@ -357,15 +378,16 @@ def _documents(household: Household, findings: list[Finding], checks: Mapping[st
         if hsa is None or hsa <= 0 or (plan is not None and not plan.conflict and plan.value is True):
             continue
         finding = Finding(
-            type="hsa_eligibility_unverified", category="hsa", priority="medium",
-            headline=f"No proof of {first_name(m)}'s HSA-eligible health plan",
+            type="hsa_eligibility_unverified", priority="medium",
             explanation=(f"{first_name(m)} contributed {money_format(hsa)} to an HSA, but no document shows coverage "
                          "under an HSA-eligible (high-deductible) health plan."),
-            dollar_impact=None, action_label="Request health plan proof", member=m.name, person_id=m.person_id,
+            dollar_impact=None, member=m.name, person_id=m.person_id,
             value_keys=[f"{m.person_id}.hsa_contribution", f"{m.person_id}.hsa_eligible_health_plan"],
+            metrics={"hsa_contribution": num(hsa), "eligible_plan_documented": False}, rule=docs_rule,
         )
         findings.append(finding)
         created.append(finding)
+        counts["hsa_without_plan"] += 1
         reasons.append(f"{first_name(m)}'s HSA contribution has no documented eligible plan")
 
     for key, name, fv, member in _all_fields(household):
@@ -374,30 +396,34 @@ def _documents(household: Household, findings: list[Finding], checks: Mapping[st
         whose = f"{first_name(member)}'s " if member else "Household "
         label = FIELD_LABELS.get(name, name).lower() if member else FIELD_LABELS.get(name, name)
         finding = Finding(
-            type="source_data_conflict", category="data_quality", priority="medium",
-            headline=f"{whose}{label} does not match its document",
+            type="source_data_conflict", priority="medium",
             explanation=f"{whose}{label} of {_fmt(name, fv.value)} is not what {fv.source_document} shows.",
-            dollar_impact=None, action_label="Check the document", member=member.name if member else None,
+            dollar_impact=None, member=member.name if member else None,
             person_id=member.person_id if member else None, value_keys=[key],
+            metrics={"field": name, "value": num(fv.value) if isinstance(fv.value, float) else fv.value,
+                     "source_document": fv.source_document, "check": "mismatch"},
+            rule=docs_rule,
         )
         findings.append(finding)
         created.append(finding)
+        counts["mismatches"] += 1
         reasons.append(f"{whose}{label} does not match {fv.source_document}")
 
     if created:
-        return ["yes", "; ".join(reasons), None, created]
-    return ["no", "No conflicts, missing proof or mismatched values", None, []]
+        return _Answer("yes", "; ".join(reasons), None, created, counts)
+    return _Answer("no", "No conflicts, missing proof or mismatched values", metrics=counts)
 
 
-def _changes(household: Household, findings: list[Finding]) -> tuple[list, list[Change]]:
+def _changes(household: Household, findings: list[Finding]) -> tuple[_Answer, list[Change]]:
     prior = household.prior_year
     if prior is None:
-        return ["not_assessed", "No prior year on file", None, []], []
-    events: list[tuple[Change, str | None, str | None, list[str]]] = []
+        return _Answer("not_assessed", "No prior year on file"), []
+    events: list[tuple[Change, Member | None, list[str], dict[str, Any]]] = []
 
     now_deps, then_deps = household.value("dependents"), prior.value("dependents")
     if isinstance(now_deps, int) and isinstance(then_deps, int) and now_deps > then_deps:
-        events.append((Change("life_event_new_dependent", f"Dependents increased from {then_deps} to {now_deps}"), None, None, ["household.dependents"]))
+        events.append((Change("life_event_new_dependent", f"Dependents increased from {then_deps} to {now_deps}"), None,
+                       ["household.dependents"], {"before": then_deps, "after": now_deps}))
 
     prior_members = {m.person_id: m for m in prior.members}
     for m in household.members:
@@ -405,60 +431,82 @@ def _changes(household: Household, findings: list[Finding]) -> tuple[list, list[
         now_employer, then_employer = m.value("employer"), before.value("employer") if before else None
         if isinstance(now_employer, str) and isinstance(then_employer, str) and now_employer.casefold() != then_employer.casefold():
             events.append((Change("life_event_new_employer", f"{first_name(m)} changed employer from {then_employer} to {now_employer}"),
-                           m.name, m.person_id, [f"{m.person_id}.employer"]))
+                           m, [f"{m.person_id}.employer"], {"before": then_employer, "after": now_employer}))
 
     now_mortgage, then_mortgage = _amount(household.get("mortgage_interest")), _amount(prior.get("mortgage_interest"))
     if now_mortgage and now_mortgage > 0 and not (then_mortgage and then_mortgage > 0):
-        events.append((Change("life_event_new_mortgage", f"Mortgage interest started ({money_format(now_mortgage)})"), None, None, ["household.mortgage_interest"]))
+        events.append((Change("life_event_new_mortgage", f"Mortgage interest started ({money_format(now_mortgage)})"), None,
+                       ["household.mortgage_interest"], {"before": num(then_mortgage) or 0, "after": num(now_mortgage)}))
 
     now_agi, then_agi = _amount(household.get("adjusted_gross_income")), _amount(prior.get("adjusted_gross_income"))
     if now_agi is not None and then_agi and then_agi > 0:
         change = (now_agi - then_agi) / then_agi
         if abs(change) >= AGI_CHANGE_SHARE:
-            kind = "life_event_large_income_increase"
             verb = "rose" if change > 0 else "fell"
-            events.append((Change(kind, f"AGI {verb} {pct(abs(change))} from {money_format(then_agi)} to {money_format(now_agi)}"),
-                           None, None, ["household.adjusted_gross_income"]))
+            events.append((Change("life_event_large_income_increase",
+                                  f"AGI {verb} {pct(abs(change))} from {money_format(then_agi)} to {money_format(now_agi)}"),
+                           None, ["household.adjusted_gross_income"],
+                           {"before": num(then_agi), "after": num(now_agi), "change_pct": pct_num(change), "flag_change_pct": 25}))
 
+    metrics = {"prior_tax_year": prior.tax_year, "events": len(events), "high_at_events": LIFE_EVENTS_FOR_HIGH}
     if not events:
-        return ["no", "No major changes since last year", None, []], []
-    priority: Priority = "high" if len(events) >= LIFE_EVENTS_FOR_HIGH else "medium"
+        return _Answer("no", "No major changes since last year", metrics=metrics), []
+    priority = "high" if len(events) >= LIFE_EVENTS_FOR_HIGH else "medium"
     created = []
-    for change, member, person_id, keys in events:
+    for change, member, keys, facts in events:
         finding = Finding(
-            type=change.type, category="life_event", priority=priority, headline=change.text,
+            type=change.type, priority=priority,
             explanation=change.text + " since last year." + (" Several changes happened together." if priority == "high" else ""),
-            dollar_impact=None, action_label="Review life changes", member=member, person_id=person_id, value_keys=keys,
+            dollar_impact=None, member=member.name if member else None, person_id=member.person_id if member else None,
+            value_keys=keys, metrics=facts, rule=rule_text("major_changes"),
         )
         findings.append(finding)
         created.append(finding)
-    answer = ["yes", _join([c.text for c, _, _, _ in events]), None, created]
-    return answer, [c for c, _, _, _ in events]
+    return _Answer("yes", _join([c.text for c, *_ in events]), None, created, metrics), [c for c, *_ in events]
 
 
 # ---------------------------------------------------------------- entry point
 
 
+def _label_finding(finding: Finding) -> None:
+    """Category, headline and action label come from tags.json finding_types."""
+    member = finding.member.split()[0] if finding.member else None
+    field_id = finding.value_keys[0].split(".", 1)[1] if finding.value_keys else None
+    finding.category = FINDING_CATEGORY[finding.type]
+    finding.headline, finding.action_label = finding_text(
+        finding.type, member, FIELD_LABELS.get(field_id, field_id).lower() if field_id else None)
+
+
 def rules_evaluate(household: Household, checks: Mapping[str, Check] | None = None) -> RulesResult:
     checks = checks or {}
     findings: list[Finding] = []
-    retirement = _retirement(household, findings)
-    tax = _tax(household, findings)
-    cash = _cash(household, findings)
-    documents = _documents(household, findings, checks)
+    limit = retirement_limit(household.tax_year)
+    answers = {
+        "retirement_can_improve": _retirement(household, findings),
+        "tax_savings_possible": _tax(household, findings),
+        "excess_cash": _cash(household, findings),
+        "needs_documents": _documents(household, findings, checks),
+    }
     changes_answer, changes = _changes(household, findings)
+    answers["major_changes"] = changes_answer
 
     for index, finding in enumerate(findings, start=1):
         finding.id = f"F{index}"
+        _label_finding(finding)
 
-    checklist = [
-        _item("retirement_can_improve", *retirement),
-        _item("tax_savings_possible", *tax),
-        _item("excess_cash", *cash),
-        _item("needs_documents", *documents),
-        _item("major_changes", *changes_answer),
-        *[_item(item_id, "not_assessed", reason) for item_id, reason in PLACEHOLDER_REASONS.items()],
-    ]
+    checklist = []
+    for item_id, question in CHECKLIST_QUESTIONS.items():
+        a = answers.get(item_id) or _Answer("not_assessed", PLACEHOLDER_REASONS.get(item_id, "No data or rules yet"))
+        checklist.append(ChecklistItem(
+            id=item_id, question=question, answer=a.answer, reason=a.reason, dollar_impact=num(a.impact),
+            finding_ids=[f.id for f in a.findings], metrics=a.metrics,
+            rule=rule_text(item_id, limit if item_id == "retirement_can_improve" else None),
+        ))
     top = max((f.priority for f in findings), key=PRIORITY_RANK.__getitem__, default=None)
-    status: Status = "findings" if any(PRIORITY_RANK[f.priority] >= PRIORITY_RANK["medium"] for f in findings) else "no_findings"
+    status = "findings" if any(PRIORITY_RANK[f.priority] >= PRIORITY_RANK["medium"] for f in findings) else "no_findings"
     return RulesResult(checklist=checklist, findings=findings, changes=changes, status=status, priority=top)
+
+
+__all__ = ["ANSWER_VALUES", "ASSESSED", "CATEGORY_VALUES", "CHANGE_TYPES", "CHECKLIST_QUESTIONS", "FIELD_LABELS",
+           "LIMIT_401K", "PRIORITY_RANK", "PRIORITY_VALUES", "STATUS_VALUES", "first_name", "num", "pct",
+           "retirement_limit", "rules_evaluate", "tag_ids"]

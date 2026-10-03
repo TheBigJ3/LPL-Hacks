@@ -101,11 +101,11 @@ def test_hh006_matches_spec_shape(backend_none):
     taylor = o["members"][0]
     assert (taylor["person_id"], taylor["name"], taylor["employer"]) == ("HH006-P1", "Taylor Mock", "Adventure Works Sample")
     k401 = next(n for n in taylor["numbers"] if n["field"] == "employee_401k_contribution")
-    assert k401["label"] == "401(k)" and k401["value"] == 2000
+    assert k401["label"] == "401(k) contribution" and k401["value"] == 2000
     assert k401["context"] == "1.8% of pay · 9% of limit · $21,500 room left"
     assert o["changes_since_last_year"] == [{"type": "life_event_new_dependent", "text": "Dependents increased from 0 to 1"}]
     f1 = next(f for f in o["findings"] if f["id"] == "F1")
-    assert f1["headline"] == "Taylor is saving very little for retirement"
+    assert f1["headline"] == "Taylor could save more for retirement"
     assert f1["action_label"] == "Discuss savings" and f1["member"] == "Taylor Mock"
     assert o["checklist_label"] == "Flags for review, not advice"
 

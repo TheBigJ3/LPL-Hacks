@@ -48,7 +48,7 @@
         },
         {
           "field": "employee_401k_contribution",
-          "label": "401(k)",
+          "label": "401(k) contribution",
           "value": 16000,
           "check": "verified",
           "source_document": "casey_w2_2025.pdf",
@@ -66,7 +66,22 @@
       "answer": "no",
       "reason": "Every wage earner contributes at least half of the 401(k) limit",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {
+        "limit": 23500,
+        "flag_below_pct_of_limit": 50,
+        "high_below_pct_of_limit": 15,
+        "members": {
+          "HH005-P1": {
+            "contribution": 16000,
+            "wages": 160000,
+            "pct_of_pay": 10.0,
+            "pct_of_limit": 68,
+            "room": 7500
+          }
+        }
+      },
+      "rule": "a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority)"
     },
     {
       "id": "tax_savings_possible",
@@ -74,7 +89,11 @@
       "answer": "no",
       "reason": "No self-employment income, early distribution or under-withheld distribution",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {
+        "members": {}
+      },
+      "rule": "self-employment income above $0, a 1099-R code 1 early distribution (estimated 10% additional tax), or a code 7 distribution with federal withholding under 10% of the taxable amount flags tax for review"
     },
     {
       "id": "excess_cash",
@@ -82,7 +101,17 @@
       "answer": "no",
       "reason": "Cash covers 1.5 months of income, within 6 months",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {
+        "cash": 22000,
+        "agi": 171000,
+        "monthly_income": 14250,
+        "months_of_income": 1.5,
+        "target_months": 6,
+        "target": 85500,
+        "high_above_months": 12
+      },
+      "rule": "cash above 6 months of income (AGI / 12) flags excess cash for review (above 12 months is high priority)"
     },
     {
       "id": "needs_documents",
@@ -90,7 +119,13 @@
       "answer": "no",
       "reason": "No conflicts, missing proof or mismatched values",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {
+        "conflicts": 0,
+        "hsa_without_plan": 0,
+        "mismatches": 0
+      },
+      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value its document contradicts means more documentation is needed"
     },
     {
       "id": "major_changes",
@@ -103,7 +138,13 @@
         "F2",
         "F3",
         "F4"
-      ]
+      ],
+      "metrics": {
+        "prior_tax_year": 2024,
+        "events": 4,
+        "high_at_events": 3
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
     {
       "id": "insurance_review",
@@ -111,7 +152,9 @@
       "answer": "not_assessed",
       "reason": "No insurance data or rules yet",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "not assessed: no data or rules yet"
     },
     {
       "id": "estate_review",
@@ -119,7 +162,9 @@
       "answer": "not_assessed",
       "reason": "No estate planning data or rules yet",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "not assessed: no data or rules yet"
     },
     {
       "id": "education_review",
@@ -127,7 +172,9 @@
       "answer": "not_assessed",
       "reason": "No education savings data or rules yet",
       "dollar_impact": null,
-      "finding_ids": []
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "not assessed: no data or rules yet"
     }
   ],
   "changes_since_last_year": [
@@ -154,52 +201,74 @@
       "type": "life_event_new_dependent",
       "category": "life_event",
       "priority": "high",
-      "headline": "Dependents increased from 0 to 1",
+      "headline": "New dependent",
       "explanation": "Dependents increased from 0 to 1 since last year. Several changes happened together.",
       "dollar_impact": null,
       "member": null,
       "person_id": null,
-      "action_label": "Review life changes",
-      "check": "verified"
+      "action_label": "Schedule review",
+      "check": "verified",
+      "metrics": {
+        "before": 0,
+        "after": 1
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
     {
       "id": "F2",
       "type": "life_event_new_employer",
       "category": "life_event",
       "priority": "high",
-      "headline": "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC",
+      "headline": "Casey changed jobs",
       "explanation": "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC since last year. Several changes happened together.",
       "dollar_impact": null,
       "member": "Casey Brooks",
       "person_id": "HH005-P1",
-      "action_label": "Review life changes",
-      "check": "not_checked"
+      "action_label": "Schedule review",
+      "check": "not_checked",
+      "metrics": {
+        "before": "Acme Sample Corp",
+        "after": "Bluefin Sample LLC"
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
     {
       "id": "F3",
       "type": "life_event_new_mortgage",
       "category": "life_event",
       "priority": "high",
-      "headline": "Mortgage interest started ($14,200)",
+      "headline": "New mortgage",
       "explanation": "Mortgage interest started ($14,200) since last year. Several changes happened together.",
       "dollar_impact": null,
       "member": null,
       "person_id": null,
-      "action_label": "Review life changes",
-      "check": "verified"
+      "action_label": "Schedule review",
+      "check": "verified",
+      "metrics": {
+        "before": 0,
+        "after": 14200
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
     {
       "id": "F4",
       "type": "life_event_large_income_increase",
       "category": "life_event",
       "priority": "high",
-      "headline": "AGI rose 94% from $88,000 to $171,000",
+      "headline": "Large income change",
       "explanation": "AGI rose 94% from $88,000 to $171,000 since last year. Several changes happened together.",
       "dollar_impact": null,
       "member": null,
       "person_id": null,
-      "action_label": "Review life changes",
-      "check": "verified"
+      "action_label": "Schedule review",
+      "check": "verified",
+      "metrics": {
+        "before": 88000,
+        "after": 171000,
+        "change_pct": 94,
+        "flag_change_pct": 25
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     }
   ],
   "data_quality": {
@@ -209,5 +278,44 @@
     "unchecked_values": 0,
     "missing_documents": []
   },
-  "errors": []
+  "errors": [],
+  "prior_year": {
+    "tax_year": 2024,
+    "filing_status": "married_filing_jointly",
+    "numbers": [
+      {
+        "field": "adjusted_gross_income",
+        "label": "Adjusted gross income",
+        "value": 88000
+      },
+      {
+        "field": "dependents",
+        "label": "Dependents",
+        "value": 0
+      }
+    ],
+    "members": [
+      {
+        "person_id": "HH005-P1",
+        "name": "Casey Brooks",
+        "numbers": [
+          {
+            "field": "employer",
+            "label": "Employer",
+            "value": "Acme Sample Corp"
+          },
+          {
+            "field": "wages",
+            "label": "Wages",
+            "value": 90000
+          },
+          {
+            "field": "employee_401k_contribution",
+            "label": "401(k) contribution",
+            "value": 9000
+          }
+        ]
+      }
+    ]
+  }
 }

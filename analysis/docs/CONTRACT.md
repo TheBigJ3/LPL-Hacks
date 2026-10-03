@@ -44,14 +44,21 @@ priority      informational | low | medium | high | null   (highest finding prio
 checklist_label "Flags for review, not advice"
 summary       {filing_status, dependents, dependents_check, agi, cash (+months_of_income), mortgage_interest}
 members[]     {person_id, name, employer, numbers[] {field, label, value, check, source_document, page, context, candidates}}
-checklist[]   {id, question, answer, reason, dollar_impact, finding_ids}
+checklist[]   {id, question, answer, reason, dollar_impact, finding_ids, metrics, rule}
 changes_since_last_year[] {type, text}
-findings[]    {id, type, category, priority, headline, explanation, dollar_impact, member, person_id, action_label, check}
+findings[]    {id, type, category, priority, headline, explanation, dollar_impact, member, person_id, action_label, check, metrics, rule}
 data_quality  {documents, conflicts[], low_confidence_fields[], unchecked_values, missing_documents[]}
 errors[]      {code, path, message, severity}
+prior_year    {tax_year, filing_status, numbers[] {field, label, value}, members[] {person_id, name, numbers[]}} | null
 ```
 
 - `status` is `no_findings` when no finding is `medium` or above.
+- Checklist questions, finding `type`/`category`/`headline`/`action_label` and field labels come from
+  `config/tags.json` (headline `{member}` = the member's first name, `{field}` = the field label, lowercased).
+- `metrics` holds the exact numbers a rule decided on (e.g. `contribution`, `pct_of_pay`, `pct_of_limit`, `room`,
+  `limit`; `cash`, `months_of_income`, `target`, `excess`; `withholding_pct`); `rule` states the threshold applied.
+  Downstream text (Ask, RAG) quotes these and never recomputes them.
+- `prior_year` is last year's values exactly as received. They have no documents and are never checked.
 - Findings are sorted by priority, highest first. A finding's `check` is the worst check of the values it rests on.
 - A conflicted value has `value: null`, `check: "conflicted"` and every `candidates[]` entry with its source document.
 - `errors` with `severity: "error"` (input could not be normalized) means `status: "needs_review"`, `summary: null`,

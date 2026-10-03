@@ -79,7 +79,7 @@ def test_hh006_findings():
     found = by_type(result)
     retirement = found["retirement_contribution_review"]
     assert retirement.priority == "high"
-    assert retirement.headline == "Taylor is saving very little for retirement"
+    assert retirement.headline == "Taylor could save more for retirement"
     assert retirement.explanation == ("Taylor contributed $2,000 to a 401(k), 1.8% of $110,000 wages "
                                       "and 9% of the $23,500 limit.")
     assert retirement.dollar_impact == 21500

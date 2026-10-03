@@ -191,12 +191,22 @@
             "title": "Id",
             "type": "string"
           },
+          "metrics": {
+            "additionalProperties": true,
+            "title": "Metrics",
+            "type": "object"
+          },
           "question": {
             "title": "Question",
             "type": "string"
           },
           "reason": {
             "title": "Reason",
+            "type": "string"
+          },
+          "rule": {
+            "default": "",
+            "title": "Rule",
             "type": "string"
           }
         },
@@ -761,6 +771,11 @@
             ],
             "title": "Member"
           },
+          "metrics": {
+            "additionalProperties": true,
+            "title": "Metrics",
+            "type": "object"
+          },
           "person_id": {
             "anyOf": [
               {
@@ -780,6 +795,11 @@
               "high"
             ],
             "title": "Priority",
+            "type": "string"
+          },
+          "rule": {
+            "default": "",
+            "title": "Rule",
             "type": "string"
           },
           "type": {
@@ -1390,6 +1410,16 @@
             "title": "Members",
             "type": "array"
           },
+          "prior_year": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PriorYear"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "priority": {
             "anyOf": [
               {
@@ -1463,6 +1493,130 @@
           "errors"
         ],
         "title": "Overview",
+        "type": "object"
+      },
+      "PriorYear": {
+        "additionalProperties": false,
+        "description": "Last year's values as received (no documents, so never checked).",
+        "properties": {
+          "filing_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filing Status"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/PriorYearMember"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "numbers": {
+            "items": {
+              "$ref": "#/components/schemas/PriorYearNumber"
+            },
+            "title": "Numbers",
+            "type": "array"
+          },
+          "tax_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Year"
+          }
+        },
+        "required": [
+          "tax_year",
+          "filing_status",
+          "numbers",
+          "members"
+        ],
+        "title": "PriorYear",
+        "type": "object"
+      },
+      "PriorYearMember": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "numbers": {
+            "items": {
+              "$ref": "#/components/schemas/PriorYearNumber"
+            },
+            "title": "Numbers",
+            "type": "array"
+          },
+          "person_id": {
+            "title": "Person Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "person_id",
+          "name",
+          "numbers"
+        ],
+        "title": "PriorYearMember",
+        "type": "object"
+      },
+      "PriorYearNumber": {
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "field",
+          "label",
+          "value"
+        ],
+        "title": "PriorYearNumber",
         "type": "object"
       },
       "SourceCandidate": {

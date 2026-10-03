@@ -27,3 +27,12 @@ Appended by `scripts/checkpoint.py`. One row per checkpoint run; never edited by
 | 2026-10-02T20:41:49-07:00 | CHECKPOINT 2 (re-run after S) | `pytest -q tests/test_textract.py` | 20 | 0 | 0 | 0 | 0 |  |
 | 2026-10-02T20:42:00-07:00 | CHECKPOINT 3 (re-run after S) | `pytest -q tests/test_evidence.py` | 60 | 0 | 2 | 0 | 0 | zero false confirmations |
 | 2026-10-02T20:42:32-07:00 | Full suite after S | `pytest -q tests` | 457 | 0 | 2 | 0 | 0 |  |
+| 2026-10-02T20:47:52-07:00 | CHECKPOINT 4+ | `pytest -q tests/test_rules_tags.py tests/test_rules.py tests/test_checklist.py tests/test_tags.py` | 115 | 0 | 0 | 0 | 0 | checklist/finding ids, headlines, action labels and field labels from config/tags.json; metrics + rule on every finding/checklist item; prior_year block; 2026 limit cited; demo households fully checked |
+| 2026-10-02T20:48:03-07:00 | CHECKPOINT 3 (re-run after 4+) | `pytest -q tests/test_evidence.py` | 60 | 0 | 2 | 0 | 0 | samples regenerated |
+| 2026-10-02T20:48:04-07:00 | CHECKPOINT 4 (re-run after 4+) | `pytest -q tests/test_rules.py tests/test_checklist.py` | 81 | 0 | 0 | 0 | 0 | samples regenerated |
+| 2026-10-02T20:48:18-07:00 | CHECKPOINT 5 (re-run after 4+) | `pytest -q tests/test_overview.py` | 75 | 9 | 0 | 0 | 0 | samples regenerated STOP: failures. |
+| 2026-10-02T20:49:33-07:00 | CHECKPOINT 4+ | `pytest -q tests/test_rules_tags.py tests/test_rules.py tests/test_checklist.py tests/test_tags.py` | 115 | 0 | 0 | 0 | 0 | re-run after renaming metric keys threshold_* -> flag_* (tripped the no-model-internals guard) |
+| 2026-10-02T20:49:44-07:00 | CHECKPOINT 3 (re-run after 4+) | `pytest -q tests/test_evidence.py` | 60 | 0 | 2 | 0 | 0 |  |
+| 2026-10-02T20:49:44-07:00 | CHECKPOINT 4 (re-run after 4+) | `pytest -q tests/test_rules.py tests/test_checklist.py` | 81 | 0 | 0 | 0 | 0 |  |
+| 2026-10-02T20:49:59-07:00 | CHECKPOINT 5 (re-run after 4+) | `pytest -q tests/test_overview.py` | 84 | 0 | 0 | 0 | 0 | samples regenerated |
+| 2026-10-02T20:50:33-07:00 | Full suite after 4+ | `pytest -q tests` | 467 | 0 | 2 | 0 | 0 |  |

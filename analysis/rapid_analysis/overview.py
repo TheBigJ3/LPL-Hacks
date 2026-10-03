@@ -145,6 +145,21 @@ def _data_quality(household: Household, checks: Mapping[str, Check], findings) -
                                 unchecked_values=unchecked, missing_documents=missing)
 
 
+def _prior_year(household: Household) -> contract.PriorYear | None:
+    prior = household.prior_year
+    if prior is None:
+        return None
+
+    def numbers(fields: dict) -> list[contract.PriorYearNumber]:
+        return [contract.PriorYearNumber(field=name, label=FIELD_LABELS.get(name, name), value=_display(fv))
+                for name, fv in fields.items() if fv is not None]
+
+    return contract.PriorYear(
+        tax_year=prior.tax_year, filing_status=prior.filing_status, numbers=numbers(prior.fields),
+        members=[contract.PriorYearMember(person_id=m.person_id, name=m.name, numbers=numbers(m.fields)) for m in prior.members],
+    )
+
+
 def _label_for(key: str, household: Household) -> tuple[str, str, Member | None]:
     owner, name = key.split(".", 1)
     member = next((m for m in household.members if m.person_id == owner), None)
@@ -210,7 +225,7 @@ def overview_build_household(household: Household, documents: Mapping[str, Evide
     findings_out = [contract.Finding(
         id=f.id, type=f.type, category=f.category, priority=f.priority, headline=f.headline,
         explanation=f.explanation, dollar_impact=f.dollar_impact, member=f.member, person_id=f.person_id,
-        action_label=f.action_label, check=finding_check(f.value_keys),
+        action_label=f.action_label, check=finding_check(f.value_keys), metrics=f.metrics, rule=f.rule,
     ) for f in result.findings]
     findings_out.sort(key=lambda f: (-PRIORITY_RANK[f.priority], int(f.id[1:])))
 
@@ -237,12 +252,14 @@ def overview_build_household(household: Household, documents: Mapping[str, Evide
         summary=summary,
         members=[_member_card(household, m, checks) for m in household.members],
         checklist=[contract.ChecklistItem(id=i.id, question=i.question, answer=i.answer, reason=i.reason,
-                                          dollar_impact=i.dollar_impact, finding_ids=i.finding_ids)
+                                          dollar_impact=i.dollar_impact, finding_ids=i.finding_ids,
+                                          metrics=i.metrics, rule=i.rule)
                    for i in result.checklist],
         changes_since_last_year=[contract.Change(type=c.type, text=c.text) for c in result.changes],
         findings=findings_out,
         data_quality=_data_quality(household, checks, result.findings),
         errors=errors,
+        prior_year=_prior_year(household),
     )
 
     evidence: dict[str, dict] = {}
