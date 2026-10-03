@@ -8,3 +8,4 @@ Appended by `scripts/checkpoint.py`. One row per checkpoint run; never edited by
 | 2026-10-02T19:26:21-07:00 | Phase 1 | `pytest -q tests` | 62 | 0 | 0 | 0 | 0 | normalization + 10 fixtures; cumulative suite |
 | 2026-10-02T19:30:49-07:00 | Phase 2 | `pytest -q tests` | 80 | 0 | 0 | 0 | 0 | Textract Blocks ingestion incl. real backend 1099-R log; cumulative suite |
 | 2026-10-02T19:35:33-07:00 | Phase 3 | `pytest -q tests` | 130 | 0 | 2 | 0 | 0 | evidence checker: 38-claim battery 0 false confirmations; 2 strict xfails (raw LINE order, household noul) |
+| 2026-10-02T19:39:03-07:00 | Phase 4 | `pytest -q tests` | 209 | 0 | 2 | 0 | 0 | rules v2025.1: section 6 table exact for all 10 fixtures; cumulative suite |
