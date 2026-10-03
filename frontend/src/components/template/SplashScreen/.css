@@ -1,0 +1,77 @@
+.splash-screen {
+  --splash-screen-logo-height: 40px;
+  --splash-screen-unit: calc(var(--splash-screen-logo-height) / 16.2565);
+  --splash-screen-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2000;
+  color: var(--color-main-black);
+  background: var(--color-main-white);
+  transition: opacity var(--splash-screen-exit-ms) ease;
+}
+
+@media (min-width: 640px) {
+  .splash-screen {
+    --splash-screen-logo-height: 56px;
+  }
+}
+
+.splash-screen[data-phase="exiting"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-screen__logo {
+  height: var(--splash-screen-logo-height);
+  transition: transform var(--splash-screen-exit-ms) var(--splash-screen-ease);
+}
+
+.splash-screen[data-phase="exiting"] .splash-screen__logo {
+  transform: translateY(calc(var(--splash-screen-unit) * -3)) scale(.98);
+}
+
+.splash-screen__mark {
+  width: calc(var(--splash-screen-unit) * 16.0787);
+  height: 100%;
+  overflow: visible;
+}
+
+.splash-screen__square,
+.splash-screen__inner,
+.splash-screen__outer {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.splash-screen__square {
+  animation: splash-screen-square var(--splash-screen-square-ms) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.splash-screen__inner {
+  animation: splash-screen-inner var(--splash-screen-inner-ms) var(--splash-screen-ease) var(--splash-screen-inner-delay-ms) both;
+}
+
+.splash-screen__outer {
+  animation: splash-screen-outer var(--splash-screen-outer-ms) var(--splash-screen-ease) var(--splash-screen-outer-delay-ms) both;
+}
+
+@keyframes splash-screen-square {
+  from { opacity: 0; transform: translateY(-6px) rotate(-14deg) scale(.6); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes splash-screen-inner {
+  from { opacity: 0; transform: translate(5px, -5px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes splash-screen-outer {
+  from { opacity: 0; transform: translate(9px, -9px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-screen__square,
+  .splash-screen__inner,
+  .splash-screen__outer { animation: none; }
+
+  .splash-screen__logo { transition: none; }
+}

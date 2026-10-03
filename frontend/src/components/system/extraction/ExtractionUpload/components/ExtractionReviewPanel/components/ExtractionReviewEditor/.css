@@ -94,6 +94,11 @@
   accent-color: var(--color-accent-blue);
 }
 
+.extraction-review-editor__field {
+  color: var(--color-dark-gray);
+  font-size: 12px;
+}
+
 .extraction-review-editor__input {
   border: 1px solid var(--color-border);
   background: var(--color-main-white);

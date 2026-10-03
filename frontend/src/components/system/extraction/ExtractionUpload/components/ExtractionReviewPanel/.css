@@ -62,11 +62,44 @@
   color: var(--color-dark-gray);
 }
 
-.extraction-review-panel__next:focus-visible {
+.extraction-review-panel__confirm {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-default);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+
+.extraction-review-panel__confirm .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.extraction-review-panel__confirm:hover {
+  background: var(--color-surface-hover);
+}
+
+.extraction-review-panel__confirm[data-ready="true"] {
+  border-color: var(--color-accent-blue);
+  background: var(--color-accent-blue);
+  color: #FFFFFF;
+}
+
+.extraction-review-panel__confirm[data-ready="true"]:hover {
+  opacity: 0.9;
+}
+
+.extraction-review-panel__hint {
+  color: var(--color-dark-gray);
+  font-size: 12px;
+  text-align: center;
+}
+
+.extraction-review-panel__next:focus-visible,
+.extraction-review-panel__confirm:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .extraction-review-panel__progress, .extraction-review-panel__next { transition: none; }
+  .extraction-review-panel__progress, .extraction-review-panel__next, .extraction-review-panel__confirm { transition: none; }
 }

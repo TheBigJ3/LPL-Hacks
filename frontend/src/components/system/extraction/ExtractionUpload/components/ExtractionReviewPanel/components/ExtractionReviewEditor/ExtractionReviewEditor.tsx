@@ -7,7 +7,7 @@ const ExtractionReviewEditor = ({ selected, onEdit, onConfirm, onRevert }: {
   onConfirm: (id: string) => void
   onRevert: (id: string) => void
 }) =>
-  <section className="extraction-review-editor flex flex-col gap-3 rounded-lg p-4" aria-label={selected.label}>
+  <section id={EXTRACTION_EDITOR_DOM_ID} className="extraction-review-editor flex scroll-m-4 flex-col gap-3 rounded-lg p-4" aria-label={selected.label}>
     <div className="flex items-start justify-between gap-3">
       <p className="extraction-review-editor__label">{selected.label}</p>
       <span className="extraction-review-editor__badge flex-none rounded-full px-2 py-0.5" data-status={selected.status}>{selected.statusLabel}</span>
@@ -18,7 +18,7 @@ const ExtractionReviewEditor = ({ selected, onEdit, onConfirm, onRevert }: {
         <div style={selected.crop.markerStyle} className="extraction-review-editor__marker absolute rounded-sm" />
       </div>}
     <dl className="extraction-review-editor__details grid items-center gap-x-3 gap-y-1.5">
-      <dt>OCR read</dt>
+      <dt>Picked up</dt>
       <dd className="extraction-review-editor__mono break-all">{selected.readAs}</dd>
       {selected.normalizedLabel && <>
         <dt>Parsed</dt>
@@ -43,10 +43,13 @@ const ExtractionReviewEditor = ({ selected, onEdit, onConfirm, onRevert }: {
       </ul>}
     {selected.kind === 'checkbox'
       ? <label className="extraction-review-editor__check flex items-center gap-2">
-        <input id={EXTRACTION_EDITOR_DOM_ID} type="checkbox" className="size-4" checked={selected.checked} onChange={(event) => onEdit(selected.id, event.target.checked)} />
+        <input type="checkbox" className="size-4" checked={selected.checked} onChange={(event) => onEdit(selected.id, event.target.checked)} />
         Checked
       </label>
-      : <input id={EXTRACTION_EDITOR_DOM_ID} type="text" className="extraction-review-editor__input w-full rounded-lg px-3 py-2" aria-label={selected.label} value={selected.text} onChange={(event) => onEdit(selected.id, event.target.value)} />}
+      : <label className="extraction-review-editor__field flex flex-col gap-1">
+        Value
+        <input type="text" className="extraction-review-editor__input w-full rounded-lg px-3 py-2" value={selected.text} onChange={(event) => onEdit(selected.id, event.target.value)} />
+      </label>}
     {(selected.canConfirm || selected.canRevert) &&
       <div className="flex gap-2">
         {selected.canConfirm &&
