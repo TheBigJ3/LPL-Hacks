@@ -66,8 +66,9 @@ function knowledgeBaseDocumentSectionMetadata(document: KnowledgeBaseDocument, s
       clientId: document.clientId,
       fileName: document.fileName,
       sectionId: section.sectionId,
-      tags: document.tags,
-      familyMembers: document.familyMembers,
+      // Bedrock skips a document whose metadata has an empty list, so empty lists are left out like the other optional keys.
+      ...(document.tags.length > 0 ? { tags: document.tags } : {}),
+      ...(document.familyMembers.length > 0 ? { familyMembers: document.familyMembers } : {}),
       ...(section.page !== null ? { page: section.page } : {}),
       ...(document.docType !== null ? { docType: document.docType } : {}),
       ...(document.taxYear !== null ? { taxYear: document.taxYear } : {}),

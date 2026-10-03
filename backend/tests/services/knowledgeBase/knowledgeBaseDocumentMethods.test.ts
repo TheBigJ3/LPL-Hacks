@@ -48,12 +48,20 @@ describe("knowledgeBaseDocumentIngestDecision", () => {
         fileName: "taylor_w2_2025.pdf",
         sectionId: "document",
         tags: ["tag_earnings"],
-        familyMembers: [],
         docType: "w2",
         taxYear: 2025,
       },
     });
     expect(indexed.map((input) => input.Body).join("")).not.toMatch(/probabilities|confidence|0\.89|0\.73|0\.98/);
+  });
+
+  it("leaves empty tag and member lists out of the metadata", async () => {
+    const untagged = JSON.stringify({ answers: { docType: { type: "other", evidence: [{ id: "document", text: "Letter" }] } } });
+
+    await knowledgeBaseDocumentIngestDecision("HH006", "letter.pdf", Buffer.from(untagged));
+
+    const metadata = sent("PutObjectCommand").find((input) => input.Key.endsWith(".metadata.json"))!;
+    expect(Object.keys(JSON.parse(metadata.Body).metadataAttributes)).toEqual(["documentId", "clientId", "fileName", "sectionId"]);
   });
 
   it("deletes indexed objects the new decision no longer has", async () => {
