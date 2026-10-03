@@ -1,17 +1,27 @@
 import './.css'
-import { EXTRACTION_HIGHLIGHT_LEGEND, EXTRACTION_PANEL_DOM_ID, type ExtractionEditValue, type ExtractionReviewView } from '../../.ts'
+import {
+  EXTRACTION_HIGHLIGHT_LEGEND,
+  EXTRACTION_PANEL_DOM_ID,
+  type ExtractionConfirmView,
+  type ExtractionEditValue,
+  type ExtractionReviewView,
+  type ExtractionTagView,
+} from '../../.ts'
 import ExtractionReviewEditor from './components/ExtractionReviewEditor/ExtractionReviewEditor'
 import ExtractionReviewList from './components/ExtractionReviewList/ExtractionReviewList'
+import ExtractionTagSummary from './components/ExtractionTagSummary/ExtractionTagSummary'
 
-const ExtractionReviewPanel = ({ review, onEdit, onConfirm, onUnconfirm, onRevert, onFocusItem, onNext, onConfirmExport }: {
+const ExtractionReviewPanel = ({ review, confirm, tag, onEdit, onConfirm, onUnconfirm, onRevert, onFocusItem, onNext, onConfirmAndTag }: {
   review: ExtractionReviewView
+  confirm: ExtractionConfirmView
+  tag: ExtractionTagView | null
   onEdit: (id: string, value: ExtractionEditValue) => void
   onConfirm: (id: string) => void
   onUnconfirm: (id: string) => void
   onRevert: (id: string) => void
   onFocusItem: (id: string) => void
   onNext: () => void
-  onConfirmExport: () => void
+  onConfirmAndTag: () => void
 }) =>
   <aside id={EXTRACTION_PANEL_DOM_ID} className="extraction-review-panel flex flex-col gap-4" aria-label="Review">
     <div className="extraction-review-panel__card flex flex-col gap-3 rounded-lg p-4">
@@ -34,12 +44,13 @@ const ExtractionReviewPanel = ({ review, onEdit, onConfirm, onUnconfirm, onRever
         {review.nextLabel}
         <span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
       </button>
-      <button type="button" className="extraction-review-panel__confirm flex items-center justify-center gap-1.5 rounded-lg px-3 py-2" data-ready={review.unresolved === 0} onClick={onConfirmExport}>
-        <span className="material-symbols-outlined" aria-hidden="true">download</span>
-        Confirm &amp; download JSON
+      <button type="button" className="extraction-review-panel__confirm flex items-center justify-center gap-1.5 rounded-lg px-3 py-2" data-ready={!confirm.disabled} disabled={confirm.disabled} onClick={onConfirmAndTag}>
+        <span className="material-symbols-outlined" data-icon={confirm.icon} aria-hidden="true">{confirm.icon}</span>
+        {confirm.label}
       </button>
-      {review.exportHint && <p className="extraction-review-panel__hint">{review.exportHint}</p>}
+      {confirm.hint && <p className="extraction-review-panel__hint">{confirm.hint}</p>}
     </div>
+    {tag && <ExtractionTagSummary tag={tag} onRetry={onConfirmAndTag} />}
     {review.selected
       ? <ExtractionReviewEditor selected={review.selected} onEdit={onEdit} onConfirm={onConfirm} onUnconfirm={onUnconfirm} onRevert={onRevert} onNext={onNext} />
       : <p className="extraction-review-panel__empty flex items-start gap-2 rounded-lg p-4">

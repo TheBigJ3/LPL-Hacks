@@ -1,8 +1,10 @@
 import { randomUUID } from "crypto";
 import type { Readable } from "stream";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import type { Document } from "@lpl-hacks/shared/src/types/native/documents/document.js";
+import type { DocumentReview, DocumentReviewField } from "@lpl-hacks/shared/src/types/native/documents/documentReview.js";
+import type { DocumentTagging } from "@lpl-hacks/shared/src/types/native/documents/documentTagging.js";
 import type { ExtractedAnalysis } from "@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis.js";
 import documentsExtractionSettled from "@lpl-hacks/shared/src/types/native/sockets/documents/extractionSettled.js";
 import { db } from "../../loaders/postgresLoader.js";
@@ -17,6 +19,7 @@ import { DOCUMENT_ERRORS } from "../../types/native/documents/errors.js";
 import { EXTRACTION_ERRORS } from "../../types/native/extraction/errors.js";
 import { extractedFieldAnalyze, type ExtractedFieldResult } from "../extraction/extractedFieldMethods.js";
 import { realtimeNotifyRooms } from "../realtime/realtimeMethods.js";
+import { documentReviewCheckFields } from "./documentReviewChecks.js";
 
 type DocumentUpload = UploadRequest & {
   fileName: string;
@@ -70,11 +73,46 @@ export async function documentGetContent(documentId: string): Promise<{ contentT
   return { contentType: record.contentType, body: object.Body as Readable };
 }
 
-export async function documentGet(documentId: string): Promise<{ document: Document; extraction: ExtractedAnalysis | null }> {
+export async function documentGet(documentId: string): Promise<{
+  document: Document;
+  extraction: ExtractedAnalysis | null;
+  review: DocumentReview | null;
+  tagging: DocumentTagging | null;
+}> {
   const record = await documentGetRecord(documentId);
   if (!record) throw new AppError(DOCUMENT_ERRORS.DOCUMENT_NOT_FOUND);
 
-  return { document: documentToView(record), extraction: record.extraction ?? null };
+  return {
+    document: documentToView(record),
+    extraction: record.extraction ?? null,
+    review: record.reviewedAt && record.reviewedFields ? { reviewedAt: record.reviewedAt.toISOString(), fields: record.reviewedFields } : null,
+    tagging: record.tagging ?? null,
+  };
+}
+
+// Saving the review is what makes its fields verified; it also hands the document to tagging, replacing any earlier result.
+export async function documentConfirm(documentId: string, fields: Record<string, DocumentReviewField>): Promise<{ document: Document; reviewedAt: string }> {
+  const [record] = await db.select({ status: documents.status, extraction: documents.extraction, tagStatus: documents.tagStatus })
+    .from(documents)
+    .where(eq(documents.id, documentId))
+    .limit(1);
+  if (!record) throw new AppError(DOCUMENT_ERRORS.DOCUMENT_NOT_FOUND);
+  if (record.status !== "extracted" || !record.extraction) throw new AppError(DOCUMENT_ERRORS.DOCUMENT_NOT_EXTRACTED);
+  if (record.tagStatus === "pending") throw new AppError(DOCUMENT_ERRORS.TAGGING_IN_PROGRESS);
+  documentReviewCheckFields(record.extraction, fields);
+
+  const reviewedAt = new Date();
+  const [updated] = await db.update(documents)
+    .set({ reviewedFields: fields, reviewedAt, tagStatus: "pending", tagging: null, tagFailureMessage: null, indexStatus: null })
+    .where(and(
+      eq(documents.id, documentId),
+      eq(documents.status, "extracted"),
+      or(isNull(documents.tagStatus), ne(documents.tagStatus, "pending")),
+    ))
+    .returning();
+  if (!updated) throw new AppError(DOCUMENT_ERRORS.TAGGING_IN_PROGRESS);
+
+  return { document: documentToView(updated), reviewedAt: reviewedAt.toISOString() };
 }
 
 export async function documentGetRecord(documentId: string): Promise<DocumentRecord | null> {
@@ -135,5 +173,8 @@ function documentToView(record: DocumentRecord): Document {
     status: record.status,
     pageCount: record.pageCount,
     failureMessage: record.failureMessage,
+    tagStatus: record.tagStatus,
+    tagFailureMessage: record.tagFailureMessage,
+    indexStatus: record.indexStatus,
   };
 }
