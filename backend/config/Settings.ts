@@ -7,4 +7,10 @@ export default  {
     AUTH_REFILL_PER_SEC: 5,
     IPV6_PREFIX: 64
   },
+  DOCUMENTS: {
+    _TAGS: ["Tax", "Earnings", "Investments", "Retirement", "Banking", "Insurance", "Estate", "Identity"],
+  },
+  ANSWER: {
+    MAX_SOURCES: 8,
+  },
 }

@@ -1,0 +1,3 @@
+export const ANSWER_ERRORS = {
+    ANSWER_UNAVAILABLE: { STATUS: "SERVICE_UNAVAILABLE", HTTP_CODE: 503, MESSAGE: "The assistant is unavailable, try again later" },
+} as const;
