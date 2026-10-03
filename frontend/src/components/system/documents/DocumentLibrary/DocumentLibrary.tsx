@@ -14,7 +14,7 @@ const DocumentLibrary = () => {
     <PageHeader title="Documents" />
     <div className="document-library flex flex-1 items-center justify-center">
       <h1 className="sr-only">Documents</h1>
-      <EmptyState title="No client selected" subtitle="Select one to get started" />
+      <EmptyState title="No client selected" subtitle="Select one to get started" icon="draft" />
     </div>
   </>
 
@@ -46,7 +46,7 @@ const DocumentLibrary = () => {
                     <DocumentSection key={section.key} section={section} mode={library.mode} columns={library.columns} wide={library.wide} />
                   )}
                 </div>
-                : <EmptyState title={library.empty.title} subtitle={library.empty.subtitle} />}
+                : <EmptyState title={library.empty.title} subtitle={library.empty.subtitle} icon="draft" />}
             </motion.div>}
         </AnimatePresence>
       </div>
