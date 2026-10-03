@@ -14,4 +14,11 @@ export default  {
   ANSWER: {
     MAX_SOURCES: 8,
   },
+  INSIGHT: {
+    MAX_SOURCES: 8,
+    MAX_TOOL_ROUNDS: 6,
+    PROGRESS_INTERVAL_MS: 150,
+    QUOTE_MAX_CHARS: 600,
+    STALE_ANSWER_MS: 5 * 60 * 1000,
+  },
 }

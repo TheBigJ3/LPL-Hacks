@@ -6,4 +6,5 @@ export const RetrievalFilterZod = z.object({
   familyMembers: z.array(z.string().min(1)).min(1).optional(),
   docType: z.string().min(1).optional(),
   taxYear: z.number().int().optional(),
+  sourceType: z.enum(["document", "note"]).optional(),
 });

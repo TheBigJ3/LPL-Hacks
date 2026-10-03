@@ -21,6 +21,10 @@ export function retrievalChunkBuildFilter(filters: RetrievalFilter): BedrockRetr
     conditions.push({ equals: { key: "docType", value: filters.docType } });
   }
 
+  if (filters.sourceType !== undefined) {
+    conditions.push({ equals: { key: "sourceType", value: filters.sourceType } });
+  }
+
   if (filters.tags !== undefined) {
     conditions.push(retrievalChunkAnyOf("tags", filters.tags));
   }
