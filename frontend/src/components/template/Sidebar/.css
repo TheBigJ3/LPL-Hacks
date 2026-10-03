@@ -56,6 +56,16 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: none;
+  /* Navy panel in both themes: remap the tokens children read to light-on-navy. */
+  --color-surface: var(--color-navy);
+  --color-surface-hover: var(--color-navy-hover);
+  --color-border: rgba(255, 255, 255, .12);
+  --color-main-white: var(--color-navy);
+  --color-main-black: #FAFAFA;
+  --color-dark-gray: var(--color-navy-muted);
+  --color-text-default: #E4E4E7;
+  --color-focus-ring: var(--color-accent-blue-light);
+  --color-heading: var(--color-accent-blue-light);
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
   border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
