@@ -16,7 +16,7 @@ const NoteLibrary = () => {
     <PageHeader title="Notes" />
     <div className="note-library flex flex-1 items-center justify-center">
       <h1 className="sr-only">Notes</h1>
-      <EmptyState title="No client selected" subtitle="Select one to get started" />
+      <EmptyState title="No client selected" subtitle="Select one to get started" icon="history_edu" />
     </div>
   </>
 
@@ -43,7 +43,7 @@ const NoteLibrary = () => {
             animate="center"
             exit="exit"
           >
-            {!library.loading && !library.notes.length && <EmptyState title={library.empty.title} subtitle={library.empty.subtitle} />}
+            {!library.loading && !library.notes.length && <EmptyState title={library.empty.title} subtitle={library.empty.subtitle} icon="history_edu" />}
             {!!library.notes.length && library.view === 'grid' &&
               <ul className="note-library__notes grid">
                 {library.notes.map((note) => <NoteCard key={note.id} note={note} variants={library.itemVariants} onOpen={library.viewNote} onEdit={library.editNote} onDelete={library.deleteNote} />)}
