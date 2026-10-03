@@ -21,7 +21,7 @@
   grid-auto-rows: minmax(44px, auto);
   gap: 12px 24px;
   padding: 12px 24px;
-  background: url('@assets/layout/note-editor-backdrop.png') center / cover no-repeat;
+  background: var(--color-main-white);
 }
 
 .note-editor__header .note-editor__toolbar-slot {

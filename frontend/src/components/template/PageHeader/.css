@@ -9,7 +9,7 @@
   grid-template-columns: var(--page-header-columns);
   gap: 12px 24px;
   padding: 12px var(--page-header-padding-right) 12px var(--page-header-padding-left);
-  background: url('@assets/layout/page-header-backdrop.png') center / cover no-repeat;
+  background: var(--color-main-white);
 }
 
 @media (min-width: 640px) {
