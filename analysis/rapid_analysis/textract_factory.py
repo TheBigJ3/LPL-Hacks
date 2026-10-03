@@ -142,3 +142,28 @@ def textract_statement(holders: str, ending_balance: str, confidence: float = 98
     f.field("Statement period", "12/01/2025 - 12/31/2025", confidence)
     f.field("Ending balance", ending_balance, confidence)
     return f.build()
+
+
+def textract_1098(borrower: str, interest: str, lender: str = "Sample Mortgage Lending Co", confidence: float = 97.0) -> dict:
+    f = TextractFactory()
+    f.line("SYNTHETIC TEST DATA - NOT FOR FILING").line("2025 Form 1098 Mortgage Interest Statement")
+    f.field("RECIPIENT'S/LENDER'S name", f"{lender} 300 Sample Boulevard, Springfield, IL 62701", confidence)
+    f.field("RECIPIENT'S TIN", "00-0000000", confidence)
+    f.field("PAYER'S/BORROWER'S TIN", "000-00-0000", confidence)
+    f.field("PAYER'S/BORROWER'S name", borrower, confidence)
+    f.field("Street address (including apt. no.)", "456 Sample Street", confidence)
+    f.field("Account number (see instructions)", "TEST-1098-0001", confidence)
+    f.field("1 Mortgage interest received from payer(s)/borrower(s)", interest, confidence)
+    f.field("Form", "1098", 91.0)
+    return f.build()
+
+
+def textract_hsa_coverage(member: str, eligible: bool, plan: str = "Sample Health Plan Bronze HSA", confidence: float = 96.0) -> dict:
+    f = TextractFactory()
+    f.line("SYNTHETIC TEST DATA - NOT FOR FILING").line("Form 1095-B Health Coverage 2025")
+    f.field("Covered member", member, confidence)
+    f.field("Member ID", "TEST-HP-0001", confidence)
+    f.field("Plan name", plan, confidence)
+    f.field("Coverage period", "01/01/2025 - 12/31/2025", confidence)
+    f.field("HSA-eligible high deductible health plan (HDHP)", eligible, confidence)
+    return f.build()

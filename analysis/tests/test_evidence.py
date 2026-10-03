@@ -51,6 +51,10 @@ TRUE_VALUES = [
     ("wages", 120000.0, "Jordan Park", "jordan_w2_2025.pdf", "verified"),
     ("wages", 165000.0, "Jordan Park", "hh004_1040_2025.pdf", "verified"),
     ("hsa_contribution", 4300.0, "Morgan Lee", "morgan_w2_2025.pdf", "verified"),
+    ("hsa_eligible_health_plan", True, "Alex Rivera", "alex_hdhp_coverage_2025.pdf", "verified"),
+    ("mortgage_interest", 14200.0, "Casey Brooks", "hh005_1098_2025.pdf", "verified"),
+    ("employee_401k_contribution", 8800.0, "Quinn Harper", "quinn_w2_2025.pdf", "verified"),
+    ("adjusted_gross_income", 139000.0, "Drew Kim and Avery Kim", "hh007_1040_2025.pdf", "verified"),
 ]
 NEAR_MISSES = [
     ("employee_401k_contribution", 8300.0, "John Sample", "john_w2_2025.pdf", "mismatch"),
@@ -65,17 +69,25 @@ NEAR_MISSES = [
     ("dependents", 3, "John Sample and Sarah Sample", "hh001_1040_2025.pdf", "mismatch"),
     ("cash_balance", 32261.56, "John Sample and Sarah Sample", "hh001_bank_statement_2025.pdf", "mismatch"),
     ("wages", 120000.0, "Jordan Park", "hh004_1040_2025.pdf", "mismatch"),
+    ("mortgage_interest", 14800.0, "Casey Brooks", "hh005_1098_2025.pdf", "mismatch"),
+    ("hsa_eligible_health_plan", False, "Alex Rivera", "alex_hdhp_coverage_2025.pdf", "mismatch"),
+]
+# Near misses the model does not flag as mismatch but must still never confirm (fails safe to unconfirmed).
+NEAR_MISS_FAIL_SAFE = [
+    ("employee_401k_contribution", 8080.0, "Quinn Harper", "quinn_w2_2025.pdf", "never_verified"),
 ]
 WRONG_PERSON = [
     ("employee_401k_contribution", 8200.0, "Sarah Sample", "sarah_w2_2025.pdf", "never_verified"),
     ("employee_401k_contribution", 8200.0, "Sarah Sample", "john_w2_2025.pdf", "never_verified"),
     ("employee_401k_contribution", 4500.0, "John Sample", "sarah_w2_2025.pdf", "never_verified"),
     ("retirement_distribution", 12000.0, "Alex Example", "pat_1099r_2025.pdf", "never_verified"),
+    ("wages", 82000.0, "Avery Kim", "drew_w2_2025.pdf", "never_verified"),
+    ("hsa_eligible_health_plan", True, "Morgan Lee", "alex_hdhp_coverage_2025.pdf", "never_verified"),
 ]
 ABSENT = [
     ("hsa_eligible_health_plan", True, "Morgan Lee", "morgan_w2_2025.pdf", "unconfirmed"),
 ]
-BATTERY = TRUE_VALUES + NEAR_MISSES + WRONG_PERSON + ABSENT
+BATTERY = TRUE_VALUES + NEAR_MISSES + NEAR_MISS_FAIL_SAFE + WRONG_PERSON + ABSENT
 
 
 def _ok(result, expected):
@@ -208,7 +220,7 @@ def test_near_misses_mismatch(loaded_engine, field_name, value, person, document
 
 
 @pytest.mark.model
-@pytest.mark.parametrize("field_name,value,person,document,expected", WRONG_PERSON, ids=lambda x: str(x)[:30])
+@pytest.mark.parametrize("field_name,value,person,document,expected", WRONG_PERSON + NEAR_MISS_FAIL_SAFE, ids=lambda x: str(x)[:30])
 def test_wrong_person_never_verified(loaded_engine, field_name, value, person, document, expected):
     assert check_value(field_name, value, person, text(document), doc(document).form_type) != "verified"
 

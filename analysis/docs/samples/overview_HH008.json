@@ -9,16 +9,16 @@
   "summary": {
     "filing_status": "single",
     "dependents": 0,
-    "dependents_check": "not_checked",
+    "dependents_check": "verified",
     "agi": {
       "value": 81000,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh008_1040_2025.pdf",
       "page": 1
     },
     "cash": {
       "value": 15000,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh008_bank_statement_2025.pdf",
       "page": 1,
       "months_of_income": 2.2
@@ -40,7 +40,7 @@
           "field": "wages",
           "label": "Wages",
           "value": 88000,
-          "check": "not_checked",
+          "check": "verified",
           "source_document": "quinn_w2_2025.pdf",
           "page": 1,
           "context": null,
@@ -50,7 +50,7 @@
           "field": "employee_401k_contribution",
           "label": "401(k)",
           "value": 8800,
-          "check": "not_checked",
+          "check": "verified",
           "source_document": "quinn_w2_2025.pdf",
           "page": 1,
           "context": "10.0% of pay · 37% of limit · $14,700 room left",
@@ -140,14 +140,14 @@
       "member": "Quinn Harper",
       "person_id": "HH008-P1",
       "action_label": "Discuss savings",
-      "check": "not_checked"
+      "check": "verified"
     }
   ],
   "data_quality": {
     "documents": 3,
     "conflicts": [],
     "low_confidence_fields": [],
-    "unchecked_values": 5,
+    "unchecked_values": 0,
     "missing_documents": []
   },
   "errors": []

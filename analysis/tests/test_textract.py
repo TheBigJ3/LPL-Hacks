@@ -15,7 +15,14 @@ from rapid_analysis.textract import (
     textract_member_fields,
     textract_parse_blocks,
 )
-from rapid_analysis.textract_factory import TextractFactory, textract_1040, textract_1099r, textract_w2
+from rapid_analysis.textract_factory import (
+    TextractFactory,
+    textract_1040,
+    textract_1098,
+    textract_1099r,
+    textract_hsa_coverage,
+    textract_w2,
+)
 
 SENSITIVE = ["000-00-0000", "00-0000000", "TEST-1099R-0001", "TEST-000001", "456 Sample Street", "Apt. 5B",
              "Long Beach", "90802", "100 Test Plaza", "Sacramento", "95814"]
@@ -187,7 +194,27 @@ def test_two_documents_agreeing_merge():
 def test_committed_document_fixtures_are_marked_synthetic():
     for name in ["john_w2_2025.pdf", "sarah_w2_2025.pdf", "hh001_1040_2025.pdf", "hh001_bank_statement_2025.pdf",
                  "jordan_w2_2025.pdf", "hh004_1040_2025.pdf", "morgan_w2_2025.pdf", "pat_1099r_2025.pdf",
-                 "alex_example_1099r_2026.pdf"]:
+                 "alex_example_1099r_2026.pdf", "alex_w2_2025.pdf", "hh002_1040_2025.pdf", "hh002_bank_statement_2025.pdf",
+                 "alex_hdhp_coverage_2025.pdf", "casey_w2_2025.pdf", "hh005_1040_2025.pdf", "hh005_1098_2025.pdf",
+                 "hh005_bank_statement_2025.pdf", "drew_w2_2025.pdf", "avery_w2_2025.pdf", "hh007_1040_2025.pdf",
+                 "hh007_bank_statement_2025.pdf", "quinn_w2_2025.pdf", "hh008_1040_2025.pdf", "hh008_bank_statement_2025.pdf"]:
         response = fixture_textract(name)
         assert response is not None, name
         assert response["_synthetic"].startswith("SYNTHETIC TEST DATA"), name
+
+
+def test_1098_maps_mortgage_interest_and_redacts_lender_address():
+    evidence = evidence_from_textract(textract_1098("Casey Brooks", "$ 14,200.00"), "hh005_1098_2025.pdf")
+    assert (evidence.form_type, evidence.recipient) == ("1098", "Casey Brooks")
+    assert evidence.values["mortgage_interest"]["value"] == "$ 14,200.00"
+    assert "Lender's name: Sample Mortgage Lending Co." in evidence.text
+    for secret in ["300 Sample Boulevard", "62701", "TEST-1098-0001", "000-00-0000", "456 Sample Street"]:
+        assert secret not in evidence.text
+
+
+def test_1095_maps_hsa_plan_checkbox():
+    evidence = evidence_from_textract(textract_hsa_coverage("Alex Rivera", True), "alex_hdhp_coverage_2025.pdf")
+    assert (evidence.form_type, evidence.recipient) == ("1095", "Alex Rivera")
+    assert evidence.values["hsa_eligible_health_plan"]["value"] is True
+    assert "HSA-eligible high deductible health plan (HDHP): yes, this box is checked." in evidence.text
+    assert "TEST-HP-0001" not in evidence.text

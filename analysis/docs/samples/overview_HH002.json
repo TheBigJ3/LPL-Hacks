@@ -9,16 +9,16 @@
   "summary": {
     "filing_status": "single",
     "dependents": 0,
-    "dependents_check": "not_checked",
+    "dependents_check": "verified",
     "agi": {
       "value": 74500,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh002_1040_2025.pdf",
       "page": 1
     },
     "cash": {
       "value": 26000,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh002_bank_statement_2025.pdf",
       "page": 1,
       "months_of_income": 4.2
@@ -40,7 +40,7 @@
           "field": "wages",
           "label": "Wages",
           "value": 98000,
-          "check": "not_checked",
+          "check": "verified",
           "source_document": "alex_w2_2025.pdf",
           "page": 1,
           "context": null,
@@ -50,7 +50,7 @@
           "field": "employee_401k_contribution",
           "label": "401(k)",
           "value": 23500,
-          "check": "not_checked",
+          "check": "verified",
           "source_document": "alex_w2_2025.pdf",
           "page": 1,
           "context": "24.0% of pay · 100% of limit · $0 room left",
@@ -60,7 +60,7 @@
           "field": "hsa_contribution",
           "label": "HSA contribution",
           "value": 4300,
-          "check": "not_checked",
+          "check": "verified",
           "source_document": "alex_w2_2025.pdf",
           "page": 1,
           "context": null,
@@ -70,7 +70,7 @@
           "field": "hsa_eligible_health_plan",
           "label": "HSA-eligible plan",
           "value": true,
-          "check": "not_checked",
+          "check": "verified",
           "source_document": "alex_hdhp_coverage_2025.pdf",
           "page": 1,
           "context": null,
@@ -151,7 +151,7 @@
     "documents": 4,
     "conflicts": [],
     "low_confidence_fields": [],
-    "unchecked_values": 7,
+    "unchecked_values": 0,
     "missing_documents": []
   },
   "errors": []

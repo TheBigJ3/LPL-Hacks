@@ -1,0 +1,500 @@
+{
+ "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+ "DocumentMetadata": {
+  "Pages": 1
+ },
+ "Blocks": [
+  {
+   "BlockType": "PAGE",
+   "Id": "page-1",
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": []
+    }
+   ]
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-1",
+   "Text": "SYNTHETIC TEST DATA - NOT FOR FILING",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-2",
+   "Text": "Sample Bank Account Statement",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-5",
+   "Text": "Quinn",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-6",
+   "Text": "Harper",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-7",
+   "Text": "Account",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-8",
+   "Text": "holder",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-4",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-5",
+      "word-6"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-3",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-7",
+      "word-8"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-4"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-11",
+   "Text": "****1234",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-12",
+   "Text": "Account",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-13",
+   "Text": "number",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-10",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-11"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-9",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-12",
+      "word-13"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-10"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-16",
+   "Text": "456",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-17",
+   "Text": "Sample",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-18",
+   "Text": "Street,",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-19",
+   "Text": "Springfield,",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-20",
+   "Text": "IL",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-21",
+   "Text": "62704",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-22",
+   "Text": "Mailing",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-23",
+   "Text": "address",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-15",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-16",
+      "word-17",
+      "word-18",
+      "word-19",
+      "word-20",
+      "word-21"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-14",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-22",
+      "word-23"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-15"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-26",
+   "Text": "12/01/2025",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-27",
+   "Text": "-",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-28",
+   "Text": "12/31/2025",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-29",
+   "Text": "Statement",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-30",
+   "Text": "period",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-25",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-26",
+      "word-27",
+      "word-28"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-24",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-29",
+      "word-30"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-25"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-33",
+   "Text": "$15,000.00",
+   "Confidence": 98.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-34",
+   "Text": "Ending",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-35",
+   "Text": "balance",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-32",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-33"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-31",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 98.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-34",
+      "word-35"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-32"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-36",
+   "Text": "Account holder",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-37",
+   "Text": "Account number",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-38",
+   "Text": "Mailing address",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-39",
+   "Text": "Statement period",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-40",
+   "Text": "Ending balance",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-41",
+   "Text": "Quinn Harper",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-42",
+   "Text": "****1234",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-43",
+   "Text": "456 Sample Street, Springfield, IL 62704",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-44",
+   "Text": "12/01/2025 - 12/31/2025",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-45",
+   "Text": "$15,000.00",
+   "Confidence": 99.0,
+   "Page": 1
+  }
+ ]
+}

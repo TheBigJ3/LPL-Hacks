@@ -1,0 +1,1272 @@
+{
+ "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+ "DocumentMetadata": {
+  "Pages": 1
+ },
+ "Blocks": [
+  {
+   "BlockType": "PAGE",
+   "Id": "page-1",
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": []
+    }
+   ]
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-1",
+   "Text": "SYNTHETIC TEST DATA - NOT FOR FILING",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-2",
+   "Text": "Form W-2 Wage and Tax Statement 2025",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-5",
+   "Text": "000-00-0000",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-6",
+   "Text": "a",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-7",
+   "Text": "Employee's",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-8",
+   "Text": "social",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-9",
+   "Text": "security",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-10",
+   "Text": "number",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-4",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-5"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-3",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-6",
+      "word-7",
+      "word-8",
+      "word-9",
+      "word-10"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-4"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-13",
+   "Text": "00-0000000",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-14",
+   "Text": "b",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-15",
+   "Text": "Employer",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-16",
+   "Text": "identification",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-17",
+   "Text": "number",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-18",
+   "Text": "(EIN)",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-12",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-13"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-11",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-14",
+      "word-15",
+      "word-16",
+      "word-17",
+      "word-18"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-12"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-21",
+   "Text": "Margie's",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-22",
+   "Text": "Sample",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-23",
+   "Text": "Travel",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-24",
+   "Text": "200",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-25",
+   "Text": "Sample",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-26",
+   "Text": "Avenue,",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-27",
+   "Text": "Springfield,",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-28",
+   "Text": "IL",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-29",
+   "Text": "62701",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-30",
+   "Text": "c",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-31",
+   "Text": "Employer's",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-32",
+   "Text": "name,",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-33",
+   "Text": "address,",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-34",
+   "Text": "and",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-35",
+   "Text": "ZIP",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-36",
+   "Text": "code",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-20",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-21",
+      "word-22",
+      "word-23",
+      "word-24",
+      "word-25",
+      "word-26",
+      "word-27",
+      "word-28",
+      "word-29"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-19",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-30",
+      "word-31",
+      "word-32",
+      "word-33",
+      "word-34",
+      "word-35",
+      "word-36"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-20"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-39",
+   "Text": "CTRL-0000-01",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-40",
+   "Text": "d",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-41",
+   "Text": "Control",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-42",
+   "Text": "number",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-38",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-39"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-37",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-40",
+      "word-41",
+      "word-42"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-38"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-45",
+   "Text": "Quinn",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-46",
+   "Text": "Harper",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-47",
+   "Text": "e",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-48",
+   "Text": "Employee's",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-49",
+   "Text": "name",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-44",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-45",
+      "word-46"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-43",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-47",
+      "word-48",
+      "word-49"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-44"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-52",
+   "Text": "456",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-53",
+   "Text": "Sample",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-54",
+   "Text": "Street,",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-55",
+   "Text": "Springfield,",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-56",
+   "Text": "IL",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-57",
+   "Text": "62704",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-58",
+   "Text": "f",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-59",
+   "Text": "Employee's",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-60",
+   "Text": "address",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-61",
+   "Text": "and",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-62",
+   "Text": "ZIP",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-63",
+   "Text": "code",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-51",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-52",
+      "word-53",
+      "word-54",
+      "word-55",
+      "word-56",
+      "word-57"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-50",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-58",
+      "word-59",
+      "word-60",
+      "word-61",
+      "word-62",
+      "word-63"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-51"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-66",
+   "Text": "88,000.00",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-67",
+   "Text": "1",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-68",
+   "Text": "Wages,",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-69",
+   "Text": "tips,",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-70",
+   "Text": "other",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-71",
+   "Text": "compensation",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-65",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-66"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-64",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-67",
+      "word-68",
+      "word-69",
+      "word-70",
+      "word-71"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-65"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-74",
+   "Text": "10,560.00",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-75",
+   "Text": "2",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-76",
+   "Text": "Federal",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-77",
+   "Text": "income",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-78",
+   "Text": "tax",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-79",
+   "Text": "withheld",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-73",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-74"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-72",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-75",
+      "word-76",
+      "word-77",
+      "word-78",
+      "word-79"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-73"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-82",
+   "Text": "D",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-83",
+   "Text": "8,800.00",
+   "Confidence": 97.5,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-84",
+   "Text": "12a",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-85",
+   "Text": "See",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-86",
+   "Text": "instructions",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-87",
+   "Text": "for",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-88",
+   "Text": "box",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-89",
+   "Text": "12",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-81",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-82",
+      "word-83"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-80",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-84",
+      "word-85",
+      "word-86",
+      "word-87",
+      "word-88",
+      "word-89"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-81"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "SELECTION_ELEMENT",
+   "Id": "sel-92",
+   "Confidence": 97.5,
+   "Page": 1,
+   "SelectionStatus": "SELECTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-93",
+   "Text": "13",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-94",
+   "Text": "Retirement",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-95",
+   "Text": "plan",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-91",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "sel-92"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-90",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 97.5,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-93",
+      "word-94",
+      "word-95"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-91"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-98",
+   "Text": "W-2",
+   "Confidence": 90.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-99",
+   "Text": "Form",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-97",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 90.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-98"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-96",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 90.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-99"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-97"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-100",
+   "Text": "a Employee's social security number",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-101",
+   "Text": "b Employer identification number (EIN)",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-102",
+   "Text": "c Employer's name, address, and ZIP code",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-103",
+   "Text": "d Control number",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-104",
+   "Text": "e Employee's name",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-105",
+   "Text": "f Employee's address and ZIP code",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-106",
+   "Text": "1 Wages, tips, other compensation",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-107",
+   "Text": "2 Federal income tax withheld",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-108",
+   "Text": "12a See instructions for box 12",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-109",
+   "Text": "13 Retirement plan",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-110",
+   "Text": "Form",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-111",
+   "Text": "000-00-0000",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-112",
+   "Text": "00-0000000",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-113",
+   "Text": "Margie's Sample Travel 200 Sample Avenue, Springfield, IL 62701",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-114",
+   "Text": "CTRL-0000-01",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-115",
+   "Text": "Quinn Harper",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-116",
+   "Text": "456 Sample Street, Springfield, IL 62704",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-117",
+   "Text": "88,000.00",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-118",
+   "Text": "10,560.00",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-119",
+   "Text": "D 8,800.00",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-120",
+   "Text": "W-2",
+   "Confidence": 99.0,
+   "Page": 1
+  }
+ ]
+}

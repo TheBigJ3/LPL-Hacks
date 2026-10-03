@@ -9,23 +9,23 @@
   "summary": {
     "filing_status": "married_filing_jointly",
     "dependents": 1,
-    "dependents_check": "not_checked",
+    "dependents_check": "verified",
     "agi": {
       "value": 171000,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh005_1040_2025.pdf",
       "page": 1
     },
     "cash": {
       "value": 22000,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh005_bank_statement_2025.pdf",
       "page": 1,
       "months_of_income": 1.5
     },
     "mortgage_interest": {
       "value": 14200,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh005_1098_2025.pdf",
       "page": 1
     }
@@ -40,7 +40,7 @@
           "field": "wages",
           "label": "Wages",
           "value": 160000,
-          "check": "not_checked",
+          "check": "verified",
           "source_document": "casey_w2_2025.pdf",
           "page": 1,
           "context": null,
@@ -50,7 +50,7 @@
           "field": "employee_401k_contribution",
           "label": "401(k)",
           "value": 16000,
-          "check": "not_checked",
+          "check": "verified",
           "source_document": "casey_w2_2025.pdf",
           "page": 1,
           "context": "10.0% of pay · 68% of limit · $7,500 room left",
@@ -160,7 +160,7 @@
       "member": null,
       "person_id": null,
       "action_label": "Review life changes",
-      "check": "not_checked"
+      "check": "verified"
     },
     {
       "id": "F2",
@@ -186,7 +186,7 @@
       "member": null,
       "person_id": null,
       "action_label": "Review life changes",
-      "check": "not_checked"
+      "check": "verified"
     },
     {
       "id": "F4",
@@ -199,14 +199,14 @@
       "member": null,
       "person_id": null,
       "action_label": "Review life changes",
-      "check": "not_checked"
+      "check": "verified"
     }
   ],
   "data_quality": {
     "documents": 4,
     "conflicts": [],
     "low_confidence_fields": [],
-    "unchecked_values": 6,
+    "unchecked_values": 0,
     "missing_documents": []
   },
   "errors": []

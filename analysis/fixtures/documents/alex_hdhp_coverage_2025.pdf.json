@@ -1,0 +1,519 @@
+{
+ "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+ "DocumentMetadata": {
+  "Pages": 1
+ },
+ "Blocks": [
+  {
+   "BlockType": "PAGE",
+   "Id": "page-1",
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": []
+    }
+   ]
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-1",
+   "Text": "SYNTHETIC TEST DATA - NOT FOR FILING",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-2",
+   "Text": "Form 1095-B Health Coverage 2025",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-5",
+   "Text": "Alex",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-6",
+   "Text": "Rivera",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-7",
+   "Text": "Covered",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-8",
+   "Text": "member",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-4",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-5",
+      "word-6"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-3",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-7",
+      "word-8"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-4"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-11",
+   "Text": "TEST-HP-0001",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-12",
+   "Text": "Member",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-13",
+   "Text": "ID",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-10",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-11"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-9",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-12",
+      "word-13"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-10"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-16",
+   "Text": "Sample",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-17",
+   "Text": "Health",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-18",
+   "Text": "Plan",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-19",
+   "Text": "Bronze",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-20",
+   "Text": "HSA",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-21",
+   "Text": "Plan",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-22",
+   "Text": "name",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-15",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-16",
+      "word-17",
+      "word-18",
+      "word-19",
+      "word-20"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-14",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-21",
+      "word-22"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-15"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-25",
+   "Text": "01/01/2025",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-26",
+   "Text": "-",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-27",
+   "Text": "12/31/2025",
+   "Confidence": 96.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-28",
+   "Text": "Coverage",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-29",
+   "Text": "period",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-24",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-25",
+      "word-26",
+      "word-27"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-23",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-28",
+      "word-29"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-24"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "SELECTION_ELEMENT",
+   "Id": "sel-32",
+   "Confidence": 96.0,
+   "Page": 1,
+   "SelectionStatus": "SELECTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-33",
+   "Text": "HSA-eligible",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-34",
+   "Text": "high",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-35",
+   "Text": "deductible",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-36",
+   "Text": "health",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-37",
+   "Text": "plan",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-38",
+   "Text": "(HDHP)",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-31",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "sel-32"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-30",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 96.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-33",
+      "word-34",
+      "word-35",
+      "word-36",
+      "word-37",
+      "word-38"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-31"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-39",
+   "Text": "Covered member",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-40",
+   "Text": "Member ID",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-41",
+   "Text": "Plan name",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-42",
+   "Text": "Coverage period",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-43",
+   "Text": "HSA-eligible high deductible health plan (HDHP)",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-44",
+   "Text": "Alex Rivera",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-45",
+   "Text": "TEST-HP-0001",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-46",
+   "Text": "Sample Health Plan Bronze HSA",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-47",
+   "Text": "01/01/2025 - 12/31/2025",
+   "Confidence": 99.0,
+   "Page": 1
+  }
+ ]
+}

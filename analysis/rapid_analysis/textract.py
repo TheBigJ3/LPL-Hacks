@@ -100,6 +100,7 @@ _FORM_PATTERNS = [
     ("1098", re.compile(r"\b1098\b")),
     ("1040", re.compile(r"\b1040\b")),
     ("account_statement", re.compile(r"\baccount statement\b", re.I)),
+    ("1095", re.compile(r"\b1095(?:-[ABC])?\b|\bhealth coverage\b", re.I)),
 ]
 
 
@@ -145,12 +146,20 @@ CANONICAL_LABELS: dict[str, list[tuple[re.Pattern[str], str]]] = {
     "account_statement": [
         (re.compile(r"^ending balance"), "cash_balance"),
     ],
+    "1098": [
+        (re.compile(r"^1 mortgage interest received"), "mortgage_interest"),
+    ],
+    "1095": [
+        (re.compile(r"^hsa eligible high deductible health plan"), "hsa_eligible_health_plan"),
+    ],
 }
 RECIPIENT_LABELS = {
     "1099-R": re.compile(r"^recipient s name"),
     "W-2": re.compile(r"^e employee s (first )?name"),
     "1040": re.compile(r"^your first name"),
     "account_statement": re.compile(r"^account holder"),
+    "1098": re.compile(r"^payer s borrower s name"),
+    "1095": re.compile(r"^covered member"),
 }
 # W-2 box 12 holds "<code> <amount>"; D = 401(k) elective deferrals, W = employer + employee HSA.
 W2_BOX12 = re.compile(r"^12[a-d]\b")
@@ -262,9 +271,10 @@ def _render_line(form: str | None, f: TextractField) -> str | None:
     value = _render_value(f)
     if value is None:
         return None
-    if re.match(r"^(payer s name|c employer s name)", key):
+    if re.match(r"^(payer s name|c employer s name|recipient s lender s name)", key):
         name = _cut_address(value)
-        return f"{'Employer' if key.startswith('c ') else 'Payer'}'s name: {name}." if name else None
+        who = "Employer" if key.startswith("c ") else "Lender" if key.startswith("recipient") else "Payer"
+        return f"{who}'s name: {name}." if name else None
     if FORM_TITLE_LABELS.match(key) or SENSITIVE_LABELS.search(key):
         return None
     if form == "W-2" and W2_BOX12.match(key):
@@ -279,7 +289,8 @@ def _render_line(form: str | None, f: TextractField) -> str | None:
 
 
 _FORM_NAMES = {"account_statement": "Account statement", "1040": "Form 1040", "W-2": "Form W-2",
-               "1099-R": "Form 1099-R", "1099-INT": "Form 1099-INT", "1098": "Form 1098"}
+               "1099-R": "Form 1099-R", "1099-INT": "Form 1099-INT", "1098": "Form 1098",
+               "1095": "Form 1095 (health coverage)"}
 
 
 def evidence_render(doc: TextractDocument, document_name: str, recipient: str | None) -> str:

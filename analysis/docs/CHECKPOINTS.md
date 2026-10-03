@@ -17,3 +17,6 @@ Appended by `scripts/checkpoint.py`. One row per checkpoint run; never edited by
 | 2026-10-02T20:07:34-07:00 | Phase 8a | `pytest -q tests` | 373 | 0 | 2 | 0 | 0 | handoff: openapi.json drift test, enums-in-contract test; scripts/gate.py live server+seed+GET HH006 == sample: True |
 | 2026-10-02T20:12:16-07:00 | Port 8100 | `pytest -q tests` | 373 | 0 | 2 | 0 | 0 | service default port 8000 -> 8100; gate.py on 8100: HH006 equals sample |
 | 2026-10-02T20:12:42-07:00 | CHECKPOINT 4 (re-run, 2026 limit) | `pytest -q tests/test_rules.py tests/test_checklist.py` | 81 | 0 | 0 | 0 | 0 | LIMIT_401K adds 2026: 24500 (IRS Notice 2025-67); HH010 unchanged: not_assessed (no wages) |
+| 2026-10-02T20:18:47-07:00 | CHECKPOINT 3 (re-run, demo docs) | `pytest -q tests/test_evidence.py tests/test_textract.py` | 80 | 0 | 2 | 0 | 0 | +15 synthetic Textract docs for HH002/HH005/HH007/HH008 incl. 1098 and 1095; battery 50 claims, 0 false confirmations; Quinn 8,080 vs 8,800 fails safe to unconfirmed (not mismatch) |
+| 2026-10-02T20:19:08-07:00 | CHECKPOINT 5 (re-run, demo docs) | `pytest -q tests/test_overview.py` | 84 | 0 | 0 | 0 | 0 | samples regenerated; every sourced number with a document is checked for all 10 households |
+| 2026-10-02T20:19:28-07:00 | Demo coverage (full suite) | `pytest -q tests` | 386 | 0 | 2 | 0 | 0 | after demo docs; gate on 8100 |

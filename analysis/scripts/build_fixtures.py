@@ -13,7 +13,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from rapid_analysis.textract_factory import textract_1040, textract_1099r, textract_statement, textract_w2  # noqa: E402
+from rapid_analysis.textract_factory import (  # noqa: E402
+    textract_1040,
+    textract_1098,
+    textract_1099r,
+    textract_hsa_coverage,
+    textract_statement,
+    textract_w2,
+)
 
 OUT = ROOT / "fixtures" / "households"
 DOCS_OUT = ROOT / "fixtures" / "documents"
@@ -150,7 +157,7 @@ HOUSEHOLDS = [
     {
         "household_id": "HH007", "tax_year": 2025, "filing_status": "married filing jointly",
         "adjusted_gross_income": fv(139000, "hh007_1040_2025.pdf", 0.985),
-        "dependents": 0,
+        "dependents": fv(0, "hh007_1040_2025.pdf", 0.99),
         "cash_balance": fv(35000, "hh007_bank_statement_2025.pdf", 0.99),
         "members": [
             {"person_id": "HH007-P1", "name": "Drew Kim",
@@ -169,7 +176,7 @@ HOUSEHOLDS = [
     {
         "household_id": "HH008", "tax_year": 2025, "filing_status": "single",
         "adjusted_gross_income": fv(81000, "hh008_1040_2025.pdf", 0.983),
-        "dependents": 0,
+        "dependents": fv(0, "hh008_1040_2025.pdf", 0.99),
         "cash_balance": fv(15000, "hh008_bank_statement_2025.pdf", 0.99),
         "members": [
             {"person_id": "HH008-P1", "name": "Quinn Harper",
@@ -242,6 +249,21 @@ def documents() -> dict[str, dict]:
         "taylor_w2_2025.pdf": textract_w2("Taylor Mock", "Adventure Works Sample", "110,000.00", "14,300.00", ["D 2,000.00"]),
         "hh006_1040_2025.pdf": textract_1040("Taylor Mock and Sam Mock", "110,000.00", "152,000.00", "1", business_income="48,000.00"),
         "pat_1099r_2025.pdf": textract_1099r("Pat Rowe", "$ 12,000.00", "$ 12,000.00", "$ 600.00", "1", "$ 240.00", "03/14/2025"),
+        "alex_w2_2025.pdf": textract_w2("Alex Rivera", "Northwind Sample Traders", "98,000.00", "11,760.00", ["D 23,500.00", "W 4,300.00"]),
+        "hh002_1040_2025.pdf": textract_1040("Alex Rivera", "98,000.00", "74,500.00", "0"),
+        "hh002_bank_statement_2025.pdf": textract_statement("Alex Rivera", "$26,000.00"),
+        "alex_hdhp_coverage_2025.pdf": textract_hsa_coverage("Alex Rivera", True),
+        "casey_w2_2025.pdf": textract_w2("Casey Brooks", "Bluefin Sample LLC", "160,000.00", "27,200.00", ["D 16,000.00"]),
+        "hh005_1040_2025.pdf": textract_1040("Casey Brooks", "160,000.00", "171,000.00", "1"),
+        "hh005_1098_2025.pdf": textract_1098("Casey Brooks", "$ 14,200.00"),
+        "hh005_bank_statement_2025.pdf": textract_statement("Casey Brooks", "$22,000.00"),
+        "drew_w2_2025.pdf": textract_w2("Drew Kim", "Litware Sample Inc", "82,000.00", "9,020.00", ["D 23,500.00"]),
+        "avery_w2_2025.pdf": textract_w2("Avery Kim", "Proseware Sample LLC", "80,000.00", "8,800.00", ["D 23,500.00"]),
+        "hh007_1040_2025.pdf": textract_1040("Drew Kim and Avery Kim", "162,000.00", "139,000.00", "0"),
+        "hh007_bank_statement_2025.pdf": textract_statement("Drew Kim and Avery Kim", "$35,000.00"),
+        "quinn_w2_2025.pdf": textract_w2("Quinn Harper", "Margie's Sample Travel", "88,000.00", "10,560.00", ["D 8,800.00"]),
+        "hh008_1040_2025.pdf": textract_1040("Quinn Harper", "88,000.00", "81,000.00", "0"),
+        "hh008_bank_statement_2025.pdf": textract_statement("Quinn Harper", "$15,000.00"),
     }
 
 
