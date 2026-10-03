@@ -12,6 +12,14 @@ import NoteTable from './components/NoteTable/NoteTable'
 const NoteLibrary = () => {
   const library = useNoteLibrary()
 
+  if (!library.clientSelected) return <>
+    <PageHeader title="Notes" />
+    <div className="note-library flex flex-1 items-center justify-center">
+      <h1 className="sr-only">Notes</h1>
+      <EmptyState title="No client selected" subtitle="Select one to get started" />
+    </div>
+  </>
+
   return <>
     <PageHeader title="Notes">
       <NoteToolbar search={library.search} onCreate={library.createNote} />

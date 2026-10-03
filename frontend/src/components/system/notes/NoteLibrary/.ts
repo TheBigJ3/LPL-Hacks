@@ -77,6 +77,15 @@ const NOTE_DEMO_CONTENT: [string, string][] = [
   ['Cash flow questions', 'Asked about setting up a monthly ACH from the brokerage account to cover living expenses.'],
 ]
 
+const NOTE_DEMO_OWNERS: [string, string | null][] = [
+  ['johnson', null], ['johnson', 'jess'], ['patel', null], ['johnson', 'michelle'],
+  ['dana-whitfield', null], ['johnson', 'adam'], ['nguyen', 'linh'], ['johnson', null],
+  ['marcus-reed', null], ['johnson', 'kim'], ['garcia', 'sofia'], ['patel', 'priya'],
+  ['elena-rossi', null], ['kenji-sato', null], ['nguyen', null], ['garcia', null],
+]
+
+const NOTE_DEMO_PER_OWNER = 3
+
 const NOTE_DAY_MS = 86_400_000
 const NOTE_DEMO_LATEST = Date.UTC(2026, 8, 24, 22, 36)
 
@@ -105,17 +114,20 @@ export const NOTE_LIBRARY_VIEW_VARIANTS: Variants = {
   exit: { opacity: 0, transition: { duration: 0.14, ease: 'easeInOut' } },
 }
 
-const noteBuildDemoRecords = (clientId: string, memberIds: string[]): NoteRecord[] =>
-  NOTE_DEMO_CONTENT.map(([title, body], index) => ({
-    id: `${clientId}-note-${index + 1}`,
+const NOTE_DEMO_RECORDS: NoteRecord[] = Array.from({ length: NOTE_DEMO_OWNERS.length * NOTE_DEMO_PER_OWNER }, (_, index) => {
+  const [clientId, memberId] = NOTE_DEMO_OWNERS[index % NOTE_DEMO_OWNERS.length]
+  const [title, body] = NOTE_DEMO_CONTENT[(index * 3) % NOTE_DEMO_CONTENT.length]
+  return {
+    id: `note-${index + 1}`,
     clientId,
-    memberId: memberIds.length ? memberIds[index % memberIds.length] : null,
+    memberId,
     title,
     body,
     html: `<p>${body}</p>`,
-    createdAt: new Date(NOTE_DEMO_LATEST - index * 3 * NOTE_DAY_MS),
+    createdAt: new Date(NOTE_DEMO_LATEST - index * NOTE_DAY_MS),
     color: NOTE_COLORS[index % NOTE_COLORS.length],
-  }))
+  }
+})
 
 const noteFormatDate = (date: Date) => `${NOTE_DATE_FORMAT.format(date)} ${NOTE_TIME_FORMAT.format(date).replace(' ', '').toLowerCase()}`
 
@@ -139,12 +151,11 @@ const noteMatchesQuery = (record: NoteRecord, client: SidebarClient | null, need
   [record.title, record.body, noteGetMemberLabel(record, client)].some((field) => field.toLowerCase().includes(needle))
 
 export function useNoteLibrary() {
-  const { clientId = 'workspace' } = useParams()
+  const { clientId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const memberId = searchParams.get('member')
   const query = (searchParams.get(NOTE_SEARCH_PARAM) ?? '').trim()
   const client = SIDEBAR_DEMO_CLIENTS.find((item) => item.id === clientId) ?? null
-  const memberIds = client?.members.map((member) => member.id) ?? []
   const view: NoteView = searchParams.get(NOTE_VIEW_PARAM) === 'list' ? 'list' : 'grid'
 
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -153,13 +164,12 @@ export function useNoteLibrary() {
   const [editorSession, setEditorSession] = useState(0)
   const [seenViews, setSeenViews] = useState<NoteView[]>([view])
   const [staggerView, setStaggerView] = useState<NoteView | null>(view)
-  const [records, setRecords] = useState<NoteRecord[]>(() => noteBuildDemoRecords(clientId, memberIds))
-  const [recordsClientId, setRecordsClientId] = useState(clientId)
-  if (clientId !== recordsClientId) {
-    setRecordsClientId(clientId)
+  const [records, setRecords] = useState(NOTE_DEMO_RECORDS)
+  const [viewedClientId, setViewedClientId] = useState(clientId)
+  if (clientId !== viewedClientId) {
+    setViewedClientId(clientId)
     setSeenViews([view])
     setStaggerView(view)
-    setRecords(noteBuildDemoRecords(clientId, memberIds))
     setEditorOpen(false)
   }
 
@@ -187,10 +197,10 @@ export function useNoteLibrary() {
 
   const applySearch = (value: string) => updateParam(NOTE_SEARCH_PARAM, value || null)
 
-  const scoped = records.filter((record) => !memberId || !record.memberId || record.memberId === memberId)
+  const scoped = records.filter((record) => record.clientId === clientId && (!memberId || record.memberId === memberId))
   const visible = query ? scoped.filter((record) => noteMatchesQuery(record, client, query.toLowerCase())) : scoped
 
-  const editing = editingId ? records.find((record) => record.id === editingId) ?? null : null
+  const editing = editingId ? scoped.find((record) => record.id === editingId) ?? null : null
 
   const openEditor = (id: string | null, startsEditing: boolean) => {
     setEditingId(id)
@@ -202,6 +212,7 @@ export function useNoteLibrary() {
   // Demo only: notes live in memory until a notes API exists.
   const saveNote = (saved: NoteSaved) => {
     const fields = { title: saved.title.trim() || NOTE_UNTITLED, body: saved.text.trim(), html: saved.html, color: saved.color, memberId: saved.memberId }
+    if (!clientId) return
     if (editing) {
       setRecords((current) => current.map((record) => record.id === editing.id ? { ...record, ...fields } : record))
     } else {
@@ -217,6 +228,7 @@ export function useNoteLibrary() {
   }
 
   return {
+    clientSelected: !!clientId,
     view,
     setView: (next: NoteView) => {
       if (next === view) return
@@ -254,7 +266,7 @@ export function useNoteLibrary() {
       draft: <NoteDraft>{
         title: editing?.title ?? '',
         html: editing?.html ?? '',
-        color: editing?.color ?? NOTE_COLORS[records.length % NOTE_COLORS.length],
+        color: editing?.color ?? NOTE_COLORS[scoped.length % NOTE_COLORS.length],
         memberId: editing ? editing.memberId : memberId,
       },
       members: <NoteMemberOption[]>[
