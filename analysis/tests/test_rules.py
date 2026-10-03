@@ -24,7 +24,7 @@ def by_type(result):
 
 def test_ruleset_version_and_limit_table():
     assert RULESET_VERSION == "2025.1"
-    assert LIMIT_401K == {2025: 23500.0}
+    assert LIMIT_401K == {2025: 23500.0, 2026: 24500.0}
     assert fixture("HH001").ruleset_version == "2025.1"
 
 
@@ -147,10 +147,26 @@ def test_1099r_code_g_is_informational():
 
 def test_unknown_tax_year_limit_is_needs_data():
     raw = fixture_household_raw("HH008")
-    raw["tax_year"] = 2026
+    raw["tax_year"] = 2027
     item = next(i for i in evaluate(raw).checklist if i.id == "retirement_can_improve")
     assert item.answer == "needs_data"
-    assert "2026" in item.reason
+    assert "2027" in item.reason
+
+
+def test_2026_uses_the_24500_limit():
+    raw = fixture_household_raw("HH008")
+    raw["tax_year"] = 2026
+    result = evaluate(raw)
+    item = next(i for i in result.checklist if i.id == "retirement_can_improve")
+    assert (item.answer, item.dollar_impact) == ("yes", 15700)
+    assert "of the $24,500 limit" in by_type(result)["retirement_contribution_review"].explanation
+
+
+def test_hh010_2026_assesses_normally():
+    items = {i.id: i for i in fixture("HH010").checklist}
+    assert items["retirement_can_improve"].answer == "not_assessed"
+    assert items["retirement_can_improve"].reason == "No household member has wages"
+    assert items["tax_savings_possible"].answer == "no"
 
 
 def test_missing_401k_is_needs_data():

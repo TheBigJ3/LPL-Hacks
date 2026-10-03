@@ -28,7 +28,8 @@ PRIORITY_RANK = {p: i for i, p in enumerate(PRIORITY_VALUES)}
 
 # 401(k) employee elective deferral limit by tax year (IRS). Add a year only from IRS guidance.
 # An unknown year means needs_data. Catch-up contributions are not modeled.
-LIMIT_401K: dict[int, float] = {2025: 23500.0}
+# 2026: IRS Notice 2025-67 / IRS news release 2025-11-13, https://www.irs.gov/newsroom/401k-limit-increases-to-24500-for-2026-ira-limit-increases-to-7500
+LIMIT_401K: dict[int, float] = {2025: 23500.0, 2026: 24500.0}
 
 RETIREMENT_LOW_SHARE = 0.50
 RETIREMENT_HIGH_SHARE = 0.15

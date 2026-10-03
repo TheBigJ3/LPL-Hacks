@@ -16,3 +16,4 @@ Appended by `scripts/checkpoint.py`. One row per checkpoint run; never edited by
 | 2026-10-02T19:51:18-07:00 | Phase 7 (no model) | `pytest -q tests -m not model` | 256 | 0 | 0 | 0 | 0 | DECISION_BACKEND=none for the whole run |
 | 2026-10-02T20:07:34-07:00 | Phase 8a | `pytest -q tests` | 373 | 0 | 2 | 0 | 0 | handoff: openapi.json drift test, enums-in-contract test; scripts/gate.py live server+seed+GET HH006 == sample: True |
 | 2026-10-02T20:12:16-07:00 | Port 8100 | `pytest -q tests` | 373 | 0 | 2 | 0 | 0 | service default port 8000 -> 8100; gate.py on 8100: HH006 equals sample |
+| 2026-10-02T20:12:42-07:00 | CHECKPOINT 4 (re-run, 2026 limit) | `pytest -q tests/test_rules.py tests/test_checklist.py` | 81 | 0 | 0 | 0 | 0 | LIMIT_401K adds 2026: 24500 (IRS Notice 2025-67); HH010 unchanged: not_assessed (no wages) |
