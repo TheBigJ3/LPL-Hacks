@@ -21,12 +21,13 @@ const handler = async (payload: Payload, job: Job) => {
   } catch (err) {
     if (job.attemptsMade + 1 >= (job.opts.attempts ?? 1)) {
       await documentTagMarkFailed(payload.documentId, payload.reviewedAt, err instanceof AppError ? err.message : DOCUMENT_ERRORS.TAGGING_FAILED.MESSAGE);
+      await documentIndex.producer({ documentId: payload.documentId, reviewedAt: payload.reviewedAt });
     }
     throw err;
   }
 
-  // A replay reports "skipped" after its tagging committed, so indexing is still queued; the index job checks the state itself.
-  if (outcome !== "failed") await documentIndex.producer({ documentId: payload.documentId, reviewedAt: payload.reviewedAt });
+  // Every outcome queues indexing, a failed tagging included; the index job checks the state itself and skips what isn't pending.
+  await documentIndex.producer({ documentId: payload.documentId, reviewedAt: payload.reviewedAt });
   return outcome;
 };
 

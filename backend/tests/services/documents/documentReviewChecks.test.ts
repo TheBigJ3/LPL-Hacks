@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { documentReviewCheckFields } from "../../../services/documents/documentReviewChecks.js";
+import { DOCUMENT_REVIEW_TAGGING_STALE_MS, documentReviewCheckFields, documentReviewCheckTaggingBusy } from "../../../services/documents/documentReviewChecks.js";
 import { DOCUMENT_ERRORS } from "../../../types/native/documents/errors.js";
 
 const value = (requiresReview: boolean, rawValue: string | null = "1") => ({
@@ -39,5 +39,28 @@ describe("documentReviewCheckFields", () => {
   it("rejects an id the document doesn't have, including a hidden cell", () => {
     expect(() => documentReviewCheckFields(EXTRACTION, { wages: verified("1"), cell: verified("2"), mirrored: verified("1") }))
       .toThrow(expect.objectContaining({ _status: DOCUMENT_ERRORS.REVIEW_FIELD_UNKNOWN.STATUS }));
+  });
+});
+
+describe("documentReviewCheckTaggingBusy", () => {
+  const now = new Date("2026-10-03T12:00:00Z");
+  const ago = (ms: number) => new Date(now.getTime() - ms);
+
+  it("is free when no tagging is pending", () => {
+    expect(documentReviewCheckTaggingBusy(null, null, now)).toBe(false);
+    expect(documentReviewCheckTaggingBusy("tagged", ago(1_000), now)).toBe(false);
+    expect(documentReviewCheckTaggingBusy("failed", ago(1_000), now)).toBe(false);
+  });
+
+  it("is busy while a pending run is younger than the stale limit", () => {
+    expect(documentReviewCheckTaggingBusy("pending", ago(DOCUMENT_REVIEW_TAGGING_STALE_MS - 1), now)).toBe(true);
+  });
+
+  it("frees a pending run once it reaches the stale limit", () => {
+    expect(documentReviewCheckTaggingBusy("pending", ago(DOCUMENT_REVIEW_TAGGING_STALE_MS), now)).toBe(false);
+  });
+
+  it("stays busy for a pending run with no review time, since its age can't be known", () => {
+    expect(documentReviewCheckTaggingBusy("pending", null, now)).toBe(true);
   });
 });

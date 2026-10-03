@@ -1,5 +1,6 @@
 import './.css'
 import PageHeader from '@components/template/PageHeader/PageHeader'
+import EmptyState from '@components/template/EmptyState/EmptyState'
 import { useExtractionUpload } from './.ts'
 import ExtractionDocument from './components/ExtractionDocument/ExtractionDocument'
 import ExtractionModePicker from './components/ExtractionModePicker/ExtractionModePicker'
@@ -10,6 +11,14 @@ import ExtractionToolbar from './components/ExtractionToolbar/ExtractionToolbar'
 
 const ExtractionUpload = () => {
   const extraction = useExtractionUpload()
+
+  if (!extraction.result && !extraction.clientSelected) return <>
+    <PageHeader title="Extract" />
+    <div className="extraction-upload flex flex-1 items-center justify-center" data-reviewing="false">
+      <h1 className="sr-only">Extract</h1>
+      <EmptyState title="No client selected" subtitle="Pick a client so their documents are tagged and added to search" />
+    </div>
+  </>
 
   return <>
     <PageHeader title="Extract" />
