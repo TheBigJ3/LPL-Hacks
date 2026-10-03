@@ -213,8 +213,104 @@
         "person_id": "HH003-P1",
         "description": "Proof of an HSA-eligible health plan for Morgan Lee"
       }
+    ],
+    "unassigned_documents": [],
+    "documents_needing_review": [
+      {
+        "name": "morgan_w2_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      }
     ]
   },
   "errors": [],
-  "prior_year": null
+  "prior_year": null,
+  "tags": {
+    "household": {
+      "topics": [
+        "income",
+        "retirement",
+        "tax"
+      ],
+      "categories_flagged": [
+        "hsa"
+      ],
+      "checklist_yes": [
+        "needs_documents"
+      ],
+      "checklist_not_assessed": [
+        "major_changes",
+        "insurance_review",
+        "estate_review",
+        "education_review"
+      ],
+      "life_events": [],
+      "data_quality": [
+        "missing_document",
+        "unchecked_value"
+      ]
+    },
+    "members": [
+      {
+        "person_id": "HH003-P1",
+        "name": "Morgan Lee",
+        "topics": [
+          "income",
+          "retirement",
+          "tax",
+          "health_savings"
+        ],
+        "fields_present": [
+          "wages",
+          "employer",
+          "employee_401k_contribution",
+          "hsa_contribution"
+        ],
+        "documents": [
+          "morgan_w2_2025.pdf"
+        ],
+        "findings": [
+          "F1"
+        ],
+        "checks": {
+          "verified": 3,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 0,
+          "not_checked": 0
+        }
+      }
+    ],
+    "documents": [
+      {
+        "name": "morgan_w2_2025.pdf",
+        "doc_type": "w2",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH003-P1",
+            "name": "Morgan Lee",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      }
+    ]
+  }
 }

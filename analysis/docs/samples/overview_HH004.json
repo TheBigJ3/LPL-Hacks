@@ -227,8 +227,129 @@
     ],
     "low_confidence_fields": [],
     "unchecked_values": 2,
-    "missing_documents": []
+    "missing_documents": [],
+    "unassigned_documents": [],
+    "documents_needing_review": [
+      {
+        "name": "jordan_w2_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      }
+    ]
   },
   "errors": [],
-  "prior_year": null
+  "prior_year": null,
+  "tags": {
+    "household": {
+      "topics": [
+        "income",
+        "retirement",
+        "tax"
+      ],
+      "categories_flagged": [
+        "data_quality"
+      ],
+      "checklist_yes": [
+        "needs_documents"
+      ],
+      "checklist_not_assessed": [
+        "major_changes",
+        "insurance_review",
+        "estate_review",
+        "education_review"
+      ],
+      "life_events": [],
+      "data_quality": [
+        "conflict",
+        "unchecked_value"
+      ]
+    },
+    "members": [
+      {
+        "person_id": "HH004-P1",
+        "name": "Jordan Park",
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "fields_present": [
+          "wages",
+          "employer",
+          "employee_401k_contribution"
+        ],
+        "documents": [
+          "hh004_1040_2025.pdf",
+          "jordan_w2_2025.pdf"
+        ],
+        "findings": [
+          "F1"
+        ],
+        "checks": {
+          "verified": 1,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 1,
+          "not_checked": 0
+        }
+      }
+    ],
+    "documents": [
+      {
+        "name": "hh004_1040_2025.pdf",
+        "doc_type": "1040",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "tax"
+        ],
+        "model_tags": [
+          "tax",
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH004-P1",
+            "name": "Jordan Park",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": []
+      },
+      {
+        "name": "jordan_w2_2025.pdf",
+        "doc_type": "w2",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH004-P1",
+            "name": "Jordan Park",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      }
+    ]
+  }
 }

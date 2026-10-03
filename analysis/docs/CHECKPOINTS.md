@@ -36,3 +36,5 @@ Appended by `scripts/checkpoint.py`. One row per checkpoint run; never edited by
 | 2026-10-02T20:49:44-07:00 | CHECKPOINT 4 (re-run after 4+) | `pytest -q tests/test_rules.py tests/test_checklist.py` | 81 | 0 | 0 | 0 | 0 |  |
 | 2026-10-02T20:49:59-07:00 | CHECKPOINT 5 (re-run after 4+) | `pytest -q tests/test_overview.py` | 84 | 0 | 0 | 0 | 0 | samples regenerated |
 | 2026-10-02T20:50:33-07:00 | Full suite after 4+ | `pytest -q tests` | 467 | 0 | 2 | 0 | 0 |  |
+| 2026-10-02T20:52:57-07:00 | CHECKPOINT B | `pytest -q tests/test_tags_block.py` | 32 | 0 | 0 | 0 | 0 | tags block (household/members/documents) + data_quality unassigned_documents/documents_needing_review; samples + CONTRACT updated |
+| 2026-10-02T20:53:32-07:00 | Full suite after B | `pytest -q tests` | 499 | 0 | 2 | 0 | 0 |  |

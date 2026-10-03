@@ -59,6 +59,35 @@ prior_year    {tax_year, filing_status, numbers[] {field, label, value}, members
   `limit`; `cash`, `months_of_income`, `target`, `excess`; `withholding_pct`); `rule` states the threshold applied.
   Downstream text (Ask, RAG) quotes these and never recomputes them.
 - `prior_year` is last year's values exactly as received. They have no documents and are never checked.
+
+## Tags block (`overview.tags`) and strict documents
+
+```
+tags.household  {topics[], categories_flagged[], checklist_yes[], checklist_not_assessed[], life_events[], data_quality[]}
+tags.members[]  {person_id, name, topics[], fields_present[], documents[], findings[], checks {verified, unconfirmed, mismatch, conflicted, not_checked}}
+tags.documents[] {name, doc_type, doc_subtype, doc_type_method, suggested_doc_type, topics[], model_tags[],
+                  members[] {person_id, name, role, method}, attribution_status, status, review_reasons[]}
+data_quality.unassigned_documents[]       names of documents not assigned to a member
+data_quality.documents_needing_review[]   {name, review_reasons[]}
+```
+
+Every id is a `config/tags.json` id. `household.topics` is the union of document topics; `categories_flagged` are
+categories of non-informational findings; `data_quality` uses the tag file's data-quality ids.
+
+Per-document decisions are strict (anything uncertain is `needs_review` with a reason):
+- `doc_type` comes from form-number patterns (`doc_type_method: "pattern"`); with no match it is `unknown`
+  (`doc_type_unknown`). The model's guess is only stored as `suggested_doc_type`. A pattern result the model
+  contradicts with probability ≥ 0.90 keeps the pattern and adds `doc_type_model_disagrees`.
+- `topics` come from the tag file's `doc_types[].topics`; `model_tags` (`tax`, `income`) only when the model's
+  status is `confirmed` (else `tag_uncertain:<topic>`).
+- `members` come from name matching (`method: "name_match"`, `owner` or `joint`). Surname/initial-only is
+  `ambiguous` (`member_ambiguous`); no match is `unassigned` (`member_unassigned` if it carries amounts). The model can
+  only veto (`member_model_disagrees`); a model-only yes is ignored (`member_model_only`).
+- Value checks use only documents assigned to that member; household values use joint documents (or, in a
+  one-member household, that member's documents).
+
+Review reasons: `doc_type_unknown`, `doc_type_model_disagrees`, `tag_uncertain:tax`, `tag_uncertain:income`,
+`member_ambiguous`, `member_unassigned`, `member_model_disagrees`, `member_model_only`.
 - Findings are sorted by priority, highest first. A finding's `check` is the worst check of the values it rests on.
 - A conflicted value has `value: null`, `check: "conflicted"` and every `candidates[]` entry with its source document.
 - `errors` with `severity: "error"` (input could not be normalized) means `status: "needs_review"`, `summary: null`,

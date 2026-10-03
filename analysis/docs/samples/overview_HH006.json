@@ -300,7 +300,16 @@
     "conflicts": [],
     "low_confidence_fields": [],
     "unchecked_values": 3,
-    "missing_documents": []
+    "missing_documents": [],
+    "unassigned_documents": [],
+    "documents_needing_review": [
+      {
+        "name": "taylor_w2_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      }
+    ]
   },
   "errors": [],
   "prior_year": {
@@ -349,6 +358,155 @@
             "label": "Self-employment income",
             "value": 36000
           }
+        ]
+      }
+    ]
+  },
+  "tags": {
+    "household": {
+      "topics": [
+        "income",
+        "retirement",
+        "tax"
+      ],
+      "categories_flagged": [
+        "retirement",
+        "tax",
+        "cash_management",
+        "life_event"
+      ],
+      "checklist_yes": [
+        "retirement_can_improve",
+        "tax_savings_possible",
+        "excess_cash",
+        "major_changes"
+      ],
+      "checklist_not_assessed": [
+        "insurance_review",
+        "estate_review",
+        "education_review"
+      ],
+      "life_events": [
+        "life_event_new_dependent"
+      ],
+      "data_quality": [
+        "unchecked_value"
+      ]
+    },
+    "members": [
+      {
+        "person_id": "HH006-P1",
+        "name": "Taylor Mock",
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "fields_present": [
+          "wages",
+          "employer",
+          "employee_401k_contribution"
+        ],
+        "documents": [
+          "hh006_1040_2025.pdf",
+          "taylor_w2_2025.pdf"
+        ],
+        "findings": [
+          "F1"
+        ],
+        "checks": {
+          "verified": 2,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 0,
+          "not_checked": 0
+        }
+      },
+      {
+        "person_id": "HH006-P2",
+        "name": "Sam Mock",
+        "topics": [
+          "income",
+          "tax",
+          "self_employment"
+        ],
+        "fields_present": [
+          "self_employment_income"
+        ],
+        "documents": [
+          "hh006_1040_2025.pdf"
+        ],
+        "findings": [
+          "F2"
+        ],
+        "checks": {
+          "verified": 1,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 0,
+          "not_checked": 0
+        }
+      }
+    ],
+    "documents": [
+      {
+        "name": "hh006_1040_2025.pdf",
+        "doc_type": "1040",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "tax"
+        ],
+        "model_tags": [
+          "tax",
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH006-P1",
+            "name": "Taylor Mock",
+            "role": "joint",
+            "method": "name_match"
+          },
+          {
+            "person_id": "HH006-P2",
+            "name": "Sam Mock",
+            "role": "joint",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": []
+      },
+      {
+        "name": "taylor_w2_2025.pdf",
+        "doc_type": "w2",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH006-P1",
+            "name": "Taylor Mock",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax"
         ]
       }
     ]

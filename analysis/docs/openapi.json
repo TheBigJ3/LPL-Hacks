@@ -92,6 +92,38 @@
         "title": "Change",
         "type": "object"
       },
+      "CheckCounts": {
+        "additionalProperties": false,
+        "properties": {
+          "conflicted": {
+            "default": 0,
+            "title": "Conflicted",
+            "type": "integer"
+          },
+          "mismatch": {
+            "default": 0,
+            "title": "Mismatch",
+            "type": "integer"
+          },
+          "not_checked": {
+            "default": 0,
+            "title": "Not Checked",
+            "type": "integer"
+          },
+          "unconfirmed": {
+            "default": 0,
+            "title": "Unconfirmed",
+            "type": "integer"
+          },
+          "verified": {
+            "default": 0,
+            "title": "Verified",
+            "type": "integer"
+          }
+        },
+        "title": "CheckCounts",
+        "type": "object"
+      },
       "CheckedValue": {
         "additionalProperties": false,
         "properties": {
@@ -306,6 +338,13 @@
             "title": "Documents",
             "type": "integer"
           },
+          "documents_needing_review": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentReview"
+            },
+            "title": "Documents Needing Review",
+            "type": "array"
+          },
           "low_confidence_fields": {
             "items": {
               "$ref": "#/components/schemas/LowConfidenceField"
@@ -318,6 +357,13 @@
               "$ref": "#/components/schemas/MissingDocument"
             },
             "title": "Missing Documents",
+            "type": "array"
+          },
+          "unassigned_documents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unassigned Documents",
             "type": "array"
           },
           "unchecked_values": {
@@ -365,6 +411,170 @@
           "status"
         ],
         "title": "DocumentIngestResult",
+        "type": "object"
+      },
+      "DocumentMember": {
+        "additionalProperties": false,
+        "properties": {
+          "method": {
+            "enum": [
+              "name_match",
+              "model",
+              "manual"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "person_id": {
+            "title": "Person Id",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "owner",
+              "joint",
+              "mentioned"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "person_id",
+          "name",
+          "role",
+          "method"
+        ],
+        "title": "DocumentMember",
+        "type": "object"
+      },
+      "DocumentResult": {
+        "additionalProperties": false,
+        "description": "Amendment §3.3: the strict per-document decision.",
+        "properties": {
+          "attribution_status": {
+            "enum": [
+              "assigned",
+              "ambiguous",
+              "unassigned"
+            ],
+            "title": "Attribution Status",
+            "type": "string"
+          },
+          "doc_subtype": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doc Subtype"
+          },
+          "doc_type": {
+            "title": "Doc Type",
+            "type": "string"
+          },
+          "doc_type_method": {
+            "enum": [
+              "pattern",
+              "none"
+            ],
+            "title": "Doc Type Method",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentMember"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "model_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Model Tags",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "review_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Reasons",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "accepted",
+              "needs_review"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "suggested_doc_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SuggestedDocType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "doc_type",
+          "doc_subtype",
+          "doc_type_method",
+          "suggested_doc_type",
+          "topics",
+          "model_tags",
+          "members",
+          "attribution_status",
+          "status",
+          "review_reasons"
+        ],
+        "title": "DocumentResult",
+        "type": "object"
+      },
+      "DocumentReview": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "review_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Reasons",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "review_reasons"
+        ],
+        "title": "DocumentReview",
         "type": "object"
       },
       "Enums": {
@@ -1033,6 +1243,63 @@
         "title": "HouseholdRow",
         "type": "object"
       },
+      "HouseholdTags": {
+        "additionalProperties": false,
+        "properties": {
+          "categories_flagged": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Categories Flagged",
+            "type": "array"
+          },
+          "checklist_not_assessed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Checklist Not Assessed",
+            "type": "array"
+          },
+          "checklist_yes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Checklist Yes",
+            "type": "array"
+          },
+          "data_quality": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Data Quality",
+            "type": "array"
+          },
+          "life_events": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Life Events",
+            "type": "array"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "topics",
+          "categories_flagged",
+          "checklist_yes",
+          "checklist_not_assessed",
+          "life_events",
+          "data_quality"
+        ],
+        "title": "HouseholdTags",
+        "type": "object"
+      },
       "IngestResult": {
         "additionalProperties": false,
         "properties": {
@@ -1309,6 +1576,68 @@
         "title": "MemberNumber",
         "type": "object"
       },
+      "MemberTags": {
+        "additionalProperties": false,
+        "properties": {
+          "checks": {
+            "$ref": "#/components/schemas/CheckCounts"
+          },
+          "documents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "fields_present": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Fields Present",
+            "type": "array"
+          },
+          "findings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "person_id": {
+            "title": "Person Id",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "person_id",
+          "name",
+          "topics",
+          "fields_present",
+          "documents",
+          "findings",
+          "checks"
+        ],
+        "title": "MemberTags",
+        "type": "object"
+      },
       "MissingDocument": {
         "additionalProperties": false,
         "properties": {
@@ -1461,6 +1790,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/Summary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Tags"
               },
               {
                 "type": "null"
@@ -1754,6 +2093,44 @@
         "title": "Stats",
         "type": "object"
       },
+      "SuggestedDocType": {
+        "additionalProperties": false,
+        "properties": {
+          "doc_type": {
+            "title": "Doc Type",
+            "type": "string"
+          },
+          "model_choice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Choice"
+          },
+          "probability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Probability"
+          }
+        },
+        "required": [
+          "doc_type",
+          "model_choice",
+          "probability"
+        ],
+        "title": "SuggestedDocType",
+        "type": "object"
+      },
       "Summary": {
         "additionalProperties": false,
         "properties": {
@@ -1809,6 +2186,35 @@
           "mortgage_interest"
         ],
         "title": "Summary",
+        "type": "object"
+      },
+      "Tags": {
+        "additionalProperties": false,
+        "properties": {
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentResult"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "household": {
+            "$ref": "#/components/schemas/HouseholdTags"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberTags"
+            },
+            "title": "Members",
+            "type": "array"
+          }
+        },
+        "required": [
+          "household",
+          "members",
+          "documents"
+        ],
+        "title": "Tags",
         "type": "object"
       },
       "ValidationError": {

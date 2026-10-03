@@ -22,6 +22,7 @@ from rapid_analysis.rules import (
     retirement_limit,
     rules_evaluate,
 )
+from rapid_analysis.taxonomy import tag_ids, tags
 from rapid_analysis.textract import EvidenceDocument
 
 LOW_CONFIDENCE_THRESHOLD = float(os.environ.get("LOW_CONFIDENCE_THRESHOLD", "0.90"))
@@ -145,6 +146,55 @@ def _data_quality(household: Household, checks: Mapping[str, Check], findings) -
                                 unchecked_values=unchecked, missing_documents=missing)
 
 
+def _ordered(values: set[str], section: str) -> list[str]:
+    return [v for v in tag_ids(section) if v in values]
+
+
+def _tags(household: Household, overview: contract.Overview, decisions: Mapping[str, DocumentDecision],
+          checks: Mapping[str, Check]) -> contract.Tags:
+    """Amendment §5: every id comes from config/tags.json."""
+    results = [d.result for d in decisions.values()]
+    field_topics = {f["id"]: f["topic"] for f in tags()["fields"]}
+    dq = overview.data_quality
+    dq_ids = set()
+    if dq.conflicts:
+        dq_ids.add("conflict")
+    if dq.low_confidence_fields:
+        dq_ids.add("low_confidence")
+    if dq.missing_documents:
+        dq_ids.add("missing_document")
+    if dq.unassigned_documents:
+        dq_ids.add("unassigned_document")
+    if dq.unchecked_values:
+        dq_ids.add("unchecked_value")
+    household_tags = contract.HouseholdTags(
+        topics=_ordered({t for r in results for t in r["topics"]}, "topics"),
+        categories_flagged=[c for c in tags()["categories"]
+                            if any(f.category == c and f.priority != "informational" for f in overview.findings)],
+        checklist_yes=[i.id for i in overview.checklist if i.answer == "yes"],
+        checklist_not_assessed=[i.id for i in overview.checklist if i.answer == "not_assessed"],
+        life_events=[c.type for c in overview.changes_since_last_year],
+        data_quality=_ordered(dq_ids, "data_quality"),
+    )
+    members = []
+    for m in household.members:
+        docs = [r["name"] for r in results if any(x["person_id"] == m.person_id for x in r["members"])]
+        present = [name for name, fv in m.fields.items() if fv is not None and name in field_topics]
+        counts = contract.CheckCounts()
+        for name, fv in m.fields.items():
+            if fv is not None and name not in UNCHECKED_FIELDS:
+                check = checks.get(f"{m.person_id}.{name}", "not_checked")
+                setattr(counts, check, getattr(counts, check) + 1)
+        topics = {t for r in results if r["name"] in docs for t in r["topics"]} | {field_topics[f] for f in present}
+        members.append(contract.MemberTags(
+            person_id=m.person_id, name=m.name, topics=_ordered(topics, "topics"),
+            fields_present=_ordered(set(present), "fields"), documents=docs,
+            findings=[f.id for f in overview.findings if f.person_id == m.person_id], checks=counts,
+        ))
+    return contract.Tags(household=household_tags, members=members,
+                         documents=[contract.DocumentResult(**r) for r in results])
+
+
 def _prior_year(household: Household) -> contract.PriorYear | None:
     prior = household.prior_year
     if prior is None:
@@ -261,6 +311,12 @@ def overview_build_household(household: Household, documents: Mapping[str, Evide
         errors=errors,
         prior_year=_prior_year(household),
     )
+    overview.data_quality.unassigned_documents = [
+        d.result["name"] for d in decisions.values() if d.result["attribution_status"] != "assigned"]
+    overview.data_quality.documents_needing_review = [
+        contract.DocumentReview(name=d.result["name"], review_reasons=d.result["review_reasons"])
+        for d in decisions.values() if d.result["status"] == "needs_review"]
+    overview.tags = _tags(household, overview, decisions, checks)
 
     evidence: dict[str, dict] = {}
     for f in result.findings:

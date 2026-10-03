@@ -164,6 +164,75 @@ class DataQuality(_Model):
     low_confidence_fields: list[LowConfidenceField] = Field(default_factory=list)
     unchecked_values: int = 0
     missing_documents: list[MissingDocument] = Field(default_factory=list)
+    unassigned_documents: list[str] = Field(default_factory=list)
+    documents_needing_review: list["DocumentReview"] = Field(default_factory=list)
+
+
+class DocumentReview(_Model):
+    name: str
+    review_reasons: list[str]
+
+
+class DocumentMember(_Model):
+    person_id: str
+    name: str
+    role: Literal["owner", "joint", "mentioned"]
+    method: Literal["name_match", "model", "manual"]
+
+
+class SuggestedDocType(_Model):
+    doc_type: str
+    model_choice: str | None
+    probability: float | None
+
+
+class DocumentResult(_Model):
+    """Amendment §3.3: the strict per-document decision."""
+
+    name: str
+    doc_type: str
+    doc_subtype: str | None
+    doc_type_method: Literal["pattern", "none"]
+    suggested_doc_type: SuggestedDocType | None
+    topics: list[str]
+    model_tags: list[str]
+    members: list[DocumentMember]
+    attribution_status: Literal["assigned", "ambiguous", "unassigned"]
+    status: Literal["accepted", "needs_review"]
+    review_reasons: list[str]
+
+
+class CheckCounts(_Model):
+    verified: int = 0
+    unconfirmed: int = 0
+    mismatch: int = 0
+    conflicted: int = 0
+    not_checked: int = 0
+
+
+class HouseholdTags(_Model):
+    topics: list[str]
+    categories_flagged: list[str]
+    checklist_yes: list[str]
+    checklist_not_assessed: list[str]
+    life_events: list[str]
+    data_quality: list[str]
+
+
+class MemberTags(_Model):
+    person_id: str
+    name: str | None
+    topics: list[str]
+    fields_present: list[str]
+    documents: list[str]
+    findings: list[str]
+    checks: CheckCounts
+
+
+class Tags(_Model):
+    household: HouseholdTags
+    members: list[MemberTags]
+    documents: list[DocumentResult]
 
 
 class ErrorItem(_Model):
@@ -189,6 +258,7 @@ class Overview(_Model):
     data_quality: DataQuality
     errors: list[ErrorItem]
     prior_year: PriorYear | None = None
+    tags: Tags | None = None
 
 
 class EvidenceDocumentCheck(_Model):
@@ -295,3 +365,7 @@ class DocumentIngestResult(_Model):
 class ErrorResponse(_Model):
     status: Literal["needs_review", "not_found"]
     errors: list[ErrorItem]
+
+
+DataQuality.model_rebuild()
+

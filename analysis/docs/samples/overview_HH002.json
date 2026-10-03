@@ -195,8 +195,195 @@
     "conflicts": [],
     "low_confidence_fields": [],
     "unchecked_values": 0,
-    "missing_documents": []
+    "missing_documents": [],
+    "unassigned_documents": [],
+    "documents_needing_review": [
+      {
+        "name": "alex_hdhp_coverage_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      },
+      {
+        "name": "alex_w2_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      },
+      {
+        "name": "hh002_bank_statement_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      }
+    ]
   },
   "errors": [],
-  "prior_year": null
+  "prior_year": null,
+  "tags": {
+    "household": {
+      "topics": [
+        "income",
+        "retirement",
+        "tax",
+        "health_savings",
+        "banking_cash",
+        "insurance"
+      ],
+      "categories_flagged": [],
+      "checklist_yes": [],
+      "checklist_not_assessed": [
+        "major_changes",
+        "insurance_review",
+        "estate_review",
+        "education_review"
+      ],
+      "life_events": [],
+      "data_quality": []
+    },
+    "members": [
+      {
+        "person_id": "HH002-P1",
+        "name": "Alex Rivera",
+        "topics": [
+          "income",
+          "retirement",
+          "tax",
+          "health_savings",
+          "banking_cash",
+          "insurance"
+        ],
+        "fields_present": [
+          "wages",
+          "employer",
+          "employee_401k_contribution",
+          "hsa_contribution",
+          "hsa_eligible_health_plan"
+        ],
+        "documents": [
+          "alex_hdhp_coverage_2025.pdf",
+          "alex_w2_2025.pdf",
+          "hh002_1040_2025.pdf",
+          "hh002_bank_statement_2025.pdf"
+        ],
+        "findings": [],
+        "checks": {
+          "verified": 4,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 0,
+          "not_checked": 0
+        }
+      }
+    ],
+    "documents": [
+      {
+        "name": "alex_hdhp_coverage_2025.pdf",
+        "doc_type": "1095",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "health_savings",
+          "insurance"
+        ],
+        "model_tags": [],
+        "members": [
+          {
+            "person_id": "HH002-P1",
+            "name": "Alex Rivera",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      },
+      {
+        "name": "alex_w2_2025.pdf",
+        "doc_type": "w2",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH002-P1",
+            "name": "Alex Rivera",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      },
+      {
+        "name": "hh002_1040_2025.pdf",
+        "doc_type": "1040",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "tax"
+        ],
+        "model_tags": [
+          "tax",
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH002-P1",
+            "name": "Alex Rivera",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": []
+      },
+      {
+        "name": "hh002_bank_statement_2025.pdf",
+        "doc_type": "account_statement",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "banking_cash"
+        ],
+        "model_tags": [],
+        "members": [
+          {
+            "person_id": "HH002-P1",
+            "name": "Alex Rivera",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      }
+    ]
+  }
 }

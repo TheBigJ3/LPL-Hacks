@@ -202,8 +202,161 @@
     "conflicts": [],
     "low_confidence_fields": [],
     "unchecked_values": 0,
-    "missing_documents": []
+    "missing_documents": [],
+    "unassigned_documents": [],
+    "documents_needing_review": [
+      {
+        "name": "hh008_bank_statement_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      },
+      {
+        "name": "quinn_w2_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      }
+    ]
   },
   "errors": [],
-  "prior_year": null
+  "prior_year": null,
+  "tags": {
+    "household": {
+      "topics": [
+        "income",
+        "retirement",
+        "tax",
+        "banking_cash"
+      ],
+      "categories_flagged": [
+        "retirement"
+      ],
+      "checklist_yes": [
+        "retirement_can_improve"
+      ],
+      "checklist_not_assessed": [
+        "major_changes",
+        "insurance_review",
+        "estate_review",
+        "education_review"
+      ],
+      "life_events": [],
+      "data_quality": []
+    },
+    "members": [
+      {
+        "person_id": "HH008-P1",
+        "name": "Quinn Harper",
+        "topics": [
+          "income",
+          "retirement",
+          "tax",
+          "banking_cash"
+        ],
+        "fields_present": [
+          "wages",
+          "employer",
+          "employee_401k_contribution"
+        ],
+        "documents": [
+          "hh008_1040_2025.pdf",
+          "hh008_bank_statement_2025.pdf",
+          "quinn_w2_2025.pdf"
+        ],
+        "findings": [
+          "F1"
+        ],
+        "checks": {
+          "verified": 2,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 0,
+          "not_checked": 0
+        }
+      }
+    ],
+    "documents": [
+      {
+        "name": "hh008_1040_2025.pdf",
+        "doc_type": "1040",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "tax"
+        ],
+        "model_tags": [
+          "tax",
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH008-P1",
+            "name": "Quinn Harper",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": []
+      },
+      {
+        "name": "hh008_bank_statement_2025.pdf",
+        "doc_type": "account_statement",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "banking_cash"
+        ],
+        "model_tags": [],
+        "members": [
+          {
+            "person_id": "HH008-P1",
+            "name": "Quinn Harper",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      },
+      {
+        "name": "quinn_w2_2025.pdf",
+        "doc_type": "w2",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH008-P1",
+            "name": "Quinn Harper",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      }
+    ]
+  }
 }

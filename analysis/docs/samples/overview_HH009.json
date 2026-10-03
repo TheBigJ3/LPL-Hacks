@@ -236,8 +236,90 @@
     "conflicts": [],
     "low_confidence_fields": [],
     "unchecked_values": 0,
-    "missing_documents": []
+    "missing_documents": [],
+    "unassigned_documents": [],
+    "documents_needing_review": []
   },
   "errors": [],
-  "prior_year": null
+  "prior_year": null,
+  "tags": {
+    "household": {
+      "topics": [
+        "retirement",
+        "tax"
+      ],
+      "categories_flagged": [
+        "tax"
+      ],
+      "checklist_yes": [
+        "tax_savings_possible"
+      ],
+      "checklist_not_assessed": [
+        "retirement_can_improve",
+        "major_changes",
+        "insurance_review",
+        "estate_review",
+        "education_review"
+      ],
+      "life_events": [],
+      "data_quality": []
+    },
+    "members": [
+      {
+        "person_id": "HH009-P1",
+        "name": "Pat Rowe",
+        "topics": [
+          "retirement",
+          "tax"
+        ],
+        "fields_present": [
+          "retirement_distribution",
+          "retirement_distribution_taxable",
+          "federal_tax_withheld",
+          "state_tax_withheld",
+          "distribution_code"
+        ],
+        "documents": [
+          "pat_1099r_2025.pdf"
+        ],
+        "findings": [
+          "F1"
+        ],
+        "checks": {
+          "verified": 7,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 0,
+          "not_checked": 0
+        }
+      }
+    ],
+    "documents": [
+      {
+        "name": "pat_1099r_2025.pdf",
+        "doc_type": "1099_r",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "tax"
+        ],
+        "members": [
+          {
+            "person_id": "HH009-P1",
+            "name": "Pat Rowe",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": []
+      }
+    ]
+  }
 }

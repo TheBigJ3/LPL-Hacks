@@ -209,8 +209,231 @@
     "conflicts": [],
     "low_confidence_fields": [],
     "unchecked_values": 0,
-    "missing_documents": []
+    "missing_documents": [],
+    "unassigned_documents": [],
+    "documents_needing_review": [
+      {
+        "name": "avery_w2_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      },
+      {
+        "name": "drew_w2_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "member_model_only"
+        ]
+      },
+      {
+        "name": "hh007_bank_statement_2025.pdf",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      }
+    ]
   },
   "errors": [],
-  "prior_year": null
+  "prior_year": null,
+  "tags": {
+    "household": {
+      "topics": [
+        "income",
+        "retirement",
+        "tax",
+        "banking_cash"
+      ],
+      "categories_flagged": [],
+      "checklist_yes": [],
+      "checklist_not_assessed": [
+        "major_changes",
+        "insurance_review",
+        "estate_review",
+        "education_review"
+      ],
+      "life_events": [],
+      "data_quality": []
+    },
+    "members": [
+      {
+        "person_id": "HH007-P1",
+        "name": "Drew Kim",
+        "topics": [
+          "income",
+          "retirement",
+          "tax",
+          "banking_cash"
+        ],
+        "fields_present": [
+          "wages",
+          "employer",
+          "employee_401k_contribution"
+        ],
+        "documents": [
+          "drew_w2_2025.pdf",
+          "hh007_1040_2025.pdf",
+          "hh007_bank_statement_2025.pdf"
+        ],
+        "findings": [],
+        "checks": {
+          "verified": 2,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 0,
+          "not_checked": 0
+        }
+      },
+      {
+        "person_id": "HH007-P2",
+        "name": "Avery Kim",
+        "topics": [
+          "income",
+          "retirement",
+          "tax",
+          "banking_cash"
+        ],
+        "fields_present": [
+          "wages",
+          "employer",
+          "employee_401k_contribution"
+        ],
+        "documents": [
+          "avery_w2_2025.pdf",
+          "hh007_1040_2025.pdf",
+          "hh007_bank_statement_2025.pdf"
+        ],
+        "findings": [],
+        "checks": {
+          "verified": 2,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 0,
+          "not_checked": 0
+        }
+      }
+    ],
+    "documents": [
+      {
+        "name": "avery_w2_2025.pdf",
+        "doc_type": "w2",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH007-P2",
+            "name": "Avery Kim",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax"
+        ]
+      },
+      {
+        "name": "drew_w2_2025.pdf",
+        "doc_type": "w2",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH007-P1",
+            "name": "Drew Kim",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "member_model_only"
+        ]
+      },
+      {
+        "name": "hh007_1040_2025.pdf",
+        "doc_type": "1040",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "tax"
+        ],
+        "model_tags": [
+          "tax",
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH007-P1",
+            "name": "Drew Kim",
+            "role": "joint",
+            "method": "name_match"
+          },
+          {
+            "person_id": "HH007-P2",
+            "name": "Avery Kim",
+            "role": "joint",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": []
+      },
+      {
+        "name": "hh007_bank_statement_2025.pdf",
+        "doc_type": "account_statement",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "banking_cash"
+        ],
+        "model_tags": [],
+        "members": [
+          {
+            "person_id": "HH007-P1",
+            "name": "Drew Kim",
+            "role": "joint",
+            "method": "name_match"
+          },
+          {
+            "person_id": "HH007-P2",
+            "name": "Avery Kim",
+            "role": "joint",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "needs_review",
+        "review_reasons": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      }
+    ]
+  }
 }
