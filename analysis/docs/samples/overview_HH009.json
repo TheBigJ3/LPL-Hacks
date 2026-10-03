@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "ruleset_version": "2025.1",
   "household_id": "HH009",
   "tax_year": 2025,
@@ -181,7 +181,7 @@
   "findings": [
     {
       "id": "F1",
-      "type": "early_distribution",
+      "type": "retirement_distribution_review",
       "category": "tax",
       "priority": "high",
       "headline": "Pat took an early retirement distribution",

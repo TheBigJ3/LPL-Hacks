@@ -56,7 +56,7 @@ PLACEHOLDER_REASONS = {
     "estate_review": "No estate planning data or rules yet",
     "education_review": "No education savings data or rules yet",
 }
-CHANGE_TYPES = ("new_dependent", "new_employer", "new_mortgage", "large_income_increase", "large_income_decrease")
+CHANGE_TYPES = ("life_event_new_dependent", "life_event_new_employer", "life_event_new_mortgage", "life_event_large_income_increase")
 
 
 @dataclass
@@ -225,7 +225,7 @@ def _tax(household: Household, findings: list[Finding]) -> list:
         if "1" in code:
             penalty = taxable * EARLY_DISTRIBUTION_RATE if taxable is not None else None
             finding = Finding(
-                type="early_distribution", category="tax", priority="high",
+                type="retirement_distribution_review", category="tax", priority="high",
                 headline=f"{first_name(m)} took an early retirement distribution",
                 explanation=(f"{first_name(m)}'s 1099-R shows code 1 (early distribution) on "
                              f"{money_format(taxable) if taxable is not None else 'an unknown'} taxable; "
@@ -246,7 +246,7 @@ def _tax(household: Household, findings: list[Finding]) -> list:
             under = withheld < taxable * NORMAL_WITHHOLDING_RATE
             share = withheld / taxable if taxable else 0.0
             finding = Finding(
-                type="distribution_under_withheld" if under else "normal_distribution",
+                type="retirement_distribution_review",
                 category="tax", priority="medium" if under else "low",
                 headline=(f"{first_name(m)}'s retirement distribution may be under-withheld" if under
                           else f"{first_name(m)} took a normal retirement distribution"),
@@ -261,14 +261,14 @@ def _tax(household: Household, findings: list[Finding]) -> list:
                 reasons.append(f"{first_name(m)}'s code 7 distribution has {pct(share, 1)} federal withholding")
         elif code == "G":
             findings.append(Finding(
-                type="rollover_distribution", category="tax", priority="informational",
+                type="retirement_distribution_review", category="tax", priority="informational",
                 headline=f"{first_name(m)} rolled over a retirement distribution",
                 explanation=f"{first_name(m)}'s 1099-R shows code G (direct rollover), which is normally not taxed.",
                 dollar_impact=None, action_label="Note rollover", member=m.name, person_id=m.person_id, value_keys=keys,
             ))
         else:
             findings.append(Finding(
-                type="distribution_review", category="tax", priority="low",
+                type="retirement_distribution_review", category="tax", priority="low",
                 headline=f"{first_name(m)} has a code {code} retirement distribution",
                 explanation=f"{first_name(m)}'s 1099-R shows distribution code {code}.",
                 dollar_impact=None, action_label="Note distribution", member=m.name, person_id=m.person_id, value_keys=keys,
@@ -294,7 +294,7 @@ def _cash(household: Household, findings: list[Finding]) -> list:
         return ["no", f"Cash covers {months:.1f} months of income, within {CASH_MONTHS_TARGET} months", None, []]
     excess = cash - target
     finding = Finding(
-        type="excess_cash", category="cash_management", priority="high" if months > CASH_MONTHS_HIGH else "medium",
+        type="excess_cash_review", category="cash_management", priority="high" if months > CASH_MONTHS_HIGH else "medium",
         headline="Cash well above an emergency cushion",
         explanation=(f"The household holds {money_format(cash)} in cash, {months:.1f} months of income; "
                      f"{money_format(excess)} is above a {CASH_MONTHS_TARGET}-month cushion of {money_format(target)}."),
@@ -341,7 +341,7 @@ def _documents(household: Household, findings: list[Finding], checks: Mapping[st
         label = FIELD_LABELS.get(name, name).lower() if member else FIELD_LABELS.get(name, name)
         parts = [f"{_fmt(name, c.value)} on {c.source_document or 'an unnamed source'}" for c in fv.candidates]
         finding = Finding(
-            type="source_conflict", category="data_quality", priority="high",
+            type="source_data_conflict", category="data_quality", priority="high",
             headline=f"{whose}{label} disagree between documents",
             explanation=f"{whose}{label}: {_join(parts)}. No value is used until this is resolved.",
             dollar_impact=None, action_label="Resolve conflict", member=member.name if member else None,
@@ -357,7 +357,7 @@ def _documents(household: Household, findings: list[Finding], checks: Mapping[st
         if hsa is None or hsa <= 0 or (plan is not None and not plan.conflict and plan.value is True):
             continue
         finding = Finding(
-            type="hsa_eligibility_proof_missing", category="hsa", priority="medium",
+            type="hsa_eligibility_unverified", category="hsa", priority="medium",
             headline=f"No proof of {first_name(m)}'s HSA-eligible health plan",
             explanation=(f"{first_name(m)} contributed {money_format(hsa)} to an HSA, but no document shows coverage "
                          "under an HSA-eligible (high-deductible) health plan."),
@@ -374,7 +374,7 @@ def _documents(household: Household, findings: list[Finding], checks: Mapping[st
         whose = f"{first_name(member)}'s " if member else "Household "
         label = FIELD_LABELS.get(name, name).lower() if member else FIELD_LABELS.get(name, name)
         finding = Finding(
-            type="value_mismatch", category="data_quality", priority="medium",
+            type="source_data_conflict", category="data_quality", priority="medium",
             headline=f"{whose}{label} does not match its document",
             explanation=f"{whose}{label} of {_fmt(name, fv.value)} is not what {fv.source_document} shows.",
             dollar_impact=None, action_label="Check the document", member=member.name if member else None,
@@ -397,25 +397,25 @@ def _changes(household: Household, findings: list[Finding]) -> tuple[list, list[
 
     now_deps, then_deps = household.value("dependents"), prior.value("dependents")
     if isinstance(now_deps, int) and isinstance(then_deps, int) and now_deps > then_deps:
-        events.append((Change("new_dependent", f"Dependents increased from {then_deps} to {now_deps}"), None, None, ["household.dependents"]))
+        events.append((Change("life_event_new_dependent", f"Dependents increased from {then_deps} to {now_deps}"), None, None, ["household.dependents"]))
 
     prior_members = {m.person_id: m for m in prior.members}
     for m in household.members:
         before = prior_members.get(m.person_id)
         now_employer, then_employer = m.value("employer"), before.value("employer") if before else None
         if isinstance(now_employer, str) and isinstance(then_employer, str) and now_employer.casefold() != then_employer.casefold():
-            events.append((Change("new_employer", f"{first_name(m)} changed employer from {then_employer} to {now_employer}"),
+            events.append((Change("life_event_new_employer", f"{first_name(m)} changed employer from {then_employer} to {now_employer}"),
                            m.name, m.person_id, [f"{m.person_id}.employer"]))
 
     now_mortgage, then_mortgage = _amount(household.get("mortgage_interest")), _amount(prior.get("mortgage_interest"))
     if now_mortgage and now_mortgage > 0 and not (then_mortgage and then_mortgage > 0):
-        events.append((Change("new_mortgage", f"Mortgage interest started ({money_format(now_mortgage)})"), None, None, ["household.mortgage_interest"]))
+        events.append((Change("life_event_new_mortgage", f"Mortgage interest started ({money_format(now_mortgage)})"), None, None, ["household.mortgage_interest"]))
 
     now_agi, then_agi = _amount(household.get("adjusted_gross_income")), _amount(prior.get("adjusted_gross_income"))
     if now_agi is not None and then_agi and then_agi > 0:
         change = (now_agi - then_agi) / then_agi
         if abs(change) >= AGI_CHANGE_SHARE:
-            kind = "large_income_increase" if change > 0 else "large_income_decrease"
+            kind = "life_event_large_income_increase"
             verb = "rose" if change > 0 else "fell"
             events.append((Change(kind, f"AGI {verb} {pct(abs(change))} from {money_format(then_agi)} to {money_format(now_agi)}"),
                            None, None, ["household.adjusted_gross_income"]))

@@ -17,7 +17,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Iterable
 
-from rapid_analysis.normalization import HOUSEHOLD_FIELDS, MEMBER_FIELDS, NormError, normalize_field
+from rapid_analysis.normalization import HOUSEHOLD_FIELDS, MEMBER_FIELDS, NormError, doc_type_normalize, normalize_field
 
 PLACEHOLDER = re.compile(r"^[\s$%/\\()_.\-–—]*$")
 FIELD_KINDS = {**MEMBER_FIELDS, **HOUSEHOLD_FIELDS}
@@ -94,9 +94,9 @@ def textract_parse_blocks(response: dict) -> TextractDocument:
 
 
 _FORM_PATTERNS = [
-    ("1099-R", re.compile(r"\b1099-?R\b", re.I)),
-    ("1099-INT", re.compile(r"\b1099-?INT\b", re.I)),
-    ("W-2", re.compile(r"\bW-?2\b", re.I)),
+    ("1099_r", re.compile(r"\b1099-?R\b", re.I)),
+    ("1099_int", re.compile(r"\b1099-?INT\b", re.I)),
+    ("w2", re.compile(r"\bW-?2\b", re.I)),
     ("1098", re.compile(r"\b1098\b")),
     ("1040", re.compile(r"\b1040\b")),
     ("account_statement", re.compile(r"\baccount statement\b", re.I)),
@@ -122,7 +122,7 @@ def _key(label: str) -> str:
 
 # (form, label regex on normalized label) -> canonical member field
 CANONICAL_LABELS: dict[str, list[tuple[re.Pattern[str], str]]] = {
-    "1099-R": [
+    "1099_r": [
         (re.compile(r"^1 gross distribution"), "retirement_distribution"),
         (re.compile(r"^2a taxable amount$"), "retirement_distribution_taxable"),
         (re.compile(r"^4 federal income tax withheld"), "federal_tax_withheld"),
@@ -131,7 +131,7 @@ CANONICAL_LABELS: dict[str, list[tuple[re.Pattern[str], str]]] = {
         (re.compile(r"^13 date of payment"), "distribution_date"),
         (re.compile(r"^14 state tax withheld"), "state_tax_withheld"),
     ],
-    "W-2": [
+    "w2": [
         (re.compile(r"^1 wages tips other comp"), "wages"),
         (re.compile(r"^2 federal income tax withheld"), "federal_tax_withheld"),
         (re.compile(r"^17 state income tax"), "state_tax_withheld"),
@@ -154,8 +154,8 @@ CANONICAL_LABELS: dict[str, list[tuple[re.Pattern[str], str]]] = {
     ],
 }
 RECIPIENT_LABELS = {
-    "1099-R": re.compile(r"^recipient s name"),
-    "W-2": re.compile(r"^e employee s (first )?name"),
+    "1099_r": re.compile(r"^recipient s name"),
+    "w2": re.compile(r"^e employee s (first )?name"),
     "1040": re.compile(r"^your first name"),
     "account_statement": re.compile(r"^account holder"),
     "1098": re.compile(r"^payer s borrower s name"),
@@ -217,7 +217,7 @@ def textract_canonical_values(doc: TextractDocument, document_name: str) -> tupl
         if pattern and pattern.match(key) and f.text and recipient is None:
             recipient = _cut_address(f.text) or None
             continue
-        if form == "W-2" and W2_BOX12.match(key) and f.text:
+        if form == "w2" and W2_BOX12.match(key) and f.text:
             match = re.match(r"^\s*([A-Za-z]{1,2})\s+(.*\d.*)$", f.text)
             if match and match.group(1).upper() in W2_BOX12_CODES:
                 put(W2_BOX12_CODES[match.group(1).upper()], match.group(2), f)
@@ -277,7 +277,7 @@ def _render_line(form: str | None, f: TextractField) -> str | None:
         return f"{who}'s name: {name}." if name else None
     if FORM_TITLE_LABELS.match(key) or SENSITIVE_LABELS.search(key):
         return None
-    if form == "W-2" and W2_BOX12.match(key):
+    if form == "w2" and W2_BOX12.match(key):
         match = re.match(r"^\s*([A-Za-z]{1,2})\s+(.*\d.*)$", value)
         if match:
             code = match.group(1).upper()
@@ -288,8 +288,8 @@ def _render_line(form: str | None, f: TextractField) -> str | None:
     return f"{f.label}: {value}."
 
 
-_FORM_NAMES = {"account_statement": "Account statement", "1040": "Form 1040", "W-2": "Form W-2",
-               "1099-R": "Form 1099-R", "1099-INT": "Form 1099-INT", "1098": "Form 1098",
+_FORM_NAMES = {"account_statement": "Account statement", "1040": "Form 1040", "w2": "Form W-2",
+               "1099_r": "Form 1099-R", "1099_int": "Form 1099-INT", "1098": "Form 1098",
                "1095": "Form 1095 (health coverage)"}
 
 
@@ -316,7 +316,9 @@ def evidence_from_textract(response: dict, document_name: str) -> EvidenceDocume
 
 def evidence_from_text(text: str, document_name: str, form_type: str | None = None) -> EvidenceDocument:
     """Pre-rendered evidence text from the pipeline: still redacted before it is kept."""
-    return EvidenceDocument(name=document_name, form_type=form_type, recipient=None, text=redact(text))
+    doc_type = doc_type_normalize(form_type)
+    return EvidenceDocument(name=document_name, form_type=None if doc_type == "unknown" else doc_type,
+                            recipient=None, text=redact(text))
 
 
 def textract_member_fields(documents: Iterable[EvidenceDocument]) -> tuple[dict[str, Any], list[NormError]]:

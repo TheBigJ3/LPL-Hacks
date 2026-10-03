@@ -73,7 +73,7 @@ HOUSEHOLDS = [
         "documents": [w2("alex_w2_2025.pdf", 2025),
                       {"name": "hh002_1040_2025.pdf", "type": "1040", "date": "2026-04-02"},
                       {"name": "hh002_bank_statement_2025.pdf", "type": "account_statement", "date": "2025-12-31"},
-                      {"name": "alex_hdhp_coverage_2025.pdf", "type": "insurance_statement", "date": "2025-01-01"}],
+                      {"name": "alex_hdhp_coverage_2025.pdf", "type": "1095", "date": "2025-01-01"}],
     },
     {
         "household_id": "HH003", "tax_year": 2025, "filing_status": "Single",

@@ -1,4 +1,4 @@
-# Rapid analysis contract (schema 1.0, ruleset 2025.1)
+# Rapid analysis contract (schema 1.1, ruleset 2025.1)
 
 The frontend renders `GET /api/households/{id}/overview` directly. Pydantic models in
 `rapid_analysis/contract.py` are the source of truth; `openapi.json` is exported from them and
@@ -38,7 +38,7 @@ Ingest error codes: `malformed_json`, `body_too_large`, `invalid_household`, `mi
 ## Overview
 
 ```
-schema_version "1.0" · ruleset_version "2025.1" · household_id · tax_year
+schema_version "1.1" · ruleset_version "2025.1" · household_id · tax_year
 status        findings | no_findings | needs_review
 priority      informational | low | medium | high | null   (highest finding priority)
 checklist_label "Flags for review, not advice"
@@ -69,13 +69,34 @@ errors[]      {code, path, message, severity}
 | priority | `informational` · `low` · `medium` · `high` |
 | status | `findings` · `no_findings` · `needs_review` |
 | category | `retirement` · `tax` · `hsa` · `cash_management` · `life_event` · `data_quality` |
-| change_type | `new_dependent` · `new_employer` · `new_mortgage` · `large_income_increase` · `large_income_decrease` |
+| change_type | `life_event_new_dependent` · `life_event_new_employer` · `life_event_new_mortgage` · `life_event_large_income_increase` (rise or fall of 25% or more) |
+| finding type | `retirement_contribution_review` · `self_employment_tax_review` · `excess_cash_review` · `retirement_distribution_review` · `hsa_eligibility_unverified` · `source_data_conflict` · `life_event_new_dependent` · `life_event_new_employer` · `life_event_new_mortgage` · `life_event_large_income_increase` |
+| doc_type | `w2` · `1040` · `1099_r` · `1099_int` · `1099_div` · `1099_nec` · `1098` · `5498_sa` · `1095` · `account_statement` · `unknown` |
 | severity | `error` · `warning` |
 | filing_status | `single` · `married_filing_jointly` · `married_filing_separately` · `head_of_household` · `qualifying_surviving_spouse` |
 
 Checklist ids: `retirement_can_improve`, `tax_savings_possible`, `excess_cash`, `needs_documents`,
 `major_changes`, `insurance_review`, `estate_review`, `education_review` (the last three are always
 `not_assessed` placeholders).
+
+## Schema 1.0 → 1.1 id mapping
+
+All ids now come from [`tags.json`](tags.json) (the taxonomy, amendment Appendix A); `tests/test_tags.py`
+fails if the service emits an id that is not in it. Ids not listed here did not change (checklist ids,
+answers, priorities, statuses, categories and check statuses already matched).
+
+| Where | 1.0 | 1.1 |
+|---|---|---|
+| `schema_version` | `1.0` | `1.1` |
+| finding `type` | `excess_cash` | `excess_cash_review` |
+| finding `type` | `early_distribution`, `distribution_under_withheld`, `normal_distribution`, `rollover_distribution`, `distribution_review` | `retirement_distribution_review` (priority still follows the code: 1 high, 7 under-withheld medium, 7 low, G informational) |
+| finding `type` | `hsa_eligibility_proof_missing` | `hsa_eligibility_unverified` |
+| finding `type` | `source_conflict`, `value_mismatch` | `source_data_conflict` |
+| finding `type`, change `type` | `new_dependent`, `new_employer`, `new_mortgage` | `life_event_new_dependent`, `life_event_new_employer`, `life_event_new_mortgage` |
+| finding `type`, change `type` | `large_income_increase`, `large_income_decrease` | `life_event_large_income_increase` (the text says "rose" or "fell") |
+| `data_quality.missing_documents[].type` | `hsa_plan_proof` | `1095` (the doc type that would prove it) |
+| document ingest response | `form_type` (`W-2`, `1099-R`, … or null) | `doc_type` (`w2`, `1099_r`, … or `unknown`) |
+| household input `documents[].type` | free text, passed through | normalized to a `doc_type` id (`W-2` → `w2`); unrecognized → `unknown` |
 
 ## How a check is made
 

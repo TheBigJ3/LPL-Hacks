@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "ruleset_version": "2025.1",
   "household_id": "HH004",
   "tax_year": 2025,
@@ -142,7 +142,7 @@
   "findings": [
     {
       "id": "F1",
-      "type": "source_conflict",
+      "type": "source_data_conflict",
       "category": "data_quality",
       "priority": "high",
       "headline": "Jordan's wages disagree between documents",

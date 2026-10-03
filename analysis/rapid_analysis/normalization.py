@@ -46,6 +46,29 @@ FILING_STATUS_ALIASES: dict[str, FilingStatus] = {
 
 MAX_ABS_VALUE = 1e9
 
+# Pipeline / printed form names -> tags.json doc_types[].id. Anything else is "unknown".
+DOC_TYPE_IDS = ("w2", "1040", "1099_r", "1099_int", "1099_div", "1099_nec", "1098", "5498_sa", "1095",
+                "account_statement", "unknown")
+DOC_TYPE_ALIASES: dict[str, str] = {
+    "w2": "w2", "w 2": "w2", "form w 2": "w2",
+    "1040": "1040", "form 1040": "1040",
+    "1099 r": "1099_r", "1099r": "1099_r", "form 1099 r": "1099_r",
+    "1099 int": "1099_int", "1099int": "1099_int",
+    "1099 div": "1099_div", "1099div": "1099_div",
+    "1099 nec": "1099_nec", "1099nec": "1099_nec",
+    "1098": "1098", "form 1098": "1098",
+    "5498 sa": "5498_sa", "5498sa": "5498_sa",
+    "1095": "1095", "1095 a": "1095", "1095 b": "1095", "1095 c": "1095",
+    "account statement": "account_statement", "bank statement": "account_statement", "statement": "account_statement",
+}
+
+
+def doc_type_normalize(raw: Any) -> str:
+    if not isinstance(raw, str):
+        return "unknown"
+    key = re.sub(r"[^a-z0-9]+", " ", raw.lower()).strip()
+    return DOC_TYPE_ALIASES.get(key, DOC_TYPE_ALIASES.get(key.replace(" ", ""), "unknown"))
+
 HOUSEHOLD_FIELDS: dict[str, str] = {
     "adjusted_gross_income": "money_signed",
     "dependents": "count",
@@ -105,7 +128,7 @@ class Member(BaseModel):
 
 class Document(BaseModel):
     name: str
-    type: str | None = None
+    type: str = "unknown"  # tags.json doc_types[].id
     date: str | None = None
 
 
@@ -429,7 +452,7 @@ def _normalize_documents(raw: Any, path: str, errors: list[NormError]) -> list[D
                 date = parse_date(item["date"])
             except ValueProblem as problem:
                 _err(errors, problem.code, f"{item_path}.date", problem.message)
-        doc_type = item.get("type") if isinstance(item.get("type"), str) else None
+        doc_type = doc_type_normalize(item.get("type"))
         documents.append(Document(name=name, type=doc_type, date=date))
     return documents
 

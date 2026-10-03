@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "ruleset_version": "2025.1",
   "household_id": "HH003",
   "tax_year": 2025,
@@ -141,7 +141,7 @@
   "findings": [
     {
       "id": "F1",
-      "type": "hsa_eligibility_proof_missing",
+      "type": "hsa_eligibility_unverified",
       "category": "hsa",
       "priority": "medium",
       "headline": "No proof of Morgan's HSA-eligible health plan",
@@ -160,7 +160,7 @@
     "unchecked_values": 3,
     "missing_documents": [
       {
-        "type": "hsa_plan_proof",
+        "type": "1095",
         "member": "Morgan Lee",
         "person_id": "HH003-P1",
         "description": "Proof of an HSA-eligible health plan for Morgan Lee"

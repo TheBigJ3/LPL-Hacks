@@ -54,7 +54,7 @@ CLAIM_SUBJECTS: dict[str, tuple[str, str]] = {
     "cash_balance": ("ending balance", "was"),
 }
 FORM_SUBJECTS: dict[tuple[str, str], tuple[str, str]] = {
-    ("W-2", "state_tax_withheld"): ("state income tax", "was"),
+    ("w2", "state_tax_withheld"): ("state income tax", "was"),
     # The 1040 never says "wages": line 1a reads "Total amount from Form(s) W-2, box 1".
     ("1040", "wages"): ("total amount from Form(s) W-2, box 1", "was"),
 }

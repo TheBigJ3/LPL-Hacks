@@ -40,7 +40,7 @@ def real_alex_response():
 
 def test_form_detected_and_confidence_rescaled(pat_response):
     doc = textract_parse_blocks(pat_response)
-    assert doc.form_type == "1099-R"
+    assert doc.form_type == "1099_r"
     gross = next(f for f in doc.fields if f.label == "1 Gross distribution")
     assert gross.confidence == pytest.approx(0.952)
     assert all(f.confidence is None or 0.0 <= f.confidence <= 1.0 for f in doc.fields)
@@ -48,7 +48,7 @@ def test_form_detected_and_confidence_rescaled(pat_response):
 
 def test_real_textract_log_detected_as_1099r(real_alex_response):
     doc = textract_parse_blocks(real_alex_response)
-    assert doc.form_type == "1099-R"
+    assert doc.form_type == "1099_r"
     assert all(f.confidence is None or 0.0 <= f.confidence <= 1.0 for f in doc.fields)
 
 
@@ -166,7 +166,7 @@ def test_evidence_uses_key_value_pairs_not_line_order(pat_response):
 
 def test_w2_box12_codes_map_to_401k_and_hsa():
     evidence = evidence_from_textract(textract_w2("Morgan Lee", "Tailspin Sample Toys", "92,000.00", "1.00", ["D 18,500.00", "W 4,300.00"]), "m.pdf")
-    assert evidence.form_type == "W-2"
+    assert evidence.form_type == "w2"
     assert evidence.values["employee_401k_contribution"]["value"] == "18,500.00"
     assert evidence.values["hsa_contribution"]["value"] == "4,300.00"
     assert "12a Code D (401(k) elective deferrals): $ 18,500.00." in evidence.text

@@ -72,7 +72,7 @@ def test_section6_holds_model_off(backend_none, household_id):
 def test_hh003_missing_hsa_plan_proof(backend_none):
     dq = build("HH003").overview["data_quality"]
     assert dq["missing_documents"] == [{
-        "type": "hsa_plan_proof", "member": "Morgan Lee", "person_id": "HH003-P1",
+        "type": "1095", "member": "Morgan Lee", "person_id": "HH003-P1",
         "description": "Proof of an HSA-eligible health plan for Morgan Lee",
     }]
 
@@ -103,7 +103,7 @@ def test_hh006_matches_spec_shape(backend_none):
     k401 = next(n for n in taylor["numbers"] if n["field"] == "employee_401k_contribution")
     assert k401["label"] == "401(k)" and k401["value"] == 2000
     assert k401["context"] == "1.8% of pay · 9% of limit · $21,500 room left"
-    assert o["changes_since_last_year"] == [{"type": "new_dependent", "text": "Dependents increased from 0 to 1"}]
+    assert o["changes_since_last_year"] == [{"type": "life_event_new_dependent", "text": "Dependents increased from 0 to 1"}]
     f1 = next(f for f in o["findings"] if f["id"] == "F1")
     assert f1["headline"] == "Taylor is saving very little for retirement"
     assert f1["action_label"] == "Discuss savings" and f1["member"] == "Taylor Mock"
@@ -205,7 +205,7 @@ def test_fixture_values_are_verified_not_just_checked(loaded_engine):
 @pytest.mark.model
 def test_hh004_evidence_drilldown(loaded_engine):
     result = build("HH004")
-    conflict = next(f for f in result.overview["findings"] if f["type"] == "source_conflict")
+    conflict = next(f for f in result.overview["findings"] if f["type"] == "source_data_conflict")
     evidence = result.evidence[conflict["id"]]
     wages = evidence["values"][0]
     assert wages["check"] == "conflicted"

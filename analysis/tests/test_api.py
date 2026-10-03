@@ -37,7 +37,7 @@ def client_off(backend_none):
 
 def test_health(client_off):
     body = client_off.get("/health").json()
-    assert body == {"status": "ok", "model_loaded": False, "device": "none", "ruleset_version": "2025.1", "schema_version": "1.0"}
+    assert body == {"status": "ok", "model_loaded": False, "device": "none", "ruleset_version": "2025.1", "schema_version": "1.1"}
 
 
 def test_enums(client_off):
@@ -244,7 +244,7 @@ def test_document_ingest_textract_and_text(client_off):
     response = client_off.post("/api/households/HH010/documents",
                                json={"name": "alex_example_1099r_2026.pdf", "textract": fixture_textract("alex_example_1099r_2026.pdf")})
     assert response.status_code == 200
-    assert response.json()["form_type"] == "1099-R"
+    assert response.json()["doc_type"] == "1099_r"
     assert "distribution_code" in response.json()["fields"]
     response = client_off.post("/api/households/HHBAD/documents",
                                json={"name": "w2.pdf", "text": "Form W-2 for Bad Input. 1 Wages: 50,000.00. SSN 000-00-0000", "form_type": "W-2"})

@@ -136,9 +136,9 @@ def _data_quality(household: Household, checks: Mapping[str, Check], findings) -
                     value=num(c.value) if isinstance(c.value, float) else c.value,
                     textract_confidence=c.textract_confidence, source_document=c.source_document, page=c.page))
     missing = [
-        contract.MissingDocument(type="hsa_plan_proof", member=f.member, person_id=f.person_id,
+        contract.MissingDocument(type="1095", member=f.member, person_id=f.person_id,
                                  description=f"Proof of an HSA-eligible health plan for {f.member or 'this member'}")
-        for f in findings if f.type == "hsa_eligibility_proof_missing"
+        for f in findings if f.type == "hsa_eligibility_unverified"
     ]
     return contract.DataQuality(documents=len(household.documents), conflicts=conflicts, low_confidence_fields=low,
                                 unchecked_values=unchecked, missing_documents=missing)

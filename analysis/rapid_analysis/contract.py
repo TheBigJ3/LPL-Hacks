@@ -1,4 +1,4 @@
-"""The overview contract (schema 1.0). The frontend renders this object directly.
+"""The overview contract (schema 1.1). The frontend renders this object directly.
 
 Checklist answers are flags for review, not advice. Nothing here exposes OpenDecision internals:
 the only model-derived field anywhere is `check`.
@@ -149,7 +149,7 @@ class ErrorItem(_Model):
 
 
 class Overview(_Model):
-    schema_version: Literal["1.0"] = SCHEMA_VERSION
+    schema_version: Literal["1.1"] = SCHEMA_VERSION
     ruleset_version: str = RULESET_VERSION
     household_id: str | None
     tax_year: int | None
@@ -214,6 +214,7 @@ class Enums(_Model):
     status: list[Status]
     category: list[Category]
     change_type: list[str]
+    doc_type: list[str]
     severity: list[Severity]
     filing_status: list[str]
     checklist: list[ChecklistQuestion]
@@ -259,7 +260,7 @@ class IngestResult(_Model):
 class DocumentIngestResult(_Model):
     household_id: str
     name: str
-    form_type: str | None
+    doc_type: str
     fields: list[str]
     status: Literal["accepted"]
 

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "ruleset_version": "2025.1",
   "household_id": "HH005",
   "tax_year": 2025,
@@ -132,26 +132,26 @@
   ],
   "changes_since_last_year": [
     {
-      "type": "new_dependent",
+      "type": "life_event_new_dependent",
       "text": "Dependents increased from 0 to 1"
     },
     {
-      "type": "new_employer",
+      "type": "life_event_new_employer",
       "text": "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC"
     },
     {
-      "type": "new_mortgage",
+      "type": "life_event_new_mortgage",
       "text": "Mortgage interest started ($14,200)"
     },
     {
-      "type": "large_income_increase",
+      "type": "life_event_large_income_increase",
       "text": "AGI rose 94% from $88,000 to $171,000"
     }
   ],
   "findings": [
     {
       "id": "F1",
-      "type": "new_dependent",
+      "type": "life_event_new_dependent",
       "category": "life_event",
       "priority": "high",
       "headline": "Dependents increased from 0 to 1",
@@ -164,7 +164,7 @@
     },
     {
       "id": "F2",
-      "type": "new_employer",
+      "type": "life_event_new_employer",
       "category": "life_event",
       "priority": "high",
       "headline": "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC",
@@ -177,7 +177,7 @@
     },
     {
       "id": "F3",
-      "type": "new_mortgage",
+      "type": "life_event_new_mortgage",
       "category": "life_event",
       "priority": "high",
       "headline": "Mortgage interest started ($14,200)",
@@ -190,7 +190,7 @@
     },
     {
       "id": "F4",
-      "type": "large_income_increase",
+      "type": "life_event_large_income_increase",
       "category": "life_event",
       "priority": "high",
       "headline": "AGI rose 94% from $88,000 to $171,000",

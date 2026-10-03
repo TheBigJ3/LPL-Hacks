@@ -322,23 +322,16 @@
       "DocumentIngestResult": {
         "additionalProperties": false,
         "properties": {
+          "doc_type": {
+            "title": "Doc Type",
+            "type": "string"
+          },
           "fields": {
             "items": {
               "type": "string"
             },
             "title": "Fields",
             "type": "array"
-          },
-          "form_type": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Form Type"
           },
           "household_id": {
             "title": "Household Id",
@@ -357,7 +350,7 @@
         "required": [
           "household_id",
           "name",
-          "form_type",
+          "doc_type",
           "fields",
           "status"
         ],
@@ -434,6 +427,13 @@
             "title": "Checklist Label",
             "type": "string"
           },
+          "doc_type": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Doc Type",
+            "type": "array"
+          },
           "filing_status": {
             "items": {
               "type": "string"
@@ -486,6 +486,7 @@
           "status",
           "category",
           "change_type",
+          "doc_type",
           "severity",
           "filing_status",
           "checklist",
@@ -1406,8 +1407,8 @@
             "type": "string"
           },
           "schema_version": {
-            "const": "1.0",
-            "default": "1.0",
+            "const": "1.1",
+            "default": "1.1",
             "title": "Schema Version",
             "type": "string"
           },
@@ -1695,7 +1696,7 @@
   "info": {
     "description": "Quick-look overview of a household for advisors. Checklist answers are flags for review, not advice. Every displayed number carries a check: verified / mismatch / unconfirmed / conflicted / not_checked.",
     "title": "Household Rapid Analysis",
-    "version": "1.0"
+    "version": "1.1"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -1841,7 +1842,7 @@
     },
     "/api/households/{household_id}/documents": {
       "post": {
-        "description": "Body: {\"name\": \"...\", \"textract\": <AnalyzeDocument response>} or {\"name\": \"...\", \"text\": \"...\", \"form_type\": \"W-2\"}.",
+        "description": "Body: {\"name\": \"...\", \"textract\": <AnalyzeDocument response>} or {\"name\": \"...\", \"text\": \"...\", \"form_type\": \"w2\"}.",
         "operationId": "document_ingest_api_households__household_id__documents_post",
         "parameters": [
           {

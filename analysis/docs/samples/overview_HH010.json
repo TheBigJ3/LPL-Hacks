@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "ruleset_version": "2025.1",
   "household_id": "HH010",
   "tax_year": 2026,
@@ -179,7 +179,7 @@
   "findings": [
     {
       "id": "F1",
-      "type": "normal_distribution",
+      "type": "retirement_distribution_review",
       "category": "tax",
       "priority": "low",
       "headline": "Alex took a normal retirement distribution",

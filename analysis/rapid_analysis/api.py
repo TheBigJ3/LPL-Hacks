@@ -22,7 +22,7 @@ from rapid_analysis import RULESET_VERSION, SCHEMA_VERSION, contract
 from rapid_analysis.engine import engine_info, engine_load
 from rapid_analysis.evidence import CHECK_VALUES
 from rapid_analysis.fixtures import FIXTURE_IDS, fixture_household_raw, fixture_household_textract
-from rapid_analysis.normalization import FILING_STATUS_ALIASES, normalize_household
+from rapid_analysis.normalization import DOC_TYPE_IDS, FILING_STATUS_ALIASES, normalize_household
 from rapid_analysis.overview import overview_build
 from rapid_analysis.rules import (
     ANSWER_VALUES,
@@ -152,6 +152,7 @@ def enums() -> dict:
         "status": list(STATUS_VALUES),
         "category": list(CATEGORY_VALUES),
         "change_type": list(CHANGE_TYPES),
+        "doc_type": list(DOC_TYPE_IDS),
         "severity": ["error", "warning"],
         "filing_status": sorted(set(FILING_STATUS_ALIASES.values())),
         "checklist": [{"id": k, "question": v} for k, v in CHECKLIST_QUESTIONS.items()],
@@ -256,7 +257,7 @@ def finding_evidence(household_id: str, finding_id: str):
 @app.post("/api/households/{household_id}/documents", response_model=contract.DocumentIngestResult, tags=["ingest"],
           responses={404: {"model": contract.ErrorResponse}, 422: {"model": contract.ErrorResponse}})
 async def document_ingest(household_id: str, request: Request):
-    """Body: {"name": "...", "textract": <AnalyzeDocument response>} or {"name": "...", "text": "...", "form_type": "W-2"}."""
+    """Body: {"name": "...", "textract": <AnalyzeDocument response>} or {"name": "...", "text": "...", "form_type": "w2"}."""
     if STORE.household_get(household_id) is None:
         return _not_found("household", household_id)
     body, error = await _read_json(request)
@@ -286,7 +287,7 @@ async def document_ingest(household_id: str, request: Request):
         log.exception("document ingestion raised")
         return _needs_review([_error("unprocessable", "document could not be read")])
     STORE.document_put(household_id, doc)
-    return {"household_id": household_id, "name": doc.name, "form_type": doc.form_type,
+    return {"household_id": household_id, "name": doc.name, "doc_type": doc.form_type or "unknown",
             "fields": sorted(doc.values), "status": "accepted"}
 
 

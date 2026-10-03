@@ -51,7 +51,7 @@ def test_hh004_no_retirement_finding_only_needs_data():
     item = next(i for i in result.checklist if i.id == "retirement_can_improve")
     assert item.answer == "needs_data" and item.finding_ids == []
     assert "Jordan's wages disagree" in item.reason
-    conflict = by_type(result)["source_conflict"]
+    conflict = by_type(result)["source_data_conflict"]
     assert conflict.priority == "high"
     assert "$120,000 on jordan_w2_2025.pdf" in conflict.explanation
     assert "$165,000 on hh004_1040_2025.pdf" in conflict.explanation
@@ -60,9 +60,9 @@ def test_hh004_no_retirement_finding_only_needs_data():
 def test_hh005_life_events_each_raised_to_high():
     result = fixture("HH005")
     life = [f for f in result.findings if f.category == "life_event"]
-    assert [f.type for f in life] == ["new_dependent", "new_employer", "new_mortgage", "large_income_increase"]
+    assert [f.type for f in life] == ["life_event_new_dependent", "life_event_new_employer", "life_event_new_mortgage", "life_event_large_income_increase"]
     assert all(f.priority == "high" for f in life)
-    assert [c.type for c in result.changes] == ["new_dependent", "new_employer", "new_mortgage", "large_income_increase"]
+    assert [c.type for c in result.changes] == ["life_event_new_dependent", "life_event_new_employer", "life_event_new_mortgage", "life_event_large_income_increase"]
     assert result.changes[1].text == "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC"
     assert result.changes[3].text == "AGI rose 94% from $88,000 to $171,000"
 
@@ -70,7 +70,7 @@ def test_hh005_life_events_each_raised_to_high():
 def test_hh006_single_life_event_stays_medium():
     result = fixture("HH006")
     life = [f for f in result.findings if f.category == "life_event"]
-    assert [(f.type, f.priority) for f in life] == [("new_dependent", "medium")]
+    assert [(f.type, f.priority) for f in life] == [("life_event_new_dependent", "medium")]
     assert result.changes[0].text == "Dependents increased from 0 to 1"
 
 
@@ -85,8 +85,8 @@ def test_hh006_findings():
     assert retirement.dollar_impact == 21500
     assert retirement.member == "Taylor Mock"
     assert found["self_employment_tax_review"].priority == "high"
-    assert found["excess_cash"].priority == "high"
-    assert found["excess_cash"].dollar_impact == 134000
+    assert found["excess_cash_review"].priority == "high"
+    assert found["excess_cash_review"].dollar_impact == 134000
 
 
 def test_retirement_priority_boundaries():
@@ -110,12 +110,12 @@ def test_self_employment_priority_boundary():
 def test_excess_cash_priority_boundary():
     raw = fixture_household_raw("HH006")
     raw["cash_balance"] = 152000  # exactly 12 months: not more than 12
-    assert by_type(evaluate(raw))["excess_cash"].priority == "medium"
+    assert by_type(evaluate(raw))["excess_cash_review"].priority == "medium"
 
 
 def test_1099r_code_1_high_with_impact():
     result = fixture("HH009")
-    finding = by_type(result)["early_distribution"]
+    finding = by_type(result)["retirement_distribution_review"]
     assert finding.priority == "high"
     assert finding.dollar_impact == 1200
     assert finding.member == "Pat Rowe"
@@ -125,14 +125,14 @@ def test_1099r_code_7_exactly_10_percent_is_not_under_withheld():
     result = fixture("HH010")
     item = next(i for i in result.checklist if i.id == "tax_savings_possible")
     assert item.answer == "no"
-    assert by_type(result)["normal_distribution"].priority == "low"
+    assert by_type(result)["retirement_distribution_review"].priority == "low"
 
 
 def test_1099r_code_7_under_withheld_is_medium():
     raw = fixture_household_raw("HH010")
     raw["members"][0]["federal_tax_withheld"]["value"] = "$ 1,874.99"
     result = evaluate(raw)
-    assert by_type(result)["distribution_under_withheld"].priority == "medium"
+    assert by_type(result)["retirement_distribution_review"].priority == "medium"
     assert next(i for i in result.checklist if i.id == "tax_savings_possible").answer == "yes"
 
 
@@ -140,7 +140,7 @@ def test_1099r_code_g_is_informational():
     raw = fixture_household_raw("HH010")
     raw["members"][0]["distribution_code"]["value"] = "G"
     result = evaluate(raw)
-    assert by_type(result)["rollover_distribution"].priority == "informational"
+    assert by_type(result)["retirement_distribution_review"].priority == "informational"
     assert next(i for i in result.checklist if i.id == "tax_savings_possible").answer == "no"
     assert result.status == "no_findings" and result.priority == "informational"
 
@@ -181,13 +181,13 @@ def test_value_mismatch_needs_documents():
     result = fixture("HH007", {"HH007-P1.wages": "mismatch"})
     item = next(i for i in result.checklist if i.id == "needs_documents")
     assert item.answer == "yes"
-    assert by_type(result)["value_mismatch"].value_keys == ["HH007-P1.wages"]
+    assert by_type(result)["source_data_conflict"].value_keys == ["HH007-P1.wages"]
     unconfirmed = fixture("HH007", {"HH007-P1.wages": "unconfirmed"})
     assert next(i for i in unconfirmed.checklist if i.id == "needs_documents").answer == "no"
 
 
 def test_hh003_hsa_proof_missing():
-    finding = by_type(fixture("HH003"))["hsa_eligibility_proof_missing"]
+    finding = by_type(fixture("HH003"))["hsa_eligibility_unverified"]
     assert finding.priority == "medium" and finding.category == "hsa"
 
 
