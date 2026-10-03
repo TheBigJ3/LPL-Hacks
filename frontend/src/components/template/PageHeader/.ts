@@ -29,7 +29,7 @@ export function usePageHeader(title: string) {
         { key: 'client', label: client.name, href: `/clients/${client.slug}` },
         ...(member ? [{ key: 'member', label: member.name, href: null }] : []),
       ]
-      : [{ key: 'page', label: title, href: null }]),
+      : title === PAGE_HEADER_ROOT_LABEL ? [] : [{ key: 'page', label: title, href: null }]),
   ]
 
   const crumbs: PageHeaderCrumb[] = trail.map((crumb, index) => index === trail.length - 1 ? { ...crumb, href: null } : crumb)

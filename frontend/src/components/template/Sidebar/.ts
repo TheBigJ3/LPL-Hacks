@@ -19,23 +19,6 @@ export type SidebarTabGroup = {
   tabs: SidebarTab[]
 }
 
-export const SIDEBAR_GROUPS: SidebarTabGroup[] = [
-  {
-    label: 'Workspace',
-    tabs: [
-      { label: 'Clients', icon: 'groups', path: '/', end: true },
-      { label: 'Documents', icon: 'description', path: '/documents' },
-      { label: 'Notes', icon: 'sticky_note_2', path: '/notes' },
-    ],
-  },
-  {
-    label: 'Tools',
-    tabs: [
-      { label: 'Extract', icon: 'document_scanner', path: '/extract' },
-    ],
-  },
-]
-
 export const SIDEBAR_CLIENT_MEMBER_PARAM = 'member'
 
 const SIDEBAR_EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const
@@ -155,7 +138,7 @@ export function useSidebar() {
     client,
     member,
     members: client?.kind === 'household' ? client.members : null,
-    groups: client ? sidebarClientGetGroups(client, member) : SIDEBAR_GROUPS,
+    groups: client ? sidebarClientGetGroups(client, member) : [],
     contextKey: client?.slug ?? 'workspace',
     contextDirection: client ? 1 : -1,
     toggle: () => setOpen(!open),
