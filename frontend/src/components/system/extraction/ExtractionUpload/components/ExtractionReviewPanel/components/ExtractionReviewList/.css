@@ -1,13 +1,14 @@
-.extraction-review-list {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-}
-
 .extraction-review-list__title {
   color: var(--color-dark-gray);
   font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.extraction-review-list__count {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
 }
 
 .extraction-review-list__item {
@@ -25,8 +26,16 @@
   font-size: 16px;
 }
 
-.extraction-review-list__icon[data-open="true"] {
+.extraction-review-list__icon[data-status="review"] {
   color: var(--color-review-text);
+}
+
+.extraction-review-list__icon[data-status="confirmed"] {
+  color: var(--color-success);
+}
+
+.extraction-review-list__icon[data-status="edited"] {
+  color: var(--color-heading);
 }
 
 .extraction-review-list__label {
@@ -36,6 +45,11 @@
 .extraction-review-list__summary {
   color: var(--color-dark-gray);
   font-size: 12px;
+}
+
+.extraction-review-list__chevron {
+  color: var(--color-main-gray);
+  font-size: 18px;
 }
 
 .extraction-review-list__item:focus-visible {

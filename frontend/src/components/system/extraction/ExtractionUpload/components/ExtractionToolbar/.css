@@ -1,0 +1,91 @@
+.extraction-toolbar {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.extraction-toolbar__back,
+.extraction-toolbar__download {
+  padding: 7px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-default);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+
+.extraction-toolbar__back .material-symbols-outlined,
+.extraction-toolbar__download .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.extraction-toolbar__back:hover,
+.extraction-toolbar__download:hover {
+  background: var(--color-surface-hover);
+}
+
+.extraction-toolbar__download[data-ready="true"] {
+  border-color: var(--color-accent-blue);
+  background: var(--color-accent-blue);
+  color: #FFFFFF;
+}
+
+.extraction-toolbar__download[data-ready="true"]:hover {
+  opacity: 0.9;
+}
+
+.extraction-toolbar__file-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  background: var(--color-surface-hover);
+  color: var(--color-dark-gray);
+  font-size: 20px;
+}
+
+.extraction-toolbar__name {
+  color: var(--color-text-default);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.extraction-toolbar__meta {
+  color: var(--color-dark-gray);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.extraction-toolbar__track {
+  width: 96px;
+  background: var(--color-border);
+}
+
+.extraction-toolbar__bar {
+  background: var(--color-review);
+  transition: width 300ms var(--ease-out-expo);
+}
+
+.extraction-toolbar__progress[data-complete="true"] .extraction-toolbar__bar {
+  background: var(--color-success);
+}
+
+.extraction-toolbar__count {
+  color: var(--color-text-default);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.extraction-toolbar__back:focus-visible,
+.extraction-toolbar__download:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .extraction-toolbar__back,
+  .extraction-toolbar__download,
+  .extraction-toolbar__bar { transition: none; }
+}

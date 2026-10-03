@@ -1,134 +1,53 @@
 .extraction-review-panel {
-  --extraction-review-panel-position: static;
-  --extraction-review-panel-max-height: none;
-  position: var(--extraction-review-panel-position);
-  top: 24px;
-  max-height: var(--extraction-review-panel-max-height);
-  overflow-y: auto;
+  --extraction-review-panel-order: -1;
+  order: var(--extraction-review-panel-order);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-100);
 }
 
 @media (min-width: 1100px) {
   .extraction-review-panel {
-    --extraction-review-panel-position: sticky;
-    --extraction-review-panel-max-height: calc(100dvh - 48px);
+    --extraction-review-panel-order: 0;
   }
 }
 
-.extraction-review-panel__card {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
+.extraction-review-panel__tabs {
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-hover);
 }
 
-.extraction-review-panel__title {
-  color: var(--color-heading);
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.4;
-}
-
-.extraction-review-panel__count {
+.extraction-review-panel__tab {
   color: var(--color-dark-gray);
   font-size: 14px;
+  font-weight: 700;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.extraction-review-panel__tab:hover {
+  color: var(--color-text-default);
+}
+
+.extraction-review-panel__tab[aria-selected="true"] {
+  background: var(--color-surface);
+  color: var(--color-text-default);
+  box-shadow: var(--shadow-100);
+}
+
+.extraction-review-panel__tab-count {
+  background: var(--color-border);
+  color: var(--color-text-default);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
   font-variant-numeric: tabular-nums;
 }
 
-.extraction-review-panel__track {
-  background: var(--color-border);
-}
-
-.extraction-review-panel__progress {
-  background: var(--color-review);
-  transition: width 300ms var(--ease-out-expo);
-}
-
-.extraction-review-panel__legend {
-  color: var(--color-dark-gray);
-  font-size: 12px;
-}
-
-.extraction-review-panel__swatch[data-status="review"] {
-  background: color-mix(in srgb, var(--color-review) 70%, transparent);
-}
-
-.extraction-review-panel__swatch[data-status="confirmed"] {
-  background: color-mix(in srgb, var(--color-review) 25%, transparent);
-}
-
-.extraction-review-panel__swatch[data-status="edited"] {
-  background: color-mix(in srgb, var(--color-accent-blue-light) 60%, transparent);
-  box-shadow: inset 0 0 0 1px var(--color-accent-blue);
-}
-
-.extraction-review-panel__empty {
-  border: 1px dashed var(--color-border);
-  color: var(--color-dark-gray);
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.extraction-review-panel__empty .material-symbols-outlined {
-  font-size: 20px;
-}
-
-.extraction-review-panel__next {
-  background: var(--color-accent-blue);
-  color: #FFFFFF;
-  font-size: 14px;
-  font-weight: 700;
-  transition: opacity 150ms ease;
-}
-
-.extraction-review-panel__next .material-symbols-outlined {
-  font-size: 16px;
-}
-
-.extraction-review-panel__next:hover:not(:disabled) {
-  opacity: 0.9;
-}
-
-.extraction-review-panel__next:disabled {
-  background: var(--color-surface-hover);
-  color: var(--color-dark-gray);
-}
-
-.extraction-review-panel__confirm {
-  border: 1px solid var(--color-border);
-  color: var(--color-text-default);
-  font-size: 14px;
-  font-weight: 700;
-  transition: background-color 150ms ease, opacity 150ms ease;
-}
-
-.extraction-review-panel__confirm .material-symbols-outlined {
-  font-size: 16px;
-}
-
-.extraction-review-panel__confirm:hover {
-  background: var(--color-surface-hover);
-}
-
-.extraction-review-panel__confirm[data-ready="true"] {
-  border-color: var(--color-accent-blue);
-  background: var(--color-accent-blue);
-  color: #FFFFFF;
-}
-
-.extraction-review-panel__confirm[data-ready="true"]:hover {
-  opacity: 0.9;
-}
-
-.extraction-review-panel__hint {
-  color: var(--color-dark-gray);
-  font-size: 12px;
-  text-align: center;
-}
-
-.extraction-review-panel__next:focus-visible,
-.extraction-review-panel__confirm:focus-visible {
+.extraction-review-panel__tab:focus-visible {
   outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .extraction-review-panel__progress, .extraction-review-panel__next, .extraction-review-panel__confirm { transition: none; }
+  .extraction-review-panel__tab { transition: none; }
 }
