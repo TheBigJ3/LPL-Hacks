@@ -16,11 +16,13 @@ const ExtractionUpload = () => {
     {extraction.result
       ? <div className="extraction-upload flex flex-col" data-reviewing="true">
         <h1 className="sr-only">Review {extraction.result.toolbar.fileName}</h1>
-        <ExtractionToolbar toolbar={extraction.result.toolbar} onBack={extraction.startOver} onDownload={extraction.download} />
+        <ExtractionToolbar toolbar={extraction.result.toolbar} confirm={extraction.result.confirm} onBack={extraction.startOver} onConfirm={extraction.confirmAndTag} />
         <div className="extraction-upload__workspace grid">
           <ExtractionDocument document={extraction.result.document} onSelect={extraction.pickHighlight} />
           <ExtractionReviewPanel
             review={extraction.result.review}
+            confirm={extraction.result.confirm}
+            tag={extraction.result.tag}
             onView={extraction.showView}
             onPick={extraction.pickField}
             onPrev={extraction.prev}
@@ -29,7 +31,7 @@ const ExtractionUpload = () => {
             onChange={extraction.changeValue}
             onSubmit={extraction.submit}
             onUndo={extraction.undo}
-            onDownload={extraction.download}
+            onConfirmAndTag={extraction.confirmAndTag}
           />
         </div>
       </div>

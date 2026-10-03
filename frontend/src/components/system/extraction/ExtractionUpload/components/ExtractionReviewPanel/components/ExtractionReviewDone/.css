@@ -67,7 +67,24 @@
   color: #FFFFFF;
 }
 
-.extraction-review-done__primary:hover {
+.extraction-review-done__primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.extraction-review-done__primary [data-icon="progress_activity"] {
+  animation: extraction-review-done-spin 900ms linear infinite;
+}
+
+@keyframes extraction-review-done-spin {
+  to { transform: rotate(360deg); }
+}
+
+.extraction-review-done__tag {
+  text-align: left;
+}
+
+.extraction-review-done__primary:hover:not(:disabled) {
   opacity: 0.9;
 }
 
@@ -89,4 +106,5 @@
 @media (prefers-reduced-motion: reduce) {
   .extraction-review-done__primary,
   .extraction-review-done__secondary { transition: none; }
+  .extraction-review-done__primary [data-icon="progress_activity"] { animation: none; }
 }

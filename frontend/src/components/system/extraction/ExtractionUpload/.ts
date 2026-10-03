@@ -2,18 +2,21 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent, type CSSPropert
 import { useParams, useSearchParams } from 'react-router'
 import type { ExtractedAnalysis } from '@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis'
 import type { ExtractedBox } from '@lpl-hacks/shared/src/types/native/extraction/extractedBox'
-import type { ExtractedTable } from '@lpl-hacks/shared/src/types/native/extraction/extractedTable'
 import type { ExtractedConfidenceLevel, ExtractedValue } from '@lpl-hacks/shared/src/types/native/extraction/extractedValue'
 import documentsExtractionSettled from '@lpl-hacks/shared/src/types/native/sockets/documents/extractionSettled'
 import documentsWatch from '@lpl-hacks/shared/src/types/native/sockets/documents/watch'
+import type { Document } from '@lpl-hacks/shared/src/types/native/documents/document'
+import type { DocumentReview, DocumentReviewField } from '@lpl-hacks/shared/src/types/native/documents/documentReview'
+import type { DocumentIndexStatus, DocumentTagging } from '@lpl-hacks/shared/src/types/native/documents/documentTagging'
+import documentsTagSettled from '@lpl-hacks/shared/src/types/native/sockets/documents/tagSettled'
 import listClientsApi from '@api/clients/listClientsApi'
+import confirmDocumentApi from '@api/documents/confirmDocumentApi'
 import getDocumentApi from '@api/documents/getDocumentApi'
 import getDocumentContentApi from '@api/documents/getDocumentContentApi'
 import uploadDocumentApi from '@api/documents/uploadDocumentApi'
-import { apiGetRequest, apiUploadRequest, useApiGetQuery } from '@features/apiLayer'
+import { apiGetRequest, apiPostRequest, apiUploadRequest, useApiGetQuery } from '@features/apiLayer'
 import { DOCUMENT_UPLOAD_ACCEPT, DOCUMENT_UPLOAD_HINT, documentUploadCheckFile } from '@features/documentUploadCheck'
 import { documentPreviewRelease, documentPreviewRender, type DocumentPreviewPage } from '@features/documentPreview'
-import { fileDownloadJson } from '@features/fileDownload'
 import { socketAwait, socketLayer, socketWatch } from '@stores/socketStore'
 import { EXTRACTION_ERRORS } from '@typings/native/extraction/errors'
 
@@ -31,6 +34,26 @@ const EXTRACTION_HIGHLIGHT_PADDING = 0.003
 const EXTRACTION_WAIT_MAX_MS = 20 * 60 * 1000
 const EXTRACTION_CHECK_CONNECTED_MS = 10_000
 const EXTRACTION_CHECK_DISCONNECTED_MS = 3_000
+const EXTRACTION_INDEX_NOTES: Record<DocumentIndexStatus, string> = {
+  pending: 'Adding to client search',
+  indexed: 'Added to client search',
+  failed: EXTRACTION_ERRORS.INDEX_FAILED.MESSAGE,
+}
+const EXTRACTION_INDEX_NOTE_UNLINKED = "Not linked to a client, so it won't be added to search"
+const EXTRACTION_TAG_WAIT_MAX_MS = 10 * 60 * 1000
+
+const EXTRACTION_DOC_TYPE_LABELS: Record<string, string> = {
+  w2: 'W-2',
+  '1099_int': '1099-INT',
+  '1099_r': '1099-R',
+  '1099_div': '1099-DIV',
+  '1099_nec': '1099-NEC',
+  '1040': 'Form 1040',
+  '1098': 'Form 1098',
+  '5498_sa': '5498-SA',
+  '1095': 'Form 1095',
+  account_statement: 'Account statement',
+}
 const EXTRACTION_PROGRESS_FALLBACK_NAME = 'Client upload'
 
 export type ExtractionPhase = 'idle' | 'uploading' | 'opening' | 'extracting'
@@ -222,8 +245,36 @@ type ExtractionAnalysis = {
 }
 
 type ExtractionWaitResult =
-  | { success: true, documentId: string, pageCount: number, data: ExtractedAnalysis }
+  | { success: true, document: Document, data: ExtractedAnalysis, review: DocumentReview | null, tagging: DocumentTagging | null }
   | { success: false, message: string }
+
+type ExtractionTagState = {
+  document: Document
+  tagging: DocumentTagging | null
+}
+
+type ExtractionTagWaitResult =
+  | { success: true, document: Document, tagging: DocumentTagging | null }
+  | { success: false, message: string }
+
+export type ExtractionConfirmView = {
+  label: string
+  icon: string
+  disabled: boolean
+  hint: string | null
+}
+
+export type ExtractionTagView = {
+  state: 'pending' | 'tagged' | 'failed'
+  icon: string
+  title: string
+  message: string
+  docType: string | null
+  tags: string[]
+  members: string[]
+  indexNote: string | null
+  canRetry: boolean
+}
 
 function extractionFormatPercent(confidence: number | null): string {
   return confidence === null ? EXTRACTION_EMPTY_VALUE_LABEL : `${confidence.toFixed(1)}%`
@@ -539,59 +590,6 @@ function extractionBuildProgress(phase: Exclude<ExtractionPhase, 'idle'>, fileNa
   }
 }
 
-function extractionExportValue(item: ExtractionItem): string | boolean {
-  return item.kind === 'checkbox' ? item.checked : item.text
-}
-
-function extractionExportFields(items: ExtractionItem[]): Record<string, string | boolean> {
-  const fields: Record<string, string | boolean> = {}
-  for (const item of items) {
-    if (item.origin !== 'field') continue
-    let key = item.label
-    for (let copy = 2; key in fields; copy++) key = `${item.label} (${copy})`
-    fields[key] = extractionExportValue(item)
-  }
-  return fields
-}
-
-function extractionExportTable(
-  table: ExtractedTable,
-  itemsById: Map<string, ExtractionItem>,
-  edits: Record<string, ExtractionEditValue>,
-  confirmed: Record<string, boolean>,
-) {
-  const values = new Map(table.cells.map((cell) => [
-    `${cell.row}:${cell.column}`,
-    extractionExportValue(itemsById.get(cell.fieldId ?? cell.id) ?? extractionBuildItem(
-      { id: cell.id, origin: 'cell', label: '', page: table.page, box: cell.box, labelBox: null, source: cell },
-      edits,
-      confirmed,
-    )),
-  ]))
-  const columns = Array.from({ length: table.columnCount }, (_, index) => index + 1)
-  const headerRows = new Set(table.cells.filter((cell) => cell.role === 'header').map((cell) => cell.row))
-  const headers = columns.map((column) => table.cells.find((cell) => cell.role === 'header' && cell.column === column)?.rawValue ?? null)
-  const rows = Array.from({ length: table.rowCount }, (_, index) => index + 1)
-    .filter((row) => !headerRows.has(row))
-    .map((row) => columns.map((column) => values.get(`${row}:${column}`) ?? ''))
-  if (headers.every((header) => header)) return rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index]])))
-  return headers.some((header) => header) ? [headers.map((header) => header ?? ''), ...rows] : rows
-}
-
-function extractionBuildExport(
-  analysis: ExtractionAnalysis,
-  items: ExtractionItem[],
-  edits: Record<string, ExtractionEditValue>,
-  confirmed: Record<string, boolean>,
-) {
-  const itemsById = new Map(items.map((item) => [item.id, item]))
-  return {
-    fileName: analysis.fileName,
-    fields: extractionExportFields(items),
-    tables: analysis.data.tables.map((table) => extractionExportTable(table, itemsById, edits, confirmed)),
-  }
-}
-
 function extractionRevealEditor() {
   document.getElementById(EXTRACTION_EDITOR_DOM_ID)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
 }
@@ -621,8 +619,8 @@ async function extractionWaitForDocument(documentId: string, signal: AbortSignal
       if (signal.aborted) return null
       if (!res.success) return { success: false, message: res.error.message }
 
-      const { document, extraction } = res.data
-      if (document.status === 'extracted' && extraction) return { success: true, documentId, pageCount: document.pageCount ?? 1, data: extraction }
+      const { document, extraction, review, tagging } = res.data
+      if (document.status === 'extracted' && extraction) return { success: true, document, data: extraction, review, tagging }
       if (document.status === 'failed') return { success: false, message: document.failureMessage ?? EXTRACTION_ERRORS.WAIT_TIMED_OUT.MESSAGE }
 
       await settled
@@ -641,6 +639,116 @@ async function extractionUploadAndWait(file: File, clientId: string | undefined,
 
   onUploaded()
   return extractionWaitForDocument(res.data.document.id, signal)
+}
+
+async function extractionWaitForTagging(documentId: string, signal: AbortSignal): Promise<ExtractionTagWaitResult | null> {
+  const unwatch = socketWatch(documentsWatch, { documentId })
+  const deadline = Date.now() + EXTRACTION_TAG_WAIT_MAX_MS
+
+  try {
+    while (Date.now() < deadline) {
+      const timeoutMs = socketLayer.getSnapshot() === 'connected' ? EXTRACTION_CHECK_CONNECTED_MS : EXTRACTION_CHECK_DISCONNECTED_MS
+      const settled = socketAwait(documentsTagSettled, (payload) => payload.documentId === documentId, { timeoutMs, signal })
+      const res = await apiGetRequest(getDocumentApi, { documentId })
+      if (signal.aborted) return null
+      if (!res.success) return { success: false, message: res.error.message }
+      if (res.data.document.tagStatus !== 'pending') return { success: true, document: res.data.document, tagging: res.data.tagging }
+
+      await settled
+      if (signal.aborted) return null
+    }
+    return { success: false, message: EXTRACTION_ERRORS.TAG_WAIT_TIMED_OUT.MESSAGE }
+  } finally {
+    unwatch()
+  }
+}
+
+function extractionBuildReviewedFields(items: ExtractionItem[]): Record<string, DocumentReviewField> {
+  return Object.fromEntries(items
+    .filter((item) => item.status === 'confirmed' || item.status === 'edited')
+    .map((item) => [item.id, { value: item.kind === 'checkbox' ? item.checked : item.text, corrected: item.edited }]))
+}
+
+function extractionRestoreReview(review: DocumentReview | null) {
+  const fields = Object.entries(review?.fields ?? {})
+  return {
+    edits: Object.fromEntries(fields.filter(([, field]) => field.corrected).map(([id, field]) => [id, field.value])),
+    confirmed: Object.fromEntries(fields.filter(([, field]) => !field.corrected).map(([id]) => [id, true])),
+  }
+}
+
+function extractionLogTagging(fileName: string, document: Document, tagging: DocumentTagging | null) {
+  if (document.tagStatus === 'failed') return console.warn(`[tagging] ${fileName} failed:`, document.tagFailureMessage)
+  if (document.tagStatus !== 'tagged' || !tagging) return
+  console.info(`[tagging] ${fileName}`, {
+    docType: tagging.docType?.choice ?? null,
+    tags: tagging.tags.map((tag) => `${tag.name} (${tag.source})`),
+    members: tagging.members.map((member) => ({ id: member.memberId, name: member.name, basis: member.basis })),
+    indexStatus: document.indexStatus,
+    taggedAt: tagging.taggedAt,
+    evidence: Object.fromEntries([
+      ...(tagging.docType ? [['docType', tagging.docType.evidence]] : []),
+      ...tagging.tags.map((tag) => [`tag_${tag.name}`, tag.evidence]),
+      ...tagging.members.map((member) => [member.name, member.evidence]),
+    ]),
+  })
+}
+
+const EXTRACTION_TOPIC_LABELS: Record<string, string> = {
+  income: 'Income',
+  retirement: 'Retirement',
+  tax: 'Tax',
+  self_employment: 'Self-employment',
+  health_savings: 'Health savings',
+  banking_cash: 'Cash and banking',
+  investments: 'Investments',
+  mortgage_housing: 'Home and mortgage',
+  insurance: 'Insurance',
+  estate: 'Estate',
+  education: 'Education',
+  life_event: 'Life event',
+  equity_compensation: 'Equity compensation',
+  debt: 'Debt',
+  charitable_giving: 'Charitable giving',
+  social_security: 'Social Security and Medicare',
+}
+
+function extractionFormatTagName(name: string): string {
+  return EXTRACTION_TOPIC_LABELS[name] ?? name.charAt(0).toUpperCase() + name.slice(1).replace(/_/g, ' ')
+}
+
+function extractionBuildTagView(state: ExtractionTagState): ExtractionTagView | null {
+  const { document, tagging } = state
+  if (document.tagStatus === 'pending') {
+    return { state: 'pending', icon: 'progress_activity', title: 'Tagging', message: 'Finding the document type, topics and family members…', docType: null, tags: [], members: [], indexNote: null, canRetry: false }
+  }
+  if (document.tagStatus === 'failed') {
+    return { state: 'failed', icon: 'error', title: "Tagging didn't finish", message: document.tagFailureMessage ?? EXTRACTION_ERRORS.TAG_WAIT_TIMED_OUT.MESSAGE, docType: null, tags: [], members: [], indexNote: null, canRetry: true }
+  }
+  if (document.tagStatus !== 'tagged' || !tagging) return null
+  const docType = tagging.docType ? EXTRACTION_DOC_TYPE_LABELS[tagging.docType.choice] ?? extractionFormatTagName(tagging.docType.choice) : null
+  return {
+    state: 'tagged',
+    icon: 'sell',
+    title: 'Tagged',
+    message: 'Confirmed values are saved as verified.',
+    docType,
+    tags: tagging.tags.map((tag) => extractionFormatTagName(tag.name)),
+    members: tagging.members.map((member) => member.name),
+    indexNote: document.indexStatus ? EXTRACTION_INDEX_NOTES[document.indexStatus] : EXTRACTION_INDEX_NOTE_UNLINKED,
+    canRetry: false,
+  }
+}
+
+function extractionBuildConfirm(review: ExtractionReviewView, tag: ExtractionTagState | null, confirming: boolean): ExtractionConfirmView {
+  const pending = confirming || tag?.document.tagStatus === 'pending'
+  const again = tag?.document.tagStatus === 'tagged' || tag?.document.tagStatus === 'failed'
+  return {
+    label: pending ? 'Tagging…' : again ? 'Confirm & tag again' : 'Confirm & tag',
+    icon: pending ? 'progress_activity' : 'sell',
+    disabled: pending || review.unresolved > 0,
+    hint: review.unresolved > 0 ? `${review.unresolved} flagged ${review.unresolved === 1 ? 'field' : 'fields'} not checked yet` : null,
+  }
 }
 
 async function extractionFetchDocumentFile(documentId: string, signal: AbortSignal): Promise<{ success: true, file: File } | { success: false, message: string } | null> {
@@ -671,15 +779,21 @@ export function useExtractionUpload() {
   const [edits, setEdits] = useState<Record<string, ExtractionEditValue>>({})
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({})
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [tagState, setTagState] = useState<ExtractionTagState | null>(null)
+  const [confirming, setConfirming] = useState(false)
   const [draft, setDraft] = useState<ExtractionEditValue | null>(null)
   const [view, setView] = useState<ExtractionPanelView>('check')
   const uploadAbort = useRef<AbortController | null>(null)
+  const tagAbort = useRef<AbortController | null>(null)
 
   useEffect(() => () => {
     if (previews) documentPreviewRelease(previews)
   }, [previews])
 
-  useEffect(() => () => uploadAbort.current?.abort(), [])
+  useEffect(() => () => {
+    uploadAbort.current?.abort()
+    tagAbort.current?.abort()
+  }, [])
 
   useEffect(() => {
     if (!openDocumentId) return
@@ -693,24 +807,29 @@ export function useExtractionUpload() {
   const result = useMemo(() => {
     if (!analysis) return null
     const items = extractionBuildItems(analysis.data, edits, confirmed)
+    const review = extractionBuildReview(items, previews, selectedId, draft, view)
     return {
       items,
       toolbar: extractionBuildToolbar(analysis, items, source),
-      review: extractionBuildReview(items, previews, selectedId, draft, view),
+      review,
+      confirm: extractionBuildConfirm(review, tagState, confirming),
+      tag: tagState ? extractionBuildTagView(tagState) : null,
       document: {
         pages: extractionBuildPages(items, previews, selectedId),
         previewMessage: previews ? null : EXTRACTION_ERRORS.PREVIEW_UNAVAILABLE.MESSAGE,
       } satisfies ExtractionDocumentView,
     }
-  }, [analysis, previews, edits, confirmed, selectedId, draft, view, source])
+  }, [analysis, previews, edits, confirmed, selectedId, draft, view, source, tagState, confirming])
 
   function extractionStart() {
     uploadAbort.current?.abort()
+    tagAbort.current?.abort()
     const abort = new AbortController()
     uploadAbort.current = abort
     setError(null)
     setAnalysis(null)
     setPreviews(null)
+    setTagState(null)
     return abort
   }
 
@@ -722,16 +841,35 @@ export function useExtractionUpload() {
       setError(result.message)
       return
     }
-    const first = extractionBuildItems(result.data, {}, {}).find((item) => item.source.requiresReview)
+    const restored = extractionRestoreReview(result.review)
+    const first = extractionFindNextOpen(extractionBuildItems(result.data, restored.edits, restored.confirmed), null)
     setPhase('idle')
-    setEdits({})
-    setConfirmed({})
+    setEdits(restored.edits)
+    setConfirmed(restored.confirmed)
     setDraft(null)
     setView('check')
     setSelectedId(first?.id ?? null)
     setPreviews(pages)
-    setAnalysis({ documentId: result.documentId, fileName: file.name, pageCount: result.pageCount, data: result.data })
+    setAnalysis({ documentId: result.document.id, fileName: file.name, pageCount: result.document.pageCount ?? 1, data: result.data })
     if (first) requestAnimationFrame(extractionFocusInput)
+    if (!result.document.tagStatus) return
+    setTagState({ document: result.document, tagging: result.tagging })
+    extractionLogTagging(file.name, result.document, result.tagging)
+    if (result.document.tagStatus === 'pending') void extractionFollowTagging(result.document.id)
+  }
+
+  async function extractionFollowTagging(documentId: string) {
+    tagAbort.current?.abort()
+    const abort = new AbortController()
+    tagAbort.current = abort
+    const settled = await extractionWaitForTagging(documentId, abort.signal)
+    if (!settled) return
+    if (!settled.success) {
+      setError(settled.message)
+      return
+    }
+    setTagState({ document: settled.document, tagging: settled.tagging })
+    extractionLogTagging(settled.document.fileName, settled.document, settled.tagging)
   }
 
   async function extractionOpen(documentId: string, signal: AbortSignal) {
@@ -837,6 +975,20 @@ export function useExtractionUpload() {
     if (index !== -1 && next) extractionGoTo(next.id)
   }
 
+  async function confirmAndTag() {
+    if (!analysis || !result || result.confirm.disabled) return
+    setConfirming(true)
+    setError(null)
+    const res = await apiPostRequest(confirmDocumentApi, { documentId: analysis.documentId, fields: extractionBuildReviewedFields(result.items) })
+    setConfirming(false)
+    if (!res.success) {
+      setError(res.error.message)
+      return
+    }
+    setTagState({ document: res.data.document, tagging: null })
+    void extractionFollowTagging(analysis.documentId)
+  }
+
   function skip() {
     if (!result) return
     extractionGoTo(extractionFindNextOpen(result.items, selectedId)?.id ?? null)
@@ -879,11 +1031,6 @@ export function useExtractionUpload() {
     if (next === 'check' && result && !result.review.selected) extractionGoTo(extractionFindNextOpen(result.items, null)?.id ?? null)
   }
 
-  function download() {
-    if (!analysis || !result) return
-    fileDownloadJson(`${analysis.fileName.replace(/\.[^.]+$/, '')}.json`, extractionBuildExport(analysis, result.items, edits, confirmed))
-  }
-
   return {
     busy: phase !== 'idle',
     progress: phase === 'idle' ? null : extractionBuildProgress(phase, pendingName),
@@ -900,7 +1047,7 @@ export function useExtractionUpload() {
     submit,
     undo,
     showView,
-    download,
+    confirmAndTag,
     accept: DOCUMENT_UPLOAD_ACCEPT,
     hint: DOCUMENT_UPLOAD_HINT,
     mode,

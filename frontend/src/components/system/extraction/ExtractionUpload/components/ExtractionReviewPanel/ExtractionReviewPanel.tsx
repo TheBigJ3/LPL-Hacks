@@ -1,12 +1,14 @@
 import './.css'
 import type { FormEvent } from 'react'
-import type { ExtractionEditValue, ExtractionPanelView, ExtractionReviewView } from '../../.ts'
+import type { ExtractionConfirmView, ExtractionEditValue, ExtractionPanelView, ExtractionReviewView, ExtractionTagView } from '../../.ts'
 import ExtractionReviewDone from './components/ExtractionReviewDone/ExtractionReviewDone'
 import ExtractionReviewEditor from './components/ExtractionReviewEditor/ExtractionReviewEditor'
 import ExtractionReviewList from './components/ExtractionReviewList/ExtractionReviewList'
 
 type ExtractionReviewPanelProps = {
   review: ExtractionReviewView
+  confirm: ExtractionConfirmView
+  tag: ExtractionTagView | null
   onView: (view: ExtractionPanelView) => void
   onPick: (id: string) => void
   onPrev: () => void
@@ -15,10 +17,10 @@ type ExtractionReviewPanelProps = {
   onChange: (value: ExtractionEditValue) => void
   onSubmit: (event: FormEvent) => void
   onUndo: () => void
-  onDownload: () => void
+  onConfirmAndTag: () => void
 }
 
-const ExtractionReviewPanel = ({ review, onView, onPick, onPrev, onNext, onSkip, onChange, onSubmit, onUndo, onDownload }: ExtractionReviewPanelProps) =>
+const ExtractionReviewPanel = ({ review, confirm, tag, onView, onPick, onPrev, onNext, onSkip, onChange, onSubmit, onUndo, onConfirmAndTag }: ExtractionReviewPanelProps) =>
   <aside className="extraction-review-panel flex flex-col overflow-hidden rounded-lg" aria-label="Review">
     <div role="tablist" aria-label="Review views" className="extraction-review-panel__tabs grid grid-cols-2 gap-1 p-1">
       {review.tabs.map((tab) =>
@@ -53,7 +55,7 @@ const ExtractionReviewPanel = ({ review, onView, onPick, onPrev, onNext, onSkip,
             onSubmit={onSubmit}
             onUndo={onUndo}
           />
-          : <ExtractionReviewDone done={review.done} onDownload={onDownload} onContinue={() => onView('check')} onShowAll={() => onView('all')} />}
+          : <ExtractionReviewDone done={review.done} confirm={confirm} tag={tag} onConfirmAndTag={onConfirmAndTag} onContinue={() => onView('check')} onShowAll={() => onView('all')} />}
     </div>
   </aside>
 

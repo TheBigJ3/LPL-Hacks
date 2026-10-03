@@ -209,7 +209,7 @@ class RawDocumentDecision(BaseModel):
     Uncalibrated, for audit and downstream experiments; never shown to advisors or fed to an LLM as fact."""
 
     docType: dict[str, Any]
-    tags: dict[str, dict[str, Any]]  # tag_<name> for each config/document_tags.json entry
+    tags: dict[str, dict[str, Any]]  # tag_<name> for each config/document_tags.json entry: the deciding check, plus checks[]
     members: dict[str, dict[str, Any]]  # member_<first>_<middle>_<last>_<suffix>, one per member sent, in order
 
 
@@ -322,7 +322,7 @@ class Enums(_Model):
     category: list[Category]
     change_type: list[str]
     doc_type: list[str]
-    document_tags: dict[str, str]  # config/document_tags.json: tag name -> the statement the model checks
+    document_tags: dict[str, list[dict[str, str]]]  # config/document_tags.json: topic id -> checks [{true, false}]
     severity: list[Severity]
     filing_status: list[str]
     checklist: list[ChecklistQuestion]

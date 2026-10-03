@@ -1,0 +1,18 @@
+.insight-chat {
+  --insight-chat-padding-top: 24px;
+  --insight-chat-gap: 32px;
+  padding: var(--insight-chat-padding-top) var(--spacing-gutter) 0;
+}
+
+@media (min-width: 768px) {
+  .insight-chat {
+    --insight-chat-padding-top: 38px;
+    --insight-chat-gap: 48px;
+  }
+}
+
+.insight-chat__thread {
+  max-width: 738px;
+  gap: var(--insight-chat-gap);
+  padding-bottom: 132px;
+}

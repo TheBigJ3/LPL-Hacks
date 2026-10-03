@@ -38,6 +38,7 @@ vi.mock("../../../services/realtime/realtimeMethods.js", () => ({ realtimeNotify
 const {
   documentCreate,
   documentExtract,
+  documentConfirm,
   documentGet,
   documentGetContent,
   documentMarkFailed,
@@ -56,6 +57,12 @@ const record = (overrides: Record<string, unknown> = {}) => ({
   pageCount: null,
   extraction: null,
   failureMessage: null,
+  reviewedFields: null,
+  reviewedAt: null,
+  tagStatus: null,
+  tagging: null,
+  tagFailureMessage: null,
+  indexStatus: null,
   ...overrides,
 });
 
@@ -129,6 +136,43 @@ describe("documentGetContent", () => {
   });
 });
 
+describe("documentConfirm", () => {
+  const extraction = { fields: [{ id: "wages", label: "Wages", rawValue: "1", requiresReview: true }], tables: [], lines: [] };
+  const fields = { wages: { value: "84,250.00", corrected: true } };
+
+  it("rejects a document that hasn't finished extracting", async () => {
+    rows.selected = [{ status: "extracting", extraction: null, tagStatus: null }];
+
+    await expect(documentConfirm(DOCUMENT_ID, fields)).rejects.toMatchObject({ _status: DOCUMENT_ERRORS.DOCUMENT_NOT_EXTRACTED.STATUS });
+    expect(db.update).not.toHaveBeenCalled();
+  });
+
+  it("rejects a second confirmation while tagging is still running", async () => {
+    rows.selected = [{ status: "extracted", extraction, tagStatus: "pending" }];
+
+    await expect(documentConfirm(DOCUMENT_ID, fields)).rejects.toMatchObject({ _status: DOCUMENT_ERRORS.TAGGING_IN_PROGRESS.STATUS });
+    expect(db.update).not.toHaveBeenCalled();
+  });
+
+  it("stores the verified fields and resets any earlier tagging", async () => {
+    rows.selected = [{ status: "extracted", extraction, tagStatus: "tagged" }];
+    rows.updated = [record({ status: "extracted", tagStatus: "pending", tagFailureMessage: null, indexStatus: null })];
+
+    const result = await documentConfirm(DOCUMENT_ID, fields);
+
+    expect(rows.sets).toEqual([{ reviewedFields: fields, reviewedAt: expect.any(Date), tagStatus: "pending", tagging: null, tagFailureMessage: null, indexStatus: null }]);
+    expect(result.reviewedAt).toBe((rows.sets[0] as { reviewedAt: Date }).reviewedAt.toISOString());
+    expect(result.document.tagStatus).toBe("pending");
+  });
+
+  it("reports tagging in progress when a concurrent confirmation won the CAS", async () => {
+    rows.selected = [{ status: "extracted", extraction, tagStatus: null }];
+    rows.updated = [];
+
+    await expect(documentConfirm(DOCUMENT_ID, fields)).rejects.toMatchObject({ _status: DOCUMENT_ERRORS.TAGGING_IN_PROGRESS.STATUS });
+  });
+});
+
 describe("documentGet", () => {
   it("throws the not-found AppError for an unknown id", async () => {
     await expect(documentGet(DOCUMENT_ID)).rejects.toMatchObject({ _status: DOCUMENT_ERRORS.DOCUMENT_NOT_FOUND.STATUS });
@@ -138,8 +182,21 @@ describe("documentGet", () => {
     rows.selected = [record({ status: "extracted", pageCount: 3, extraction: ANALYSIS })];
 
     expect(await documentGet(DOCUMENT_ID)).toEqual({
-      document: { id: DOCUMENT_ID, fileName: "statement.pdf", status: "extracted", pageCount: 3, failureMessage: null },
+      document: { id: DOCUMENT_ID, fileName: "statement.pdf", status: "extracted", pageCount: 3, failureMessage: null, tagStatus: null, tagFailureMessage: null, indexStatus: null },
       extraction: ANALYSIS,
+      review: null,
+      tagging: null,
+    });
+  });
+
+  it("returns the saved review and tagging once the document was confirmed", async () => {
+    const reviewedAt = new Date("2026-10-03T12:00:00Z");
+    const tagging = { docType: null, tags: [], members: [], taggedAt: reviewedAt.toISOString() };
+    rows.selected = [record({ status: "extracted", extraction: ANALYSIS, reviewedAt, reviewedFields: { wages: { value: "1", corrected: false } }, tagStatus: "tagged", tagging })];
+
+    expect(await documentGet(DOCUMENT_ID)).toMatchObject({
+      review: { reviewedAt: reviewedAt.toISOString(), fields: { wages: { value: "1", corrected: false } } },
+      tagging,
     });
   });
 });

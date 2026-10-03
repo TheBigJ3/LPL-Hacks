@@ -1,9 +1,12 @@
 import './.css'
-import type { ExtractionDoneView } from '../../../../.ts'
+import type { ExtractionConfirmView, ExtractionDoneView, ExtractionTagView } from '../../../../.ts'
+import ExtractionTagSummary from './components/ExtractionTagSummary/ExtractionTagSummary'
 
-const ExtractionReviewDone = ({ done, onDownload, onContinue, onShowAll }: {
+const ExtractionReviewDone = ({ done, confirm, tag, onConfirmAndTag, onContinue, onShowAll }: {
   done: ExtractionDoneView
-  onDownload: () => void
+  confirm: ExtractionConfirmView
+  tag: ExtractionTagView | null
+  onConfirmAndTag: () => void
   onContinue: () => void
   onShowAll: () => void
 }) =>
@@ -27,9 +30,9 @@ const ExtractionReviewDone = ({ done, onDownload, onContinue, onShowAll }: {
 
     <div className="flex w-full flex-col gap-2">
       {done.complete
-        ? <button type="button" className="extraction-review-done__primary flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5" onClick={onDownload}>
-          <span className="material-symbols-outlined" aria-hidden="true">download</span>
-          Download JSON
+        ? <button type="button" className="extraction-review-done__primary flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5" disabled={confirm.disabled} onClick={onConfirmAndTag}>
+          <span className="material-symbols-outlined" data-icon={confirm.icon} aria-hidden="true">{confirm.icon}</span>
+          {confirm.label}
         </button>
         : <button type="button" className="extraction-review-done__primary flex items-center justify-center gap-1.5 rounded-lg px-3 py-2.5" onClick={onContinue}>
           Continue checking
@@ -40,6 +43,8 @@ const ExtractionReviewDone = ({ done, onDownload, onContinue, onShowAll }: {
         Look over all fields
       </button>
     </div>
+
+    {tag && <div className="extraction-review-done__tag w-full"><ExtractionTagSummary tag={tag} onRetry={onConfirmAndTag} /></div>}
   </section>
 
 export default ExtractionReviewDone

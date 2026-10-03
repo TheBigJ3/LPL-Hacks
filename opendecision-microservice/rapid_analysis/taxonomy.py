@@ -3,7 +3,7 @@
 - config/tags.json: topics, fields, checklist, finding types and the other enums.
 - config/doc_types.json: every document type: label, the description the model chooses between, the form
   number and phrases that detect it (first match wins, in file order), and its topics.
-- config/document_tags.json: tag name -> the yes/no statement the model checks for each document.
+- config/document_tags.json: topic id -> the yes/no checks the model runs on each document (any confirmed yes tags it).
 """
 
 from __future__ import annotations
@@ -147,16 +147,30 @@ def doc_types() -> dict[str, DocType]:
 
 
 @lru_cache(maxsize=1)
-def document_tags() -> dict[str, str]:
-    """config/document_tags.json, validated: tag name -> the statement the model checks (asked as tag_<name>)."""
+def document_tags() -> dict[str, list[dict[str, str]]]:
+    """config/document_tags.json, validated: topic id -> the checks the model runs (asked together as tag_<name>).
+
+    Each check is {"true": statement, "false": its opposite}; the tag applies when any one check is confirmed true.
+    """
     raw = _load(DOCUMENT_TAGS_PATH)
     if not isinstance(raw, dict):
-        raise ConfigError("config/document_tags.json must be an object of tag name -> statement")
-    for name, statement in raw.items():
+        raise ConfigError("config/document_tags.json must be an object of topic id -> list of checks")
+    topics = set(tag_ids("topics"))
+    out: dict[str, list[dict[str, str]]] = {}
+    for name, checks in raw.items():
+        where = f"config/document_tags.json: {name}"
         if not ID.match(name):
-            raise ConfigError(f"config/document_tags.json: {name}: names are lowercase letters, digits and _")
-        _text(statement, f"config/document_tags.json: {name}")
-    return {name: statement.strip() for name, statement in raw.items()}
+            raise ConfigError(f"{where}: names are lowercase letters, digits and _")
+        if name not in topics:
+            raise ConfigError(f"{where}: names must be topic ids from config/tags.json")
+        if not isinstance(checks, list) or not checks:
+            raise ConfigError(f"{where} must be a non-empty list of checks")
+        out[name] = []
+        for index, check in enumerate(checks):
+            if not isinstance(check, dict) or set(check) != {"true", "false"}:
+                raise ConfigError(f"{where}[{index}] must be {{\"true\": statement, \"false\": its opposite}}")
+            out[name].append({key: _text(check[key], f"{where}[{index}].{key}") for key in ("true", "false")})
+    return out
 
 
 def config_check() -> None:

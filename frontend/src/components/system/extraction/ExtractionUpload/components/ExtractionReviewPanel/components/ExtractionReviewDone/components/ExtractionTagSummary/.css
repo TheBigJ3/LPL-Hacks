@@ -1,0 +1,106 @@
+.extraction-tag-summary {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.extraction-tag-summary[data-state="failed"] {
+  border-color: var(--color-error);
+}
+
+.extraction-tag-summary__icon {
+  color: var(--color-heading);
+  font-size: 18px;
+}
+
+.extraction-tag-summary__icon[data-state="pending"] {
+  animation: extraction-tag-summary-spin 900ms linear infinite;
+}
+
+.extraction-tag-summary__icon[data-state="failed"] {
+  color: var(--color-error);
+}
+
+@keyframes extraction-tag-summary-spin {
+  to { transform: rotate(360deg); }
+}
+
+.extraction-tag-summary__title {
+  color: var(--color-heading);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.extraction-tag-summary__message {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.extraction-tag-summary__label {
+  color: var(--color-dark-gray);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.extraction-tag-summary__chip {
+  padding: 3px 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-hover);
+  color: var(--color-text-default);
+  font-size: 13px;
+}
+
+.extraction-tag-summary__chip[data-kind="type"] {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: #FFFFFF;
+}
+
+.extraction-tag-summary__chip[data-kind="member"] {
+  border-color: color-mix(in srgb, var(--color-accent-blue) 35%, transparent);
+  background: color-mix(in srgb, var(--color-accent-blue-light) 35%, transparent);
+  color: var(--color-heading);
+}
+
+.extraction-tag-summary__empty {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.extraction-tag-summary__index {
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-dark-gray);
+  font-size: 12px;
+}
+
+.extraction-tag-summary__index .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.extraction-tag-summary__retry {
+  border: 1px solid var(--color-border);
+  color: var(--color-text-default);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 150ms ease;
+}
+
+.extraction-tag-summary__retry .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.extraction-tag-summary__retry:hover {
+  background: var(--color-surface-hover);
+}
+
+.extraction-tag-summary__retry:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .extraction-tag-summary__icon[data-state="pending"] { animation: none; }
+  .extraction-tag-summary__retry { transition: none; }
+}

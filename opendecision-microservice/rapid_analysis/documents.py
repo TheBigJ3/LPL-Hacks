@@ -5,7 +5,7 @@ unsettled owner makes a document needs_review (REVIEW_REASONS); an uncertain tag
 yes or a model doc-type disagreement is a note and leaves status alone. Decisions:
 - doc_type: the config/doc_types.json phrases on the text. The model's docType is only ever a suggestion.
 - tags: config/doc_types.json topics apply deterministically; a config/document_tags.json tag counts
-  only when the model's status is "confirmed".
+  only when the model confirms one of its checks (noul_any).
 - members: name matching decides. The model may only VETO a name-matched member
   (confirmed + answer false). A model-only YES never assigns anyone.
 
@@ -33,6 +33,9 @@ log = logging.getLogger("rapid_analysis.documents")
 OTHER_1099 = re.compile(r"\b1099-([A-Z]{1,4})\b", re.I)
 
 MODEL_DISAGREE_PROBABILITY = 0.90
+# A tag check's tentative yes counts at this binary probability (statement vs. its opposite). Measured on the
+# fixtures plus the 04-12 test PDFs: 0.80 added recall with no false tags; at 0.75 false tags began.
+TAG_CHECK_PROBABILITY = 0.80
 # The only reasons that make a document needs_review. Everything else the classifier records is a note.
 REVIEW_REASONS = ("doc_type_unknown", "member_ambiguous", "member_unassigned", "member_model_disagrees")
 FINANCIAL_VALUE = re.compile(r"\$\s?\d|\b\d{1,3}(?:,\d{3})+(?:\.\d{2})?\b")
@@ -85,7 +88,7 @@ def decision_request(text: str, members: Sequence[MemberRef]) -> dict[str, Any]:
     questions: dict[str, Any] = {
         "docType": {"type": "choice", "instructions": "Which document type is this?",
                     "criteria": {doc_id: t.description for doc_id, t in doc_types().items()}},
-        **{f"tag_{name}": {"type": "noul", "instructions": statement} for name, statement in document_tags().items()},
+        **{f"tag_{name}": {"type": "noul_any", "checks": checks} for name, checks in document_tags().items()},
     }
     for member in members:
         questions[member_key(member)] = {"type": "noul", "instructions": f"This document concerns {member.name.rstrip('.')}."}
@@ -102,9 +105,38 @@ def _decide_in_process(engine: Any, body: dict[str, Any]) -> dict[str, Any]:
     for name, question in body["questions"].items():
         if question["type"] == "choice":
             answers[name] = service.choice(chunks=chunks, instructions=question["instructions"], criteria=question["criteria"])
+        elif question["type"] == "noul_any":
+            checks = [service.noul(chunks=chunks, instructions=check["true"], criteria=check, mode=body["noul_mode"])
+                      for check in question["checks"]]
+            answers[name] = noul_any(checks)
         else:
             answers[name] = service.noul(chunks=chunks, instructions=question["instructions"], criteria=None, mode=body["noul_mode"])
     return {"chunks": len(chunks), "answers": answers}
+
+
+def _check_says_yes(check: Mapping[str, Any]) -> str | None:
+    """-> why a check counts as a yes ("confirmed" or "probability"), or None. A tentative yes counts when the
+    statement clearly beats its opposite: the separate support score alone often stays under 0.5 on short forms."""
+    if check.get("answer") is not True:
+        return None
+    if check.get("status") == "confirmed":
+        return "confirmed"
+    probability = _get(check, "binary", "probabilities", "true")
+    if check.get("status") == "tentative" and isinstance(probability, (int, float)) and probability >= TAG_CHECK_PROBABILITY:
+        return "probability"
+    return None
+
+
+def noul_any(checks: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """One answer for a tag from its checks. Any check that says yes makes the tag confirmed (basis says why); a
+    confirmed no needs every check to be one; otherwise the first undecided check is reported. All checks are kept."""
+    summary = [{"statement": c["compiled"]["proposition"], "status": c["status"], "answer": c["answer"]} for c in checks]
+    for check in checks:
+        basis = _check_says_yes(check)
+        if basis:
+            return {**check, "status": "confirmed", "answer": True, "basis": basis, "checks": summary}
+    decisive = next((c for c in checks if not (c.get("status") == "confirmed" and c.get("answer") is False)), checks[0])
+    return {**decisive, "basis": None, "checks": summary}
 
 
 def document_decide(text: str, members: Sequence[MemberRef]) -> dict[str, Any] | None:

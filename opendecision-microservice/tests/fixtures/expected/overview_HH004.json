@@ -308,35 +308,8 @@
           "tax"
         ],
         "model_tags": [
-          "tax",
-          "income"
-        ],
-        "members": [
-          {
-            "person_id": "HH004-P1",
-            "name": "Jordan Park",
-            "role": "owner",
-            "method": "name_match"
-          }
-        ],
-        "attribution_status": "assigned",
-        "status": "accepted",
-        "review_reasons": [],
-        "notes": []
-      },
-      {
-        "name": "jordan_w2_2025.pdf",
-        "doc_type": "w2",
-        "doc_subtype": null,
-        "doc_type_method": "pattern",
-        "suggested_doc_type": null,
-        "topics": [
           "income",
-          "retirement",
           "tax"
-        ],
-        "model_tags": [
-          "income"
         ],
         "members": [
           {
@@ -350,7 +323,58 @@
         "status": "accepted",
         "review_reasons": [],
         "notes": [
-          "tag_uncertain:tax"
+          "tag_uncertain:retirement",
+          "tag_uncertain:self_employment",
+          "tag_uncertain:health_savings",
+          "tag_uncertain:banking_cash",
+          "tag_uncertain:investments",
+          "tag_uncertain:mortgage_housing",
+          "tag_uncertain:insurance",
+          "tag_uncertain:estate",
+          "tag_uncertain:education",
+          "tag_uncertain:life_event",
+          "tag_uncertain:equity_compensation",
+          "tag_uncertain:debt",
+          "tag_uncertain:charitable_giving",
+          "tag_uncertain:social_security"
+        ]
+      },
+      {
+        "name": "jordan_w2_2025.pdf",
+        "doc_type": "w2",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "members": [
+          {
+            "person_id": "HH004-P1",
+            "name": "Jordan Park",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
+          "tag_uncertain:self_employment",
+          "tag_uncertain:health_savings",
+          "tag_uncertain:mortgage_housing",
+          "tag_uncertain:insurance",
+          "tag_uncertain:education",
+          "tag_uncertain:life_event",
+          "tag_uncertain:equity_compensation",
+          "tag_uncertain:debt"
         ]
       }
     ]

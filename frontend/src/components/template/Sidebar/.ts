@@ -26,15 +26,12 @@ export const SIDEBAR_GROUPS: SidebarTabGroup[] = [
       { label: 'Clients', icon: 'groups', path: '/', end: true },
       { label: 'Documents', icon: 'description', path: '/documents' },
       { label: 'Notes', icon: 'sticky_note_2', path: '/notes' },
-      { label: 'Review queue', icon: 'fact_check', path: '/review' },
     ],
   },
   {
     label: 'Tools',
     tabs: [
-      { label: 'Upload', icon: 'upload_file', path: '/upload' },
       { label: 'Extract', icon: 'document_scanner', path: '/extract' },
-      { label: 'Assistant', icon: 'auto_awesome', path: '/assistant' },
     ],
   },
 ]
@@ -72,18 +69,15 @@ const sidebarClientGetGroups = (client: Client, member: ClientMember | null): Si
     {
       label: 'Client',
       tabs: [
-        { label: 'Overview', icon: 'space_dashboard', path: `${base}${search}`, end: true },
+        { label: 'Insight', icon: 'insights', path: `${base}${search}`, end: true },
         { label: 'Documents', icon: 'description', path: `${base}/documents${search}` },
         { label: 'Notes', icon: 'sticky_note_2', path: `${base}/notes${search}` },
-        { label: 'Review queue', icon: 'fact_check', path: `${base}/review${search}` },
       ],
     },
     {
       label: 'Tools',
       tabs: [
-        { label: 'Upload', icon: 'upload_file', path: `${base}/upload${search}` },
         { label: 'Extract', icon: 'document_scanner', path: `${base}/extract${search}` },
-        { label: 'Assistant', icon: 'auto_awesome', path: `${base}/assistant${search}` },
       ],
     },
   ]

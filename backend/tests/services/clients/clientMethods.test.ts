@@ -12,7 +12,7 @@ const { db, results } = vi.hoisted(() => {
 
 vi.mock("../../../loaders/postgresLoader.js", () => ({ db }));
 
-const { clientList } = await import("../../../services/clients/clientMethods.js");
+const { clientList, clientResolve } = await import("../../../services/clients/clientMethods.js");
 
 describe("clientList", () => {
   it("folds the joined member rows into each client and keeps individuals with no members", async () => {
@@ -32,5 +32,27 @@ describe("clientList", () => {
       },
       { id: "c2", slug: "kenji-sato", name: "Kenji Sato", kind: "individual", members: [] },
     ]);
+  });
+});
+
+describe("clientResolve", () => {
+  it("returns the matching client with its members", async () => {
+    results.push([
+      { id: "c1", slug: "johnson", name: "Johnson Household", kind: "household", member: { id: "m1", slug: "adam", name: "Adam Johnson" } },
+    ]);
+
+    await expect(clientResolve("advisor", "johnson")).resolves.toEqual({
+      id: "c1",
+      slug: "johnson",
+      name: "Johnson Household",
+      kind: "household",
+      members: [{ id: "m1", slug: "adam", name: "Adam Johnson" }],
+    });
+  });
+
+  it("throws CLIENT_NOT_FOUND when no client matches for the advisor", async () => {
+    results.push([]);
+
+    await expect(clientResolve("advisor", "seed-johnson-family")).rejects.toMatchObject({ _statusCode: 404, _status: "NOT_FOUND" });
   });
 });

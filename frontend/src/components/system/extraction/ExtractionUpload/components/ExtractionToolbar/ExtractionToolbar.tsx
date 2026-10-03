@@ -1,10 +1,11 @@
 import './.css'
-import type { ExtractionToolbarView } from '../../.ts'
+import type { ExtractionConfirmView, ExtractionToolbarView } from '../../.ts'
 
-const ExtractionToolbar = ({ toolbar, onBack, onDownload }: {
+const ExtractionToolbar = ({ toolbar, confirm, onBack, onConfirm }: {
   toolbar: ExtractionToolbarView
+  confirm: ExtractionConfirmView
   onBack: () => void
-  onDownload: () => void
+  onConfirm: () => void
 }) =>
   <div className="extraction-toolbar flex flex-wrap items-center gap-x-4 gap-y-3 rounded-lg">
     <button type="button" className="extraction-toolbar__back flex flex-none items-center gap-1.5 rounded-md" onClick={onBack}>
@@ -27,9 +28,9 @@ const ExtractionToolbar = ({ toolbar, onBack, onDownload }: {
       <span className="extraction-toolbar__count">{toolbar.progressLabel}</span>
     </div>
 
-    <button type="button" className="extraction-toolbar__download flex flex-none items-center gap-1.5 rounded-md" data-ready={toolbar.complete} onClick={onDownload}>
-      <span className="material-symbols-outlined" aria-hidden="true">download</span>
-      Download JSON
+    <button type="button" className="extraction-toolbar__confirm flex flex-none items-center gap-1.5 rounded-md" data-ready={!confirm.disabled} disabled={confirm.disabled} title={confirm.hint ?? undefined} onClick={onConfirm}>
+      <span className="material-symbols-outlined" data-icon={confirm.icon} aria-hidden="true">{confirm.icon}</span>
+      {confirm.label}
     </button>
   </div>
 

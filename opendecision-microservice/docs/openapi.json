@@ -698,7 +698,13 @@
           },
           "document_tags": {
             "additionalProperties": {
-              "type": "string"
+              "items": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "type": "array"
             },
             "title": "Document Tags",
             "type": "object"

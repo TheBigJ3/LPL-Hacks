@@ -5,7 +5,7 @@
 }
 
 .extraction-toolbar__back,
-.extraction-toolbar__download {
+.extraction-toolbar__confirm {
   padding: 7px 12px;
   border: 1px solid var(--color-border);
   background: var(--color-surface);
@@ -16,23 +16,37 @@
 }
 
 .extraction-toolbar__back .material-symbols-outlined,
-.extraction-toolbar__download .material-symbols-outlined {
+.extraction-toolbar__confirm .material-symbols-outlined {
   font-size: 18px;
 }
 
 .extraction-toolbar__back:hover,
-.extraction-toolbar__download:hover {
+.extraction-toolbar__confirm:hover:not(:disabled) {
   background: var(--color-surface-hover);
 }
 
-.extraction-toolbar__download[data-ready="true"] {
+.extraction-toolbar__confirm[data-ready="true"] {
   border-color: var(--color-accent-blue);
   background: var(--color-accent-blue);
   color: #FFFFFF;
 }
 
-.extraction-toolbar__download[data-ready="true"]:hover {
+.extraction-toolbar__confirm[data-ready="true"]:hover {
   opacity: 0.9;
+}
+
+.extraction-toolbar__confirm:disabled {
+  color: var(--color-dark-gray);
+  background: var(--color-surface);
+  cursor: default;
+}
+
+.extraction-toolbar__confirm [data-icon="progress_activity"] {
+  animation: extraction-toolbar-spin 900ms linear infinite;
+}
+
+@keyframes extraction-toolbar-spin {
+  to { transform: rotate(360deg); }
 }
 
 .extraction-toolbar__file-icon {
@@ -79,13 +93,14 @@
 }
 
 .extraction-toolbar__back:focus-visible,
-.extraction-toolbar__download:focus-visible {
+.extraction-toolbar__confirm:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .extraction-toolbar__back,
-  .extraction-toolbar__download,
+  .extraction-toolbar__confirm,
   .extraction-toolbar__bar { transition: none; }
+  .extraction-toolbar__confirm [data-icon="progress_activity"] { animation: none; }
 }

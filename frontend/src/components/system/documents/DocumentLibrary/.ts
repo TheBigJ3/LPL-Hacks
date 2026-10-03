@@ -3,6 +3,11 @@ import { useParams, useSearchParams } from 'react-router'
 import type { Variants } from 'motion/react'
 import { useElementWidth } from '@hooks/useElementWidth'
 import documentPreview from '@assets/documents/document-preview.png'
+import type { DocumentListItem } from '@lpl-hacks/shared/src/types/native/documents/document'
+import listClientsApi from '@api/clients/listClientsApi'
+import listDocumentsApi from '@api/documents/listDocumentsApi'
+import { useApiGetQuery } from '@features/apiLayer'
+import { DOCUMENT_LIBRARY_ERRORS } from '@typings/native/documents/errors'
 
 export type DocumentCardView = {
   id: string
@@ -30,77 +35,35 @@ export type DocumentTagOption = {
 
 export type DocumentSectionMode = 'preview' | 'list'
 
-type DocumentTag = {
+type DocumentTopic = {
   id: string
   label: string
 }
 
-type DocumentRecord = {
-  id: string
-  name: string
-  tagId: string
-  clientId: string
-  memberId: string | null
-  uploadedAt: Date
+const DOCUMENT_REVIEW_TOPIC: DocumentTopic = { id: 'needs-review', label: 'Needs review' }
+const DOCUMENT_OTHER_TOPIC: DocumentTopic = { id: 'other', label: 'Other' }
+
+const DOCUMENT_TOPIC_LABELS: Record<string, string> = {
+  tax: 'Tax',
+  income: 'Income',
+  retirement: 'Retirement',
+  investments: 'Investments',
+  banking_cash: 'Banking & cash',
+  self_employment: 'Self-employment',
+  mortgage_housing: 'Mortgage & housing',
+  health_savings: 'Health savings',
+  insurance: 'Insurance',
 }
 
-const DOCUMENT_TAGS: DocumentTag[] = [
-  { id: 'account-opening', label: 'Account opening and agreements' },
-  { id: 'tax-forms', label: 'Tax forms' },
-  { id: 'moving-money', label: 'Moving money' },
-  { id: 'statements', label: 'Statements' },
-  { id: 'estate-planning', label: 'Estate planning' },
-  { id: 'insurance', label: 'Insurance' },
-]
+const DOCUMENT_TOPIC_ORDER = Object.keys(DOCUMENT_TOPIC_LABELS)
 
-const DOCUMENT_DEMO_NAMES: Record<string, string[]> = {
-  'account-opening': [
-    'New account application', 'Advisory agreement', 'Form CRS acknowledgment', 'Beneficiary designation',
-    'IRA adoption agreement', 'Margin agreement', 'Transfer on death agreement', 'Trusted contact form',
-  ],
-  'tax-forms': [
-    'W-9 (US persons)', 'Form 1040', 'Form 1099-DIV', 'Form 1099-B', 'Form 1099-INT', 'Form 1099-R',
-    'W-2 wage statement', 'Form 5498', 'Schedule K-1', 'Form 8606', 'Form 1098 mortgage interest', 'Pay stub',
-  ],
-  'moving-money': ['ACH authorization', 'Wire transfer request', 'Standing letter of authorization', 'Distribution request', 'Journal request'],
-  'statements': ['Brokerage statement', 'IRA statement', 'Roth IRA statement', '401(k) statement', 'Annuity statement', 'Trade confirmation'],
-  'estate-planning': ['Revocable living trust', 'Last will and testament', 'Durable power of attorney', 'Healthcare directive'],
-  'insurance': ['Life insurance policy', 'Long-term care policy', 'Umbrella policy'],
-}
-
-const DOCUMENT_DEMO_COUNTS: Record<string, number> = {
-  'account-opening': 18,
-  'tax-forms': 40,
-  'moving-money': 12,
-  'statements': 30,
-  'estate-planning': 6,
-  'insurance': 4,
-}
-
-const DOCUMENT_DEMO_OWNERS: [string, string | null][] = [
-  ['johnson', null], ['johnson', 'jess'], ['patel', null], ['johnson', 'michelle'],
-  ['dana-whitfield', null], ['johnson', 'adam'], ['nguyen', 'linh'], ['johnson', null],
-  ['marcus-reed', null], ['johnson', 'kim'], ['garcia', 'sofia'], ['patel', 'priya'],
-  ['elena-rossi', null], ['kenji-sato', null], ['nguyen', null], ['garcia', null],
-]
-
-const DOCUMENT_DEMO_LATEST = Date.UTC(2026, 8, 30)
-const DOCUMENT_DAY_MS = 86_400_000
-
-const DOCUMENT_DEMO_RECORDS: DocumentRecord[] = DOCUMENT_TAGS.flatMap((tag, tagIndex) =>
-  Array.from({ length: DOCUMENT_DEMO_COUNTS[tag.id] }, (_, index) => {
-    const names = DOCUMENT_DEMO_NAMES[tag.id]
-    const [clientId, memberId] = DOCUMENT_DEMO_OWNERS[(index + tagIndex * 3) % DOCUMENT_DEMO_OWNERS.length]
-    return {
-      id: `${tag.id}-${index + 1}`,
-      name: names[index % names.length],
-      tagId: tag.id,
-      clientId,
-      memberId,
-      uploadedAt: new Date(DOCUMENT_DEMO_LATEST - (index * 5 + tagIndex * 2) * DOCUMENT_DAY_MS),
-    }
-  })
-)
+const DOCUMENT_STATUS_LABELS = {
+  extracting: 'Extracting',
+  extractFailed: 'Extraction failed',
+  review: 'Awaiting review',
+  tagging: 'Tagging',
+  tagFailed: 'Tagging failed',
+} as const
 
 const DOCUMENT_DATE_FORMAT = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
 
@@ -136,10 +99,35 @@ const documentBuildSearch = (params: URLSearchParams, changes: Record<string, st
   return search ? `?${search}` : '?'
 }
 
-const documentMatchesQuery = (record: DocumentRecord, needle: string) => {
-  const tag = DOCUMENT_TAGS.find((item) => item.id === record.tagId)
-  return record.name.toLowerCase().includes(needle) || !!tag?.label.toLowerCase().includes(needle)
+const documentTopicLabel = (topic: string) =>
+  DOCUMENT_TOPIC_LABELS[topic] ?? topic.replace(/_/g, ' ').replace(/^./, (letter) => letter.toUpperCase())
+
+const documentGetTopics = (record: DocumentListItem): DocumentTopic[] => {
+  if (record.tagStatus !== 'tagged') return [DOCUMENT_REVIEW_TOPIC]
+  const topics = [...new Set(record.tagging?.tags.map((tag) => tag.name) ?? [])]
+  return topics.length ? topics.map((topic) => ({ id: topic, label: documentTopicLabel(topic) })) : [DOCUMENT_OTHER_TOPIC]
 }
+
+const documentCompareTopics = (a: DocumentTopic, b: DocumentTopic) => {
+  const rank = (topic: DocumentTopic) => {
+    if (topic.id === DOCUMENT_REVIEW_TOPIC.id) return -1
+    if (topic.id === DOCUMENT_OTHER_TOPIC.id) return DOCUMENT_TOPIC_ORDER.length + 1
+    const index = DOCUMENT_TOPIC_ORDER.indexOf(topic.id)
+    return index === -1 ? DOCUMENT_TOPIC_ORDER.length : index
+  }
+  return rank(a) - rank(b) || a.label.localeCompare(b.label)
+}
+
+const documentGetStatusLabel = (record: DocumentListItem) => {
+  if (record.status === 'failed') return DOCUMENT_STATUS_LABELS.extractFailed
+  if (record.status !== 'extracted') return DOCUMENT_STATUS_LABELS.extracting
+  if (record.tagStatus === 'pending') return DOCUMENT_STATUS_LABELS.tagging
+  if (record.tagStatus === 'failed') return DOCUMENT_STATUS_LABELS.tagFailed
+  return DOCUMENT_STATUS_LABELS.review
+}
+
+const documentMatchesQuery = (record: DocumentListItem, needle: string) =>
+  record.fileName.toLowerCase().includes(needle) || documentGetTopics(record).some((topic) => topic.label.toLowerCase().includes(needle))
 
 const documentFormatCount = (count: number) => `${count} ${count === 1 ? 'document' : 'documents'}`
 
@@ -152,25 +140,31 @@ const documentPreviewDecode = () => {
   return image.decode()
 }
 
-const documentToCard = (record: DocumentRecord, memberSearch: string): DocumentCardView => ({
-  id: record.id,
-  name: record.name,
-  date: DOCUMENT_DATE_FORMAT.format(record.uploadedAt),
-  thumbnail: documentPreview,
-  href: `/clients/${record.clientId}/documents/${record.id}${memberSearch}`,
-})
+const documentToCard = (record: DocumentListItem, clientSlug: string): DocumentCardView => {
+  const date = DOCUMENT_DATE_FORMAT.format(new Date(record.createdAt))
+  return {
+    id: record.id,
+    name: record.fileName,
+    date: record.tagStatus === 'tagged' ? date : `${documentGetStatusLabel(record)} · ${date}`,
+    thumbnail: documentPreview,
+    href: `/clients/${clientSlug}/extract?document=${record.id}`,
+  }
+}
 
 export function useDocumentLibrary() {
-  const { clientId } = useParams()
+  const { clientId: clientSlug } = useParams()
   const [searchParams] = useSearchParams()
   const [measureRef, width] = useElementWidth<HTMLDivElement>()
   const [previewReady, setPreviewReady] = useState(documentPreviewReady)
+  const clientsQuery = useApiGetQuery(listClientsApi)
+  const client = clientsQuery.data?.clients.find((item) => item.slug === clientSlug) ?? null
+  const documentsQuery = useApiGetQuery(listDocumentsApi, { clientId: client?.id ?? '' }, { enabled: !!client })
 
-  const memberId = searchParams.get('member')
-  const tag = DOCUMENT_TAGS.find((item) => item.id === searchParams.get('tag')) ?? null
+  const memberSlug = searchParams.get('member')
+  const member = client?.members.find((item) => item.slug === memberSlug) ?? null
   const query = (searchParams.get('q') ?? '').trim()
-  const memberSearch = memberId ? `?member=${memberId}` : ''
-  const viewKey = [clientId, memberId, tag?.id, query].join('|')
+  const memberSearch = memberSlug ? `?member=${memberSlug}` : ''
+  const viewKey = [clientSlug, memberSlug, searchParams.get('tag'), query].join('|')
 
   const lastViewKey = useRef(viewKey)
 
@@ -189,52 +183,54 @@ export function useDocumentLibrary() {
     document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })
   }, [viewKey])
 
-  const scoped = DOCUMENT_DEMO_RECORDS.filter((record) => record.clientId === clientId && (!memberId || record.memberId === memberId))
+  const records = documentsQuery.data?.documents ?? []
+  const scoped = member ? records.filter((record) => record.tagging?.members.some((item) => item.memberId === member.id)) : records
   const searched = query ? scoped.filter((record) => documentMatchesQuery(record, query.toLowerCase())) : scoped
-  const countFor = (tagId: string) => searched.filter((record) => record.tagId === tagId).length
+
+  const topics = [...new Map(searched.flatMap(documentGetTopics).map((topic) => [topic.id, topic])).values()].sort(documentCompareTopics)
+  const recordsFor = (topicId: string) => searched.filter((record) => documentGetTopics(record).some((topic) => topic.id === topicId))
+  const tagParam = searchParams.get('tag')
+  const tag = topics.find((item) => item.id === tagParam) ?? (tagParam ? { id: tagParam, label: documentTopicLabel(tagParam) } : null)
 
   const tagOptions: DocumentTagOption[] = [
     { key: 'all', label: 'All', count: searched.length, selected: !tag, href: documentBuildSearch(searchParams, { tag: null }) },
-    ...DOCUMENT_TAGS
-      .map((item) => ({
-        key: item.id,
-        label: item.label,
-        count: countFor(item.id),
-        selected: item.id === tag?.id,
-        href: documentBuildSearch(searchParams, { tag: item.id }),
-      }))
-      .filter((option) => option.count > 0 || option.selected),
+    ...topics.map((item) => ({
+      key: item.id,
+      label: item.label,
+      count: recordsFor(item.id).length,
+      selected: item.id === tag?.id,
+      href: documentBuildSearch(searchParams, { tag: item.id }),
+    })),
   ]
 
   const mode: DocumentSectionMode = tag || query ? 'list' : 'preview'
-  const listRecords = tag ? searched.filter((record) => record.tagId === tag.id) : searched
+  const listRecords = tag ? recordsFor(tag.id) : searched
+  const toCard = (record: DocumentListItem) => documentToCard(record, clientSlug ?? '')
 
   const sections: DocumentSectionView[] = mode === 'list'
     ? [{
       key: tag?.id ?? 'results',
       title: tag?.label ?? 'Search results',
       total: listRecords.length,
-      documents: listRecords.map((record) => documentToCard(record, memberSearch)),
+      documents: listRecords.map(toCard),
       seeAllHref: null,
     }].filter((section) => section.total > 0)
-    : DOCUMENT_TAGS
-      .map((item) => {
-        const records = searched.filter((record) => record.tagId === item.id)
-        return {
-          key: item.id,
-          title: item.label,
-          total: records.length,
-          documents: records.map((record) => documentToCard(record, memberSearch)),
-          seeAllHref: documentBuildSearch(searchParams, { tag: item.id }),
-        }
-      })
-      .filter((section) => section.total > 0)
+    : topics.map((item) => {
+      const topicRecords = recordsFor(item.id)
+      return {
+        key: item.id,
+        title: item.label,
+        total: topicRecords.length,
+        documents: topicRecords.map(toCard),
+        seeAllHref: documentBuildSearch(searchParams, { tag: item.id }),
+      }
+    })
 
   const shownCount = mode === 'list' ? listRecords.length : searched.length
 
   return {
-    clientSelected: !!clientId,
-    loading: !previewReady,
+    clientSelected: !!clientSlug,
+    loading: !previewReady || clientsQuery.isPending || (!!client && documentsQuery.isPending),
     measureRef,
     columns: documentGetColumns(width),
     wide: width >= DOCUMENT_WIDE_WIDTH,
@@ -244,9 +240,11 @@ export function useDocumentLibrary() {
     tagOptions,
     sections,
     summary: shownCount ? documentFormatSummary(shownCount, scoped.length) : null,
-    empty: query
-      ? { title: `No documents match “${query}”`, subtitle: 'Try a different search or tag' }
-      : { title: 'No documents yet', subtitle: 'Upload one to get started' },
-    uploadHref: `/clients/${clientId}/upload${memberSearch}`,
+    empty: documentsQuery.isError
+      ? { title: DOCUMENT_LIBRARY_ERRORS.LOAD_FAILED.MESSAGE, subtitle: documentsQuery.error.message }
+      : query
+        ? { title: `No documents match “${query}”`, subtitle: 'Try a different search or tag' }
+        : { title: 'No documents yet', subtitle: 'Upload one to get started' },
+    uploadHref: `/clients/${clientSlug}/extract${memberSearch}`,
   }
 }

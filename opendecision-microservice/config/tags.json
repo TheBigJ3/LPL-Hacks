@@ -1,20 +1,24 @@
 {
   "version": "1.0",
-  "description": "Taxonomy: topics, fields, checklist, findings and the other enums. Document types are in doc_types.json, model-checked document tags in document_tags.json. All ids are stable machine keys; labels are display text; descriptions are the exact text used as OpenDecision choice criteria.",
+  "description": "Taxonomy: topics, fields, checklist, findings and the other enums. Document types are in doc_types.json; the model checks that tag a document with a topic are in document_tags.json, keyed by topic id. All ids are stable machine keys; labels and descriptions are display text for people (the model never sees them).",
 
   "topics": [
-    {"id": "income", "label": "Income", "description": "Wages, salary, or other money earned"},
-    {"id": "retirement", "label": "Retirement", "description": "401(k), IRA, pension contributions or distributions"},
-    {"id": "tax", "label": "Tax", "description": "Income tax, withholding, or tax planning"},
-    {"id": "self_employment", "label": "Self-employment", "description": "Business, freelance, or contract income"},
-    {"id": "health_savings", "label": "Health savings", "description": "HSA contributions and health plan eligibility"},
-    {"id": "banking_cash", "label": "Cash and banking", "description": "Bank balances, savings accounts, and interest"},
-    {"id": "investments", "label": "Investments", "description": "Brokerage accounts, dividends, and capital gains"},
-    {"id": "mortgage_housing", "label": "Mortgage and housing", "description": "Home loans and mortgage interest"},
-    {"id": "insurance", "label": "Insurance", "description": "Life, disability, health, or property coverage"},
-    {"id": "estate", "label": "Estate", "description": "Wills, trusts, and beneficiaries"},
-    {"id": "education", "label": "Education", "description": "529 plans and education savings"},
-    {"id": "life_event", "label": "Life event", "description": "New child, new job, new home, marriage, or large income change"}
+    {"id": "income", "label": "Income", "description": "Money a person earned or received: wages and salary, bonuses, interest, dividends, business income and benefits such as Social Security"},
+    {"id": "retirement", "label": "Retirement", "description": "Retirement accounts and plans: 401(k), 403(b), IRA and pension contributions, plan coverage, distributions and rollovers"},
+    {"id": "tax", "label": "Tax", "description": "Tax returns and tax reporting: income tax withheld or owed, IRS information returns and amounts used to file"},
+    {"id": "self_employment", "label": "Self-employment", "description": "Income from working for oneself: freelance and contractor pay (1099-NEC), Schedule C business income and business ownership"},
+    {"id": "health_savings", "label": "Health savings", "description": "Health savings accounts: HSA contributions and balances, and the HSA-eligible high deductible health plans that allow them"},
+    {"id": "banking_cash", "label": "Cash and banking", "description": "Cash held at a bank: checking and savings balances, deposits, withdrawals and interest earned on cash"},
+    {"id": "investments", "label": "Investments", "description": "Taxable investing: brokerage accounts, securities and their market value, dividends and capital gains"},
+    {"id": "mortgage_housing", "label": "Home and mortgage", "description": "The home and what it costs: mortgages and home loans, mortgage interest, property taxes and home purchases"},
+    {"id": "insurance", "label": "Insurance", "description": "Insurance coverage and premiums: health, life, disability, long-term care and property insurance"},
+    {"id": "estate", "label": "Estate", "description": "Estate planning: wills, trusts, guardianship and beneficiary designations"},
+    {"id": "education", "label": "Education", "description": "Paying for education: 529 plans and other education savings, tuition and student loans for school"},
+    {"id": "life_event", "label": "Life event", "description": "A change in the household: a birth or new dependent, marriage or divorce, a new home, a new job or a large change in income"},
+    {"id": "equity_compensation", "label": "Equity compensation", "description": "Pay in company stock: restricted stock units (RSUs), stock options and employee stock purchase plans (ESPP)"},
+    {"id": "debt", "label": "Debt", "description": "Money owed other than a mortgage: credit cards, student loans, auto loans and personal loans"},
+    {"id": "charitable_giving", "label": "Charitable giving", "description": "Gifts to charity: donation receipts, donor-advised funds and charitable contributions for taxes"},
+    {"id": "social_security", "label": "Social Security and Medicare", "description": "Government retirement and health benefits: Social Security benefit statements (SSA-1099) and Medicare coverage or premiums"}
   ],
 
   "fields": [
