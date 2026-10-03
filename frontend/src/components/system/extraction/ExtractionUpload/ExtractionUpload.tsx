@@ -21,8 +21,8 @@ const ExtractionUpload = () => {
     {extraction.result && <div className="extraction-upload__content flex w-full flex-col">
       <p className="extraction-upload__summary" aria-live="polite">{extraction.result.summary}</p>
       <div className="extraction-upload__workspace grid items-start">
-        <ExtractionDocument document={extraction.result.document} onEdit={extraction.edit} onSelect={extraction.select} onLayout={extraction.setLayout} onToggleValues={extraction.toggleValues} />
-        <ExtractionReviewPanel review={extraction.result.review} onEdit={extraction.edit} onConfirm={extraction.confirm} onRevert={extraction.revert} onFocusItem={extraction.focusItem} onNext={extraction.focusNext} />
+        <ExtractionDocument document={extraction.result.document} onSelect={extraction.select} />
+        <ExtractionReviewPanel review={extraction.result.review} onEdit={extraction.edit} onConfirm={extraction.confirm} onRevert={extraction.revert} onFocusItem={extraction.focusItem} onNext={extraction.focusNext} onConfirmExport={extraction.confirmExport} />
       </div>
     </div>}
   </div>

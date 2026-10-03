@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type CSSProperties } from 'react'
 import type { ExtractedAnalysis } from '@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis'
 import type { ExtractedBox } from '@lpl-hacks/shared/src/types/native/extraction/extractedBox'
-import type { ExtractedLine } from '@lpl-hacks/shared/src/types/native/extraction/extractedField'
+import type { ExtractedTable } from '@lpl-hacks/shared/src/types/native/extraction/extractedTable'
 import type { ExtractedConfidenceLevel, ExtractedValue } from '@lpl-hacks/shared/src/types/native/extraction/extractedValue'
 import documentsExtractionSettled from '@lpl-hacks/shared/src/types/native/sockets/documents/extractionSettled'
 import documentsWatch from '@lpl-hacks/shared/src/types/native/sockets/documents/watch'
@@ -9,6 +9,7 @@ import getDocumentApi from '@api/documents/getDocumentApi'
 import uploadDocumentApi from '@api/documents/uploadDocumentApi'
 import { apiGetRequest, apiUploadRequest } from '@features/apiLayer'
 import { documentPreviewRelease, documentPreviewRender, type DocumentPreviewPage } from '@features/documentPreview'
+import { fileDownloadJson } from '@features/fileDownload'
 import { socketAwait, socketLayer, socketWatch } from '@stores/socketStore'
 import { EXTRACTION_ERRORS } from '@typings/native/extraction/errors'
 
@@ -18,10 +19,10 @@ export const EXTRACTION_UPLOAD_IMAGE_MAX_BYTES = 10 * 1024 * 1024
 const EXTRACTION_UPLOAD_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg']
 export const EXTRACTION_EMPTY_VALUE_LABEL = '—'
 export const EXTRACTION_EDITOR_DOM_ID = 'extraction-review-editor'
+export const EXTRACTION_PANEL_DOM_ID = 'extraction-review-panel'
 
-const EXTRACTION_FALLBACK_PAGE_ASPECT = 11 / 8.5
 const EXTRACTION_CROP_PADDING = { x: 0.05, y: 0.025 }
-const EXTRACTION_FALLBACK_TEXT_HEIGHT = 0.014
+const EXTRACTION_HIGHLIGHT_PADDING = 0.003
 const EXTRACTION_WAIT_MAX_MS = 20 * 60 * 1000
 const EXTRACTION_CHECK_CONNECTED_MS = 10_000
 const EXTRACTION_CHECK_DISCONNECTED_MS = 3_000
@@ -33,8 +34,6 @@ const EXTRACTION_PHASE_LABELS: Record<ExtractionPhase, string> = {
   uploading: 'Uploading…',
   extracting: 'Extracting…',
 }
-
-export type ExtractionLayout = 'scan' | 'rebuilt'
 
 export type ExtractionEditValue = string | boolean
 
@@ -62,47 +61,25 @@ const EXTRACTION_STATUS_LABELS: Record<ExtractionItemStatus, string> = {
   plain: 'Looks fine',
 }
 
-type ExtractionOverlayKind = 'text' | 'multiline' | 'checkbox'
-
-export type ExtractionOverlayView = {
+export type ExtractionHighlightView = {
   id: string
   domId: string
-  kind: ExtractionOverlayKind
   status: ExtractionItemStatus
-  empty: boolean
   selected: boolean
   label: string
-  text: string
-  checked: boolean
-  style: CSSProperties
-}
-
-export type ExtractionRebuiltLineView = {
-  key: string
-  text: string
   style: CSSProperties
 }
 
 export type ExtractionPageView = {
   number: number
-  imageUrl: string | null
+  imageUrl: string
   style: CSSProperties
-  overlays: ExtractionOverlayView[]
-  lines: ExtractionRebuiltLineView[]
-}
-
-export type ExtractionLayoutOption = {
-  value: ExtractionLayout
-  label: string
-  disabled: boolean
-  active: boolean
+  highlights: ExtractionHighlightView[]
 }
 
 export type ExtractionDocumentView = {
   pages: ExtractionPageView[]
-  layoutOptions: ExtractionLayoutOption[]
-  showValues: boolean
-  showValuesLabel: string
+  previewMessage: string | null
 }
 
 export type ExtractionReviewListItem = {
@@ -145,19 +122,22 @@ export type ExtractionReviewView = {
   unresolved: number
   progressStyle: CSSProperties
   nextLabel: string
+  exportHint: string | null
   flagged: ExtractionReviewListItem[]
+  pickedUp: ExtractionReviewListItem[]
   missing: ExtractionReviewListItem[]
   selected: ExtractionSelectedView | null
 }
 
 type ExtractionAnalysis = {
+  documentId: string
   fileName: string
   pageCount: number
   data: ExtractedAnalysis
 }
 
 type ExtractionWaitResult =
-  | { success: true, pageCount: number, data: ExtractedAnalysis }
+  | { success: true, documentId: string, pageCount: number, data: ExtractedAnalysis }
   | { success: false, message: string }
 
 function extractionFormatPercent(confidence: number | null): string {
@@ -173,14 +153,13 @@ function extractionFormatNormalized(value: ExtractedValue): string | null {
   return String(value.value) === value.rawValue ? null : `→ ${value.value}`
 }
 
-function extractionOverlayDomId(id: string): string {
-  return `extraction-overlay-${id}`
+function extractionFormatItemValue(item: ExtractionItem): string {
+  if (item.kind === 'checkbox') return item.checked ? 'Checked' : 'Unchecked'
+  return item.text === '' ? 'Empty' : item.text
 }
 
-function extractionBoxContainsCenter(outer: ExtractedBox, inner: ExtractedBox): boolean {
-  const x = inner.left + inner.width / 2
-  const y = inner.top + inner.height / 2
-  return x >= outer.left && x <= outer.left + outer.width && y >= outer.top && y <= outer.top + outer.height
+function extractionHighlightDomId(id: string): string {
+  return `extraction-highlight-${id}`
 }
 
 function extractionBuildItem(
@@ -219,117 +198,32 @@ function extractionBuildItems(data: ExtractedAnalysis, edits: Record<string, Ext
   return [...fieldItems, ...cellItems]
 }
 
-function extractionEstimateEms(text: string): number {
-  let ems = 0
-  for (const char of text) {
-    ems += /[0-9$]/.test(char) ? 0.56 : /[A-Z]/.test(char) ? 0.68 : /[a-z]/.test(char) ? 0.52
-      : /[\s.,:;'|!]/.test(char) ? 0.28 : /[-/()]/.test(char) ? 0.33 : /[%@#&]/.test(char) ? 0.85 : 0.56
-  }
-  return ems
-}
-
-function extractionGroupRows(lines: ExtractedLine[]): string[] {
-  const rows: { center: number, height: number, lines: ExtractedLine[] }[] = []
-  for (const line of [...lines].sort((a, b) => a.box!.top - b.box!.top)) {
-    const center = line.box!.top + line.box!.height / 2
-    const row = rows.find((candidate) => Math.abs(candidate.center - center) < Math.max(candidate.height, line.box!.height) / 2)
-    if (row) row.lines.push(line)
-    else rows.push({ center, height: line.box!.height, lines: [line] })
-  }
-  return rows.map((row) => row.lines.sort((a, b) => a.box!.left - b.box!.left).map((line) => line.text).join(' '))
-}
-
-function extractionBuildOverlay(
-  item: ExtractionItem,
-  box: ExtractedBox,
-  aspect: number,
-  pageLines: ExtractedLine[],
-  lineHeight: number,
-  selectedId: string | null,
-): ExtractionOverlayView {
-  const printed = item.source.rawValue ?? ''
-  const rows = item.origin === 'field' && printed ? extractionGroupRows(pageLines.filter((line) => line.box && extractionBoxContainsCenter(box, line.box))) : []
-  const kind: ExtractionOverlayKind = item.kind === 'checkbox' ? 'checkbox' : rows.length > 1 ? 'multiline' : 'text'
-  const lineBreaks = kind === 'multiline' && rows.join(' ') === printed
-  const text = lineBreaks && !item.edited ? rows.join('\n') : item.text
-
-  const labelBottom = item.labelBox && item.labelBox.top < box.top + box.height / 2 ? item.labelBox.top + item.labelBox.height : 0
-  const region = !printed && labelBottom > box.top
-    ? { ...box, top: labelBottom + lineHeight * 0.3, height: Math.max(lineHeight, box.top + box.height - labelBottom - lineHeight * 0.3) }
-    : box
-  const target = !printed && kind === 'text' && region.height > lineHeight * 2
-    ? { ...region, top: region.top + (region.height - lineHeight * 1.6) / 2, height: lineHeight * 1.6 }
-    : region
-
-  const inkRatio = /[gjpqy$(),;]/.test(printed) ? 0.92 : 0.74
-  const glyphHeight = kind === 'multiline' ? box.height / rows.length * 0.72
-    : item.origin === 'cell' || !printed ? lineHeight * 0.95
-      : Math.min(box.height, lineHeight * 3) / inkRatio
-  const fitWidth = kind === 'text' && printed ? box.width / (extractionEstimateEms(printed) * 1.04) : Infinity
-  const fontWidth = Math.min(glyphHeight * aspect, fitWidth)
-
-  const pad = kind === 'checkbox' ? { x: 0.002, y: 0.002 * aspect }
-    : item.origin === 'cell' ? { x: -0.004, y: -Math.max(0, (target.height - lineHeight * 1.6) / 2) }
-      : { x: 0.004, y: kind === 'multiline' ? 0.004 : target.height * 0.2 }
-  const width = extractionFormatRatio(target.width + pad.x * 2)
-  const height = extractionFormatRatio(target.height + pad.y * 2)
+function extractionBuildHighlight(item: ExtractionItem, box: ExtractedBox, aspect: number, selectedId: string | null): ExtractionHighlightView {
+  const padX = EXTRACTION_HIGHLIGHT_PADDING
+  const padY = EXTRACTION_HIGHLIGHT_PADDING / aspect
   return {
     id: item.id,
-    domId: extractionOverlayDomId(item.id),
-    kind,
+    domId: extractionHighlightDomId(item.id),
     status: item.status,
-    empty: kind !== 'checkbox' && text === '' && item.status !== 'review',
     selected: item.id === selectedId,
-    label: item.label,
-    text,
-    checked: item.checked,
+    label: `${item.label}: ${extractionFormatItemValue(item)}`,
     style: {
-      left: extractionFormatRatio(target.left - pad.x),
-      top: extractionFormatRatio(target.top - pad.y),
-      ...(kind === 'text' ? { minWidth: width, height } : kind === 'multiline' ? { width, minHeight: height } : { width, height }),
-      fontSize: `max(6px, ${(fontWidth * 100).toFixed(3)}cqw)`,
+      left: extractionFormatRatio(box.left - padX),
+      top: extractionFormatRatio(box.top - padY),
+      width: extractionFormatRatio(box.width + padX * 2),
+      height: extractionFormatRatio(box.height + padY * 2),
     },
   }
 }
 
-function extractionMedianLineHeight(lines: ExtractedLine[]): number {
-  const heights = lines.flatMap((line) => line.box ? [line.box.height] : []).sort((a, b) => a - b)
-  return heights.length === 0 ? EXTRACTION_FALLBACK_TEXT_HEIGHT : heights[Math.floor(heights.length / 2)]!
-}
-
-function extractionBuildPages(
-  data: ExtractedAnalysis,
-  items: ExtractionItem[],
-  previews: DocumentPreviewPage[] | null,
-  layout: ExtractionLayout,
-  selectedId: string | null,
-): ExtractionPageView[] {
-  const pageCount = previews?.length ?? Math.max(1, ...data.fields.map((field) => field.page), ...data.lines.map((line) => line.page))
-  return Array.from({ length: pageCount }, (_, index): ExtractionPageView => {
+function extractionBuildPages(items: ExtractionItem[], previews: DocumentPreviewPage[] | null, selectedId: string | null): ExtractionPageView[] {
+  return (previews ?? []).map((preview, index): ExtractionPageView => {
     const number = index + 1
-    const preview = previews?.[index] ?? null
-    const aspect = preview?.aspect ?? EXTRACTION_FALLBACK_PAGE_ASPECT
-    const overlays = items.flatMap((item) => item.page === number && item.box ? [{ item, box: item.box }] : [])
-    const overlayBoxes = overlays.map(({ box }) => box)
-    const pageLines = data.lines.filter((line) => line.page === number)
-    const lineHeight = extractionMedianLineHeight(pageLines)
     return {
       number,
-      imageUrl: layout === 'scan' ? preview?.url ?? null : null,
-      style: { aspectRatio: `1 / ${aspect}` },
-      overlays: overlays.map(({ item, box }) => extractionBuildOverlay(item, box, aspect, pageLines, lineHeight, selectedId)),
-      lines: layout === 'scan' ? [] : data.lines.flatMap((line, lineIndex): ExtractionRebuiltLineView[] => {
-        if (line.page !== number || !line.box || overlayBoxes.some((box) => extractionBoxContainsCenter(box, line.box!))) return []
-        return [{
-          key: `${number}-${lineIndex}`,
-          text: line.text,
-          style: {
-            left: extractionFormatRatio(line.box.left),
-            top: extractionFormatRatio(line.box.top),
-            fontSize: `max(6px, ${(line.box.height * aspect * 80).toFixed(3)}cqw)`,
-          },
-        }]
-      }),
+      imageUrl: preview.url,
+      style: { aspectRatio: `1 / ${preview.aspect}` },
+      highlights: items.flatMap((item) => item.page === number && item.box ? [extractionBuildHighlight(item, item.box, preview.aspect, selectedId)] : []),
     }
   })
 }
@@ -395,16 +289,87 @@ function extractionBuildReview(items: ExtractionItem[], previews: DocumentPrevie
     unresolved: flagged.length - resolved,
     progressStyle: { width: extractionFormatRatio(flagged.length === 0 ? 1 : resolved / flagged.length) },
     nextLabel: flagged.length === resolved ? 'All reviewed' : 'Next to review',
+    exportHint: flagged.length === resolved ? null : `${flagged.length - resolved} flagged ${flagged.length - resolved === 1 ? 'field' : 'fields'} not reviewed yet`,
     flagged: flagged.map((item) => extractionBuildReviewListItem(
       item,
       selectedId,
       item.status === 'review' ? item.source.issues[0] ?? '' : EXTRACTION_STATUS_LABELS[item.status],
     )),
+    pickedUp: items
+      .filter((item) => item.box !== null && !item.source.requiresReview)
+      .map((item) => extractionBuildReviewListItem(item, selectedId, item.edited ? `Edited: ${extractionFormatItemValue(item)}` : extractionFormatItemValue(item))),
     missing: items
       .filter((item) => item.box === null && !item.source.requiresReview)
       .map((item) => extractionBuildReviewListItem(item, selectedId, item.edited ? `Filled in: ${item.text}` : 'Not found on the page')),
     selected: selected ? extractionBuildSelected(selected, previews) : null,
   }
+}
+
+function extractionExportValue(item: ExtractionItem): string | boolean {
+  return item.kind === 'checkbox' ? item.checked : item.text
+}
+
+function extractionExportFields(items: ExtractionItem[]): Record<string, string | boolean> {
+  const fields: Record<string, string | boolean> = {}
+  for (const item of items) {
+    if (item.origin !== 'field') continue
+    let key = item.label
+    for (let copy = 2; key in fields; copy++) key = `${item.label} (${copy})`
+    fields[key] = extractionExportValue(item)
+  }
+  return fields
+}
+
+function extractionExportTable(
+  table: ExtractedTable,
+  itemsById: Map<string, ExtractionItem>,
+  edits: Record<string, ExtractionEditValue>,
+  confirmed: Record<string, boolean>,
+) {
+  const values = new Map(table.cells.map((cell) => [
+    `${cell.row}:${cell.column}`,
+    extractionExportValue(itemsById.get(cell.fieldId ?? cell.id) ?? extractionBuildItem(
+      { id: cell.id, origin: 'cell', label: '', page: table.page, box: cell.box, labelBox: null, source: cell },
+      edits,
+      confirmed,
+    )),
+  ]))
+  const columns = Array.from({ length: table.columnCount }, (_, index) => index + 1)
+  const headerRows = new Set(table.cells.filter((cell) => cell.role === 'header').map((cell) => cell.row))
+  const headers = columns.map((column) => table.cells.find((cell) => cell.role === 'header' && cell.column === column)?.rawValue ?? null)
+  const rows = Array.from({ length: table.rowCount }, (_, index) => index + 1)
+    .filter((row) => !headerRows.has(row))
+    .map((row) => columns.map((column) => values.get(`${row}:${column}`) ?? ''))
+  if (headers.every((header) => header)) return rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index]])))
+  return headers.some((header) => header) ? [headers.map((header) => header ?? ''), ...rows] : rows
+}
+
+function extractionBuildExport(
+  analysis: ExtractionAnalysis,
+  items: ExtractionItem[],
+  edits: Record<string, ExtractionEditValue>,
+  confirmed: Record<string, boolean>,
+) {
+  const itemsById = new Map(items.map((item) => [item.id, item]))
+  return {
+    fileName: analysis.fileName,
+    fields: extractionExportFields(items),
+    tables: analysis.data.tables.map((table) => extractionExportTable(table, itemsById, edits, confirmed)),
+  }
+}
+
+function extractionRevealEditor() {
+  document.getElementById(EXTRACTION_EDITOR_DOM_ID)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+}
+
+function extractionRevealItem(id: string) {
+  const highlight = document.getElementById(extractionHighlightDomId(id))
+  if (!highlight) {
+    extractionRevealEditor()
+    return
+  }
+  document.getElementById(EXTRACTION_PANEL_DOM_ID)?.scrollTo({ top: 0, behavior: 'smooth' })
+  highlight.scrollIntoView({ block: 'center', behavior: 'smooth' })
 }
 
 async function extractionWaitForDocument(documentId: string, signal: AbortSignal): Promise<ExtractionWaitResult | null> {
@@ -420,7 +385,7 @@ async function extractionWaitForDocument(documentId: string, signal: AbortSignal
       if (!res.success) return { success: false, message: res.error.message }
 
       const { document, extraction } = res.data
-      if (document.status === 'extracted' && extraction) return { success: true, pageCount: document.pageCount ?? 1, data: extraction }
+      if (document.status === 'extracted' && extraction) return { success: true, documentId, pageCount: document.pageCount ?? 1, data: extraction }
       if (document.status === 'failed') return { success: false, message: document.failureMessage ?? EXTRACTION_ERRORS.WAIT_TIMED_OUT.MESSAGE }
 
       await settled
@@ -449,8 +414,6 @@ export function useExtractionUpload() {
   const [edits, setEdits] = useState<Record<string, ExtractionEditValue>>({})
   const [confirmed, setConfirmed] = useState<Record<string, boolean>>({})
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [layout, setLayout] = useState<ExtractionLayout>('scan')
-  const [showValues, setShowValues] = useState(true)
   const uploadAbort = useRef<AbortController | null>(null)
 
   useEffect(() => () => {
@@ -463,25 +426,17 @@ export function useExtractionUpload() {
     if (!analysis) return null
     const { data } = analysis
     const items = extractionBuildItems(data, edits, confirmed)
-    const effectiveLayout: ExtractionLayout = previews ? layout : 'rebuilt'
     const review = extractionBuildReview(items, previews, selectedId)
     return {
       items,
       review,
       summary: `${analysis.fileName} · ${analysis.pageCount} ${analysis.pageCount === 1 ? 'page' : 'pages'} · ${review.unresolved} of ${review.total} left to review`,
       document: {
-        pages: extractionBuildPages(data, items, previews, effectiveLayout, selectedId),
-        layoutOptions: (['scan', 'rebuilt'] as const).map((value): ExtractionLayoutOption => ({
-          value,
-          label: value === 'scan' ? 'Scan' : 'Rebuilt',
-          disabled: value === 'scan' && !previews,
-          active: value === effectiveLayout,
-        })),
-        showValues,
-        showValuesLabel: showValues ? 'Hide values' : 'Show values',
+        pages: extractionBuildPages(items, previews, selectedId),
+        previewMessage: previews ? null : EXTRACTION_ERRORS.PREVIEW_UNAVAILABLE.MESSAGE,
       } satisfies ExtractionDocumentView,
     }
-  }, [analysis, previews, edits, confirmed, selectedId, layout, showValues])
+  }, [analysis, previews, edits, confirmed, selectedId])
 
   async function upload(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
@@ -525,10 +480,8 @@ export function useExtractionUpload() {
     setEdits({})
     setConfirmed({})
     setSelectedId(null)
-    setLayout('scan')
-    setShowValues(true)
     setPreviews(pages)
-    setAnalysis({ fileName: file.name, pageCount: result.pageCount, data: result.data })
+    setAnalysis({ documentId: result.documentId, fileName: file.name, pageCount: result.pageCount, data: result.data })
   }
 
   function edit(id: string, value: ExtractionEditValue) {
@@ -543,15 +496,20 @@ export function useExtractionUpload() {
     setEdits((current) => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)))
   }
 
+  function select(id: string) {
+    setSelectedId(id)
+    requestAnimationFrame(extractionRevealEditor)
+  }
+
   function focusItem(id: string) {
     if (!result?.items.some((item) => item.id === id)) return
     setSelectedId(id)
-    setShowValues(true)
-    requestAnimationFrame(() => {
-      const target = document.getElementById(extractionOverlayDomId(id)) ?? document.getElementById(EXTRACTION_EDITOR_DOM_ID)
-      target?.scrollIntoView({ block: 'center', behavior: 'smooth' })
-      target?.focus({ preventScroll: true })
-    })
+    requestAnimationFrame(() => extractionRevealItem(id))
+  }
+
+  function confirmExport() {
+    if (!analysis || !result) return
+    fileDownloadJson(`${analysis.fileName.replace(/\.[^.]+$/, '')}.json`, extractionBuildExport(analysis, result.items, edits, confirmed))
   }
 
   function focusNext() {
@@ -572,11 +530,10 @@ export function useExtractionUpload() {
     edit,
     confirm,
     revert,
-    select: setSelectedId,
+    select,
     focusItem,
     focusNext,
-    setLayout,
-    toggleValues: () => setShowValues((current) => !current),
+    confirmExport,
     accept: EXTRACTION_UPLOAD_MIME_TYPES.join(','),
   }
 }

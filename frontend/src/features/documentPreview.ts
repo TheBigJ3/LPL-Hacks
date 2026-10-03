@@ -14,7 +14,7 @@ export async function documentPreviewRender(file: File): Promise<DocumentPreview
   try {
     return file.type === 'application/pdf' ? await documentPreviewRenderPdf(file) : [await documentPreviewRenderImage(file)]
   } catch {
-    // Most browsers can't decode TIFF; callers fall back to rebuilding the page from OCR text.
+    // Most browsers can't decode TIFF; callers show the extracted values without the page.
     return null
   }
 }
