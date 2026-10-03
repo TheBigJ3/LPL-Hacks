@@ -1,0 +1,28 @@
+.document-tag-filter-label__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:hover > .document-tag-filter-label[data-overflowing="true"] .document-tag-filter-label__text,
+:focus-visible > .document-tag-filter-label[data-overflowing="true"] .document-tag-filter-label__text {
+  width: max-content;
+  overflow: visible;
+  text-overflow: clip;
+  animation: document-tag-filter-label-scroll var(--document-tag-filter-label-duration) ease-in-out infinite alternate;
+}
+
+@keyframes document-tag-filter-label-scroll {
+  0%, 20% { transform: translateX(0); }
+  80%, 100% { transform: translateX(var(--document-tag-filter-label-shift)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :hover > .document-tag-filter-label[data-overflowing="true"] .document-tag-filter-label__text,
+  :focus-visible > .document-tag-filter-label[data-overflowing="true"] .document-tag-filter-label__text {
+    width: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    animation: none;
+  }
+}

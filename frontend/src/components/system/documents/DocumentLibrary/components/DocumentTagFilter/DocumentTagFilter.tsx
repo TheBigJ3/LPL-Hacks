@@ -2,6 +2,7 @@ import './.css'
 import { Link } from 'react-router'
 import { AnimatePresence, motion } from 'motion/react'
 import { DOCUMENT_TAG_FILTER_MENU_VARIANTS, useDocumentTagFilter } from './.ts'
+import DocumentTagFilterLabel from './components/DocumentTagFilterLabel/DocumentTagFilterLabel'
 import type { DocumentTagOption } from '../../.ts'
 
 const DocumentTagFilter = ({ options }: { options: DocumentTagOption[] }) => {
@@ -19,7 +20,7 @@ const DocumentTagFilter = ({ options }: { options: DocumentTagOption[] }) => {
       onClick={filter.toggle}
     >
       <span className="material-symbols-outlined document-tag-filter__icon" aria-hidden="true">filter_list</span>
-      {filter.selected && <span className="document-tag-filter__value truncate">{filter.selected.label}</span>}
+      {filter.selected && <DocumentTagFilterLabel label={filter.selected.label} />}
     </button>
     {filter.selected &&
       <Link
@@ -52,7 +53,7 @@ const DocumentTagFilter = ({ options }: { options: DocumentTagOption[] }) => {
                   onClick={filter.close}
                 >
                   <span className="material-symbols-outlined document-tag-filter__check flex-none" aria-hidden="true">check</span>
-                  <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                  <DocumentTagFilterLabel label={option.label} className="flex-1" />
                   <span className="document-tag-filter__count flex-none">{option.count}</span>
                 </Link>
               </li>
