@@ -1,0 +1,138 @@
+{
+  "total": 10,
+  "households": [
+    {
+      "household_id": "HH001",
+      "tax_year": 2025,
+      "members": [
+        "John Sample",
+        "Sarah Sample"
+      ],
+      "status": "findings",
+      "priority": "medium",
+      "findings": 2,
+      "needs_documents": false,
+      "top_finding": "John could save more for retirement",
+      "dollar_impact": 34300
+    },
+    {
+      "household_id": "HH002",
+      "tax_year": 2025,
+      "members": [
+        "Alex Rivera"
+      ],
+      "status": "no_findings",
+      "priority": null,
+      "findings": 0,
+      "needs_documents": false,
+      "top_finding": null,
+      "dollar_impact": 0
+    },
+    {
+      "household_id": "HH003",
+      "tax_year": 2025,
+      "members": [
+        "Morgan Lee"
+      ],
+      "status": "findings",
+      "priority": "medium",
+      "findings": 1,
+      "needs_documents": true,
+      "top_finding": "HSA contribution without plan proof",
+      "dollar_impact": 0
+    },
+    {
+      "household_id": "HH004",
+      "tax_year": 2025,
+      "members": [
+        "Jordan Park"
+      ],
+      "status": "findings",
+      "priority": "high",
+      "findings": 1,
+      "needs_documents": true,
+      "top_finding": "Documents disagree on wages",
+      "dollar_impact": 0
+    },
+    {
+      "household_id": "HH005",
+      "tax_year": 2025,
+      "members": [
+        "Casey Brooks"
+      ],
+      "status": "findings",
+      "priority": "high",
+      "findings": 4,
+      "needs_documents": false,
+      "top_finding": "New dependent",
+      "dollar_impact": 0
+    },
+    {
+      "household_id": "HH006",
+      "tax_year": 2025,
+      "members": [
+        "Taylor Mock",
+        "Sam Mock"
+      ],
+      "status": "findings",
+      "priority": "high",
+      "findings": 4,
+      "needs_documents": false,
+      "top_finding": "Taylor could save more for retirement",
+      "dollar_impact": 155500
+    },
+    {
+      "household_id": "HH007",
+      "tax_year": 2025,
+      "members": [
+        "Drew Kim",
+        "Avery Kim"
+      ],
+      "status": "no_findings",
+      "priority": null,
+      "findings": 0,
+      "needs_documents": false,
+      "top_finding": null,
+      "dollar_impact": 0
+    },
+    {
+      "household_id": "HH008",
+      "tax_year": 2025,
+      "members": [
+        "Quinn Harper"
+      ],
+      "status": "findings",
+      "priority": "medium",
+      "findings": 1,
+      "needs_documents": false,
+      "top_finding": "Quinn could save more for retirement",
+      "dollar_impact": 14700
+    },
+    {
+      "household_id": "HH009",
+      "tax_year": 2025,
+      "members": [
+        "Pat Rowe"
+      ],
+      "status": "findings",
+      "priority": "high",
+      "findings": 1,
+      "needs_documents": false,
+      "top_finding": "Pat took a retirement distribution",
+      "dollar_impact": 1200
+    },
+    {
+      "household_id": "HH010",
+      "tax_year": 2026,
+      "members": [
+        "Alex Example"
+      ],
+      "status": "no_findings",
+      "priority": "low",
+      "findings": 0,
+      "needs_documents": false,
+      "top_finding": "Alex took a retirement distribution",
+      "dollar_impact": 0
+    }
+  ]
+}

@@ -199,9 +199,18 @@ def test_no_model_internals_leak_from_checker(isolated_engine):
     fv = FieldValue(value=8200.0, source_document="john_w2_2025.pdf", page=1)
     out = EvidenceChecker({"john_w2_2025.pdf": doc("john_w2_2025.pdf")}).check_many(
         [CheckRequest(key="k", field_name="employee_401k_contribution", value=fv, subject_name="John Sample")])
+    # Amendment §9: raw scores may be kept ONLY in the audit field (for RAG metadata), nowhere else.
+    assert out["k"].documents[0].model_scores == {"relation": "supports", "supports": 0.99}
+    for d in out["k"].documents:
+        d.model_scores = None
     dumped = repr(out)
-    for word in ("scores", "0.99", "native_nli", "backend", "probabilit", "entail"):
+    for word in ("0.99", "native_nli", "backend", "probabilit", "entail"):
         assert word not in dumped
+    from rapid_analysis.overview import overview_build
+    from rapid_analysis.fixtures import fixture_household_documents, fixture_household_raw
+    api_text = repr(overview_build(fixture_household_raw("HH001"), fixture_household_documents("HH001")).overview)
+    for word in ("model_scores", "0.99", "native_nli", "backend", "probabilit", "entail"):
+        assert word not in api_text
 
 
 # ---------------------------------------------------------------- model battery

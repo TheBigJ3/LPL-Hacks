@@ -140,7 +140,28 @@ def relations_check(items: list[tuple[str, str, str]]) -> list[DocCheck]:
                 check = RELATION_TO_CHECK.get(r.get("relation") if isinstance(r, dict) else None, "unconfirmed")
                 results[i] = check
                 _memo[_memo_key(items[i][0], items[i][1])] = check
+                _audit[_memo_key(items[i][0], items[i][1])] = _audit_scores(r)
     return [r for r in results if r is not None]
+
+
+# Raw relation + scores, kept ONLY for RAG chunk metadata (amendment §9). Never put in an API response or text.
+_audit: dict[tuple[str, str], dict[str, Any]] = {}
+
+
+def _audit_scores(raw: Any) -> dict[str, Any]:
+    if not isinstance(raw, dict):
+        return {}
+    out: dict[str, Any] = {"relation": raw.get("relation")}
+    scores = raw.get("scores") if isinstance(raw.get("scores"), dict) else {}
+    for key in ("supports", "contradicts"):
+        if isinstance(scores.get(key), (int, float)):
+            out[key] = round(float(scores[key]), 4)
+    return out
+
+
+def audit_scores(text: str, claim: str) -> dict[str, Any] | None:
+    with _memo_lock:
+        return _audit.get(_memo_key(text, claim))
 
 
 def check_value(field_name: str, value: Any, member_name: str, document_text: str, form_type: str | None = None) -> Check:
@@ -175,6 +196,7 @@ class DocumentResult:
     page: int | None
     value: Any
     check: DocCheck
+    model_scores: dict[str, Any] | None = None  # audit only: RAG metadata, never API responses or text
 
 
 @dataclass
@@ -234,8 +256,9 @@ class EvidenceChecker:
                 self.validator_unavailable = True
                 results = None
             if results is not None:
-                for (key, name, value, page, _), result in zip(plan, results):
-                    out[key].documents.append(DocumentResult(document=name, page=page, value=value, check=result))
+                for (key, name, value, page, claim), result in zip(plan, results):
+                    out[key].documents.append(DocumentResult(document=name, page=page, value=value, check=result,
+                                                             model_scores=audit_scores(self.documents[name].text, claim[0])))
         elif plan and backend_name() != "none":
             # Load failure (not a deliberate DECISION_BACKEND=none) is reported to the caller.
             self.validator_unavailable = True

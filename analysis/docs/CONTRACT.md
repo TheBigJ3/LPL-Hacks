@@ -23,6 +23,7 @@ per-value `check`. No model internals (scores, probabilities, backend, model nam
 | POST | `/api/households` | `IngestResult` | a normalized household from the pipeline (§4 input) |
 | POST | `/api/households/{id}/documents` | `DocumentIngestResult` | `{name, textract}` (AnalyzeDocument JSON) or `{name, text, form_type?}` |
 | POST | `/api/households/{id}/ask` | `AskResponse` | `{question}`, routed by keyword rules and answered from the overview |
+| GET | `/api/households/{id}/rag-chunks` | `RagChunks` | plain-English chunks + filter metadata for a RAG |
 
 Errors: unknown ids return **404** `{status: "not_found", errors}`. Bad input returns **422**
 `{status: "needs_review", errors}`; it never returns 500. Every error item is
@@ -134,6 +135,20 @@ suggestions[]
 - Answers are built only from the overview (values, checks, metrics, prior_year). A missing year or value is
   `short: "No data"`. Nothing is computed or invented.
 - Out of scope gives `answer.type: "none"`, empty text and 4 suggestions built from the household.
+
+## RAG chunks (`GET /api/households/{id}/rag-chunks`, `scripts/export_rag.py`)
+
+`{household_id, chunks[] {id, text, metadata}}`; the sample for all 10 households is `samples/rag_chunks.jsonl`.
+
+- One chunk per household summary, member, checklist item, finding, document and changes-since-last-year.
+  Ids are `"<HH>:<chunk_type>:<key>"`, e.g. `HH006:checklist:retirement_can_improve`.
+- `text` is plain English under 700 characters. Every number states its check ("verified against <doc>",
+  "unconfirmed: not found in <doc>", "documents disagree: $120,000 (…) vs $165,000 (…)", "not checked").
+  Checklist and finding chunks state the exact metrics, then `Rule: …`, then `Result: …`, and end with
+  "Flag for review, not advice." Placeholders say "has not been assessed".
+- `metadata` has the tag file's `rag_chunk_metadata` fields plus `chunk_type`, `checklist_id`, `answer`, `dollar_impact`,
+  `metrics`, `rule`, `checks` and `ruleset_version`. **`model_scores`** (raw OpenDecision relation and scores) appears
+  only here, for audit. It is uncalibrated and never appears in `text`; the LLM must not see or repeat it.
 
 ## Schema 1.0 → 1.1 id mapping
 

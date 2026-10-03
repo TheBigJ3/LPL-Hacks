@@ -20,6 +20,7 @@ from fastapi.responses import JSONResponse
 
 from rapid_analysis import RULESET_VERSION, SCHEMA_VERSION, contract
 from rapid_analysis.ask import ask
+from rapid_analysis.rag import rag_chunks
 from rapid_analysis.engine import engine_info, engine_load
 from rapid_analysis.evidence import CHECK_VALUES
 from rapid_analysis.fixtures import FIXTURE_IDS, fixture_household_raw, fixture_household_textract
@@ -41,7 +42,7 @@ from rapid_analysis.textract import evidence_from_text, evidence_from_textract
 log = logging.getLogger("rapid_analysis.api")
 
 STORE = Store()
-CORS_ORIGINS = [o.strip() for o in os.environ.get("ANALYSIS_CORS_ORIGINS", "http://localhost:5173").split(",") if o.strip()]
+CORS_ORIGINS = [o.strip() for o in os.environ.get("ANALYSIS_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if o.strip()]
 MAX_BODY_BYTES = int(os.environ.get("ANALYSIS_MAX_BODY_BYTES", str(5 * 1024 * 1024)))
 
 
@@ -127,7 +128,8 @@ def _build(household_id: str, refresh: bool = False) -> dict | None:
         if cached is not None:
             return cached
     build = overview_build(raw, STORE.documents_for(household_id))
-    entry = {"overview": build.overview, "evidence": build.evidence}
+    entry = {"overview": build.overview, "evidence": build.evidence,
+             "value_checks": build.value_checks, "textract_confidence": build.textract_confidence}
     # A transient model failure must not stick: only cache overviews whose checks actually ran.
     if not any(e["code"] == "validator_unavailable" for e in build.overview["errors"]):
         STORE.overview_put(key, entry)
@@ -273,6 +275,19 @@ async def household_ask(household_id: str, request: Request):
     if entry["overview"]["status"] == "needs_review":
         return _needs_review(entry["overview"]["errors"])
     return ask(question.strip(), entry["overview"])
+
+
+@app.get("/api/households/{household_id}/rag-chunks", response_model=contract.RagChunks, tags=["households"],
+         responses={404: {"model": contract.ErrorResponse}, 422: {"model": contract.ErrorResponse}})
+def household_rag_chunks(household_id: str):
+    """Plain-English chunks + filter metadata for a RAG. Model scores appear only in metadata.model_scores."""
+    entry = _build(household_id)
+    if entry is None:
+        return _not_found("household", household_id)
+    if entry["overview"]["status"] == "needs_review":
+        return _needs_review(entry["overview"]["errors"])
+    chunks = rag_chunks(entry["overview"], entry["evidence"], entry.get("value_checks"), entry.get("textract_confidence"))
+    return {"household_id": household_id, "chunks": chunks}
 
 
 @app.post("/api/households/{household_id}/documents", response_model=contract.DocumentIngestResult, tags=["ingest"],

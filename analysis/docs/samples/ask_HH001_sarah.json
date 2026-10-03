@@ -1,0 +1,27 @@
+{
+  "question": "can sarah make some savings",
+  "understood": {
+    "intent": "savings_opportunity",
+    "person_id": "HH001-P2",
+    "member": "Sarah Sample",
+    "field": null,
+    "time_ref": "current_year",
+    "router": "keyword"
+  },
+  "answer": {
+    "type": "checklist",
+    "short": "Yes",
+    "text": "Sarah contributes $4,500 to the 401(k), 19% of the $23,500 limit. $19,000 of room is left.",
+    "dollar_impact": 19000,
+    "values": [
+      {
+        "field": "employee_401k_contribution",
+        "value": 4500,
+        "check": "verified",
+        "source_document": "sarah_w2_2025.pdf",
+        "page": 1
+      }
+    ]
+  },
+  "suggestions": []
+}

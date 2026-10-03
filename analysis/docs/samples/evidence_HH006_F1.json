@@ -1,0 +1,40 @@
+{
+  "household_id": "HH006",
+  "finding_id": "F1",
+  "headline": "Taylor could save more for retirement",
+  "check": "verified",
+  "values": [
+    {
+      "key": "HH006-P1.employee_401k_contribution",
+      "field": "employee_401k_contribution",
+      "label": "401(k) contribution",
+      "member": "Taylor Mock",
+      "value": 2000,
+      "check": "verified",
+      "documents": [
+        {
+          "document": "taylor_w2_2025.pdf",
+          "page": 1,
+          "value": 2000,
+          "check": "verified"
+        }
+      ]
+    },
+    {
+      "key": "HH006-P1.wages",
+      "field": "wages",
+      "label": "Wages",
+      "member": "Taylor Mock",
+      "value": 110000,
+      "check": "verified",
+      "documents": [
+        {
+          "document": "taylor_w2_2025.pdf",
+          "page": 1,
+          "value": 110000,
+          "check": "verified"
+        }
+      ]
+    }
+  ]
+}

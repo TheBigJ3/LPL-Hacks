@@ -117,7 +117,10 @@
       "reason": "No household member has wages",
       "dollar_impact": null,
       "finding_ids": [],
-      "metrics": {},
+      "metrics": {
+        "flag_below_pct_of_limit": 50,
+        "high_below_pct_of_limit": 15
+      },
       "rule": "a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority)"
     },
     {
@@ -130,6 +133,9 @@
         "F1"
       ],
       "metrics": {
+        "self_employment_above": 0,
+        "early_additional_tax_pct": 10,
+        "flag_below_withholding_pct": 10,
         "members": {
           "HH009-P1": {
             "distribution_code": "1",
@@ -148,7 +154,10 @@
       "reason": "Missing cash balance and adjusted gross income",
       "dollar_impact": null,
       "finding_ids": [],
-      "metrics": {},
+      "metrics": {
+        "target_months": 6,
+        "high_above_months": 12
+      },
       "rule": "cash above 6 months of income (AGI / 12) flags excess cash for review (above 12 months is high priority)"
     },
     {
@@ -172,7 +181,10 @@
       "reason": "No prior year on file",
       "dollar_impact": null,
       "finding_ids": [],
-      "metrics": {},
+      "metrics": {
+        "flag_change_pct": 25,
+        "high_at_events": 3
+      },
       "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
     {

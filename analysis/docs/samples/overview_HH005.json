@@ -68,9 +68,9 @@
       "dollar_impact": null,
       "finding_ids": [],
       "metrics": {
-        "limit": 23500,
         "flag_below_pct_of_limit": 50,
         "high_below_pct_of_limit": 15,
+        "limit": 23500,
         "members": {
           "HH005-P1": {
             "contribution": 16000,
@@ -91,6 +91,9 @@
       "dollar_impact": null,
       "finding_ids": [],
       "metrics": {
+        "self_employment_above": 0,
+        "early_additional_tax_pct": 10,
+        "flag_below_withholding_pct": 10,
         "members": {}
       },
       "rule": "self-employment income above $0, a 1099-R code 1 early distribution (estimated 10% additional tax), or a code 7 distribution with federal withholding under 10% of the taxable amount flags tax for review"
@@ -103,13 +106,13 @@
       "dollar_impact": null,
       "finding_ids": [],
       "metrics": {
+        "target_months": 6,
+        "high_above_months": 12,
         "cash": 22000,
         "agi": 171000,
         "monthly_income": 14250,
         "months_of_income": 1.5,
-        "target_months": 6,
-        "target": 85500,
-        "high_above_months": 12
+        "target": 85500
       },
       "rule": "cash above 6 months of income (AGI / 12) flags excess cash for review (above 12 months is high priority)"
     },
@@ -140,9 +143,10 @@
         "F4"
       ],
       "metrics": {
+        "flag_change_pct": 25,
+        "high_at_events": 3,
         "prior_tax_year": 2024,
-        "events": 4,
-        "high_at_events": 3
+        "events": 4
       },
       "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },

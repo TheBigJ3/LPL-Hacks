@@ -1,0 +1,836 @@
+{
+  "_about": "SYNTHETIC TEST DATA. Real responses from the rapid analysis service for household HH006 (schema 1.1, ruleset 2025.1, model on). Full samples for all households are in docs/samples/.",
+  "GET /health": {
+    "status": "ok",
+    "model_loaded": true,
+    "device": "cuda",
+    "ruleset_version": "2025.1",
+    "schema_version": "1.1"
+  },
+  "GET /api/households/HH006/overview": {
+    "schema_version": "1.1",
+    "ruleset_version": "2025.1",
+    "household_id": "HH006",
+    "tax_year": 2025,
+    "status": "findings",
+    "priority": "high",
+    "checklist_label": "Flags for review, not advice",
+    "summary": {
+      "filing_status": "married_filing_jointly",
+      "dependents": 1,
+      "dependents_check": "not_checked",
+      "agi": {
+        "value": 152000,
+        "check": "not_checked",
+        "source_document": null,
+        "page": null
+      },
+      "cash": {
+        "value": 210000,
+        "check": "not_checked",
+        "source_document": "hh006_bank_statement_2025.pdf",
+        "page": 1,
+        "months_of_income": 16.6
+      },
+      "mortgage_interest": {
+        "value": null,
+        "check": "not_checked",
+        "source_document": null,
+        "page": null
+      }
+    },
+    "members": [
+      {
+        "person_id": "HH006-P1",
+        "name": "Taylor Mock",
+        "employer": "Adventure Works Sample",
+        "numbers": [
+          {
+            "field": "wages",
+            "label": "Wages",
+            "value": 110000,
+            "check": "verified",
+            "source_document": "taylor_w2_2025.pdf",
+            "page": 1,
+            "context": null,
+            "candidates": null
+          },
+          {
+            "field": "employee_401k_contribution",
+            "label": "401(k) contribution",
+            "value": 2000,
+            "check": "verified",
+            "source_document": "taylor_w2_2025.pdf",
+            "page": 1,
+            "context": "1.8% of pay · 9% of limit · $21,500 room left",
+            "candidates": null
+          }
+        ]
+      },
+      {
+        "person_id": "HH006-P2",
+        "name": "Sam Mock",
+        "employer": null,
+        "numbers": [
+          {
+            "field": "self_employment_income",
+            "label": "Self-employment income",
+            "value": 48000,
+            "check": "verified",
+            "source_document": "hh006_1040_2025.pdf",
+            "page": 1,
+            "context": null,
+            "candidates": null
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      {
+        "id": "retirement_can_improve",
+        "question": "Can retirement savings be improved?",
+        "answer": "yes",
+        "reason": "Taylor uses 9% of the 401(k) limit",
+        "dollar_impact": 21500,
+        "finding_ids": [
+          "F1"
+        ],
+        "metrics": {
+          "flag_below_pct_of_limit": 50,
+          "high_below_pct_of_limit": 15,
+          "limit": 23500,
+          "members": {
+            "HH006-P1": {
+              "contribution": 2000,
+              "wages": 110000,
+              "pct_of_pay": 1.8,
+              "pct_of_limit": 9,
+              "room": 21500
+            }
+          }
+        },
+        "rule": "a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority)"
+      },
+      {
+        "id": "tax_savings_possible",
+        "question": "Can tax savings be made?",
+        "answer": "yes",
+        "reason": "Sam has $48,000 of self-employment income",
+        "dollar_impact": null,
+        "finding_ids": [
+          "F2"
+        ],
+        "metrics": {
+          "self_employment_above": 0,
+          "early_additional_tax_pct": 10,
+          "flag_below_withholding_pct": 10,
+          "members": {
+            "HH006-P2": {
+              "self_employment_income": 48000,
+              "high_at": 40000
+            }
+          }
+        },
+        "rule": "self-employment income above $0, a 1099-R code 1 early distribution (estimated 10% additional tax), or a code 7 distribution with federal withholding under 10% of the taxable amount flags tax for review"
+      },
+      {
+        "id": "excess_cash",
+        "question": "Is there excess cash to put to work?",
+        "answer": "yes",
+        "reason": "Cash covers 16.6 months of income",
+        "dollar_impact": 134000,
+        "finding_ids": [
+          "F3"
+        ],
+        "metrics": {
+          "target_months": 6,
+          "high_above_months": 12,
+          "cash": 210000,
+          "agi": 152000,
+          "monthly_income": 12666.67,
+          "months_of_income": 16.6,
+          "target": 76000,
+          "excess": 134000
+        },
+        "rule": "cash above 6 months of income (AGI / 12) flags excess cash for review (above 12 months is high priority)"
+      },
+      {
+        "id": "needs_documents",
+        "question": "Is more documentation needed?",
+        "answer": "no",
+        "reason": "No conflicts, missing proof or mismatched values",
+        "dollar_impact": null,
+        "finding_ids": [],
+        "metrics": {
+          "conflicts": 0,
+          "hsa_without_plan": 0,
+          "mismatches": 0
+        },
+        "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value its document contradicts means more documentation is needed"
+      },
+      {
+        "id": "major_changes",
+        "question": "Anything major changed since last year?",
+        "answer": "yes",
+        "reason": "Dependents increased from 0 to 1",
+        "dollar_impact": null,
+        "finding_ids": [
+          "F4"
+        ],
+        "metrics": {
+          "flag_change_pct": 25,
+          "high_at_events": 3,
+          "prior_tax_year": 2024,
+          "events": 1
+        },
+        "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
+      },
+      {
+        "id": "insurance_review",
+        "question": "Insurance coverage reviewed?",
+        "answer": "not_assessed",
+        "reason": "No insurance data or rules yet",
+        "dollar_impact": null,
+        "finding_ids": [],
+        "metrics": {},
+        "rule": "not assessed: no data or rules yet"
+      },
+      {
+        "id": "estate_review",
+        "question": "Estate plan reviewed?",
+        "answer": "not_assessed",
+        "reason": "No estate planning data or rules yet",
+        "dollar_impact": null,
+        "finding_ids": [],
+        "metrics": {},
+        "rule": "not assessed: no data or rules yet"
+      },
+      {
+        "id": "education_review",
+        "question": "Education savings reviewed?",
+        "answer": "not_assessed",
+        "reason": "No education savings data or rules yet",
+        "dollar_impact": null,
+        "finding_ids": [],
+        "metrics": {},
+        "rule": "not assessed: no data or rules yet"
+      }
+    ],
+    "changes_since_last_year": [
+      {
+        "type": "life_event_new_dependent",
+        "text": "Dependents increased from 0 to 1"
+      }
+    ],
+    "findings": [
+      {
+        "id": "F1",
+        "type": "retirement_contribution_review",
+        "category": "retirement",
+        "priority": "high",
+        "headline": "Taylor could save more for retirement",
+        "explanation": "Taylor contributed $2,000 to a 401(k), 1.8% of $110,000 wages and 9% of the $23,500 limit.",
+        "dollar_impact": 21500,
+        "member": "Taylor Mock",
+        "person_id": "HH006-P1",
+        "action_label": "Discuss savings",
+        "check": "verified",
+        "metrics": {
+          "limit": 23500,
+          "flag_below_pct_of_limit": 50,
+          "high_below_pct_of_limit": 15,
+          "contribution": 2000,
+          "wages": 110000,
+          "pct_of_pay": 1.8,
+          "pct_of_limit": 9,
+          "room": 21500
+        },
+        "rule": "a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority)"
+      },
+      {
+        "id": "F2",
+        "type": "self_employment_tax_review",
+        "category": "tax",
+        "priority": "high",
+        "headline": "Sam has self-employment income to plan for",
+        "explanation": "Sam reported $48,000 of self-employment income; quarterly estimates and self-employed retirement accounts are worth a look.",
+        "dollar_impact": null,
+        "member": "Sam Mock",
+        "person_id": "HH006-P2",
+        "action_label": "Review tax plan",
+        "check": "verified",
+        "metrics": {
+          "self_employment_income": 48000,
+          "high_at": 40000
+        },
+        "rule": "self-employment income above $0, a 1099-R code 1 early distribution (estimated 10% additional tax), or a code 7 distribution with federal withholding under 10% of the taxable amount flags tax for review"
+      },
+      {
+        "id": "F3",
+        "type": "excess_cash_review",
+        "category": "cash_management",
+        "priority": "high",
+        "headline": "Cash above a 6-month cushion",
+        "explanation": "The household holds $210,000 in cash, 16.6 months of income; $134,000 is above a 6-month cushion of $76,000.",
+        "dollar_impact": 134000,
+        "member": null,
+        "person_id": null,
+        "action_label": "Discuss cash",
+        "check": "not_checked",
+        "metrics": {
+          "cash": 210000,
+          "agi": 152000,
+          "monthly_income": 12666.67,
+          "months_of_income": 16.6,
+          "target_months": 6,
+          "target": 76000,
+          "high_above_months": 12,
+          "excess": 134000
+        },
+        "rule": "cash above 6 months of income (AGI / 12) flags excess cash for review (above 12 months is high priority)"
+      },
+      {
+        "id": "F4",
+        "type": "life_event_new_dependent",
+        "category": "life_event",
+        "priority": "medium",
+        "headline": "New dependent",
+        "explanation": "Dependents increased from 0 to 1 since last year.",
+        "dollar_impact": null,
+        "member": null,
+        "person_id": null,
+        "action_label": "Schedule review",
+        "check": "not_checked",
+        "metrics": {
+          "before": 0,
+          "after": 1
+        },
+        "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
+      }
+    ],
+    "data_quality": {
+      "documents": 3,
+      "conflicts": [],
+      "low_confidence_fields": [],
+      "unchecked_values": 3,
+      "missing_documents": [],
+      "unassigned_documents": [],
+      "documents_needing_review": [
+        {
+          "name": "taylor_w2_2025.pdf",
+          "review_reasons": [
+            "tag_uncertain:tax"
+          ]
+        }
+      ]
+    },
+    "errors": [],
+    "prior_year": {
+      "tax_year": 2024,
+      "filing_status": "married_filing_jointly",
+      "numbers": [
+        {
+          "field": "adjusted_gross_income",
+          "label": "Adjusted gross income",
+          "value": 140000
+        },
+        {
+          "field": "dependents",
+          "label": "Dependents",
+          "value": 0
+        }
+      ],
+      "members": [
+        {
+          "person_id": "HH006-P1",
+          "name": "Taylor Mock",
+          "numbers": [
+            {
+              "field": "employer",
+              "label": "Employer",
+              "value": "Adventure Works Sample"
+            },
+            {
+              "field": "wages",
+              "label": "Wages",
+              "value": 104000
+            },
+            {
+              "field": "employee_401k_contribution",
+              "label": "401(k) contribution",
+              "value": 2000
+            }
+          ]
+        },
+        {
+          "person_id": "HH006-P2",
+          "name": "Sam Mock",
+          "numbers": [
+            {
+              "field": "self_employment_income",
+              "label": "Self-employment income",
+              "value": 36000
+            }
+          ]
+        }
+      ]
+    },
+    "tags": {
+      "household": {
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "categories_flagged": [
+          "retirement",
+          "tax",
+          "cash_management",
+          "life_event"
+        ],
+        "checklist_yes": [
+          "retirement_can_improve",
+          "tax_savings_possible",
+          "excess_cash",
+          "major_changes"
+        ],
+        "checklist_not_assessed": [
+          "insurance_review",
+          "estate_review",
+          "education_review"
+        ],
+        "life_events": [
+          "life_event_new_dependent"
+        ],
+        "data_quality": [
+          "unchecked_value"
+        ]
+      },
+      "members": [
+        {
+          "person_id": "HH006-P1",
+          "name": "Taylor Mock",
+          "topics": [
+            "income",
+            "retirement",
+            "tax"
+          ],
+          "fields_present": [
+            "wages",
+            "employer",
+            "employee_401k_contribution"
+          ],
+          "documents": [
+            "hh006_1040_2025.pdf",
+            "taylor_w2_2025.pdf"
+          ],
+          "findings": [
+            "F1"
+          ],
+          "checks": {
+            "verified": 2,
+            "unconfirmed": 0,
+            "mismatch": 0,
+            "conflicted": 0,
+            "not_checked": 0
+          }
+        },
+        {
+          "person_id": "HH006-P2",
+          "name": "Sam Mock",
+          "topics": [
+            "income",
+            "tax",
+            "self_employment"
+          ],
+          "fields_present": [
+            "self_employment_income"
+          ],
+          "documents": [
+            "hh006_1040_2025.pdf"
+          ],
+          "findings": [
+            "F2"
+          ],
+          "checks": {
+            "verified": 1,
+            "unconfirmed": 0,
+            "mismatch": 0,
+            "conflicted": 0,
+            "not_checked": 0
+          }
+        }
+      ],
+      "documents": [
+        {
+          "name": "hh006_1040_2025.pdf",
+          "doc_type": "1040",
+          "doc_subtype": null,
+          "doc_type_method": "pattern",
+          "suggested_doc_type": null,
+          "topics": [
+            "income",
+            "tax"
+          ],
+          "model_tags": [
+            "tax",
+            "income"
+          ],
+          "members": [
+            {
+              "person_id": "HH006-P1",
+              "name": "Taylor Mock",
+              "role": "joint",
+              "method": "name_match"
+            },
+            {
+              "person_id": "HH006-P2",
+              "name": "Sam Mock",
+              "role": "joint",
+              "method": "name_match"
+            }
+          ],
+          "attribution_status": "assigned",
+          "status": "accepted",
+          "review_reasons": []
+        },
+        {
+          "name": "taylor_w2_2025.pdf",
+          "doc_type": "w2",
+          "doc_subtype": null,
+          "doc_type_method": "pattern",
+          "suggested_doc_type": null,
+          "topics": [
+            "income",
+            "retirement",
+            "tax"
+          ],
+          "model_tags": [
+            "income"
+          ],
+          "members": [
+            {
+              "person_id": "HH006-P1",
+              "name": "Taylor Mock",
+              "role": "owner",
+              "method": "name_match"
+            }
+          ],
+          "attribution_status": "assigned",
+          "status": "needs_review",
+          "review_reasons": [
+            "tag_uncertain:tax"
+          ]
+        }
+      ]
+    }
+  },
+  "GET /api/households/HH006/findings/F1/evidence": {
+    "household_id": "HH006",
+    "finding_id": "F1",
+    "headline": "Taylor could save more for retirement",
+    "check": "verified",
+    "values": [
+      {
+        "key": "HH006-P1.employee_401k_contribution",
+        "field": "employee_401k_contribution",
+        "label": "401(k) contribution",
+        "member": "Taylor Mock",
+        "value": 2000,
+        "check": "verified",
+        "documents": [
+          {
+            "document": "taylor_w2_2025.pdf",
+            "page": 1,
+            "value": 2000,
+            "check": "verified"
+          }
+        ]
+      },
+      {
+        "key": "HH006-P1.wages",
+        "field": "wages",
+        "label": "Wages",
+        "member": "Taylor Mock",
+        "value": 110000,
+        "check": "verified",
+        "documents": [
+          {
+            "document": "taylor_w2_2025.pdf",
+            "page": 1,
+            "value": 110000,
+            "check": "verified"
+          }
+        ]
+      }
+    ]
+  },
+  "POST /api/households/HH006/ask {question: 'can taylor save more'}": {
+    "question": "can taylor save more",
+    "understood": {
+      "intent": "savings_opportunity",
+      "person_id": "HH006-P1",
+      "member": "Taylor Mock",
+      "field": null,
+      "time_ref": "current_year",
+      "router": "keyword"
+    },
+    "answer": {
+      "type": "checklist",
+      "short": "Yes",
+      "text": "Taylor contributes $2,000 to the 401(k), 9% of the $23,500 limit. $21,500 of room is left.",
+      "dollar_impact": 21500,
+      "values": [
+        {
+          "field": "employee_401k_contribution",
+          "value": 2000,
+          "check": "verified",
+          "source_document": "taylor_w2_2025.pdf",
+          "page": 1
+        }
+      ]
+    },
+    "suggestions": []
+  },
+  "GET /api/households/HH006/rag-chunks (4 of 18 chunks)": {
+    "household_id": "HH006",
+    "chunks": [
+      {
+        "id": "HH006:household_summary:HH006",
+        "text": "Household HH006, tax year 2025, filing status married filing jointly; dependents 1 (not checked); AGI $152,000 (not checked); cash $210,000 (not checked), 16.6 months of income; mortgage interest: none on file. Status: findings, highest priority high. Flag for review, not advice.",
+        "metadata": {
+          "household_id": "HH006",
+          "person_ids": [
+            "HH006-P1",
+            "HH006-P2"
+          ],
+          "member_roles": {},
+          "doc_type": null,
+          "topics": [
+            "income",
+            "retirement",
+            "tax"
+          ],
+          "fields_present": [
+            "dependents",
+            "adjusted_gross_income",
+            "cash_balance"
+          ],
+          "tax_year": 2025,
+          "source_document": null,
+          "page": null,
+          "textract_confidence_min": 0.99,
+          "attribution_status": null,
+          "synthetic": true,
+          "chunk_type": "household_summary",
+          "checklist_id": null,
+          "answer": null,
+          "dollar_impact": null,
+          "metrics": {
+            "months_of_income": 16.6
+          },
+          "rule": null,
+          "checks": {
+            "dependents": "not_checked",
+            "adjusted_gross_income": "not_checked",
+            "cash_balance": "not_checked",
+            "mortgage_interest": "not_checked"
+          },
+          "ruleset_version": "2025.1"
+        }
+      },
+      {
+        "id": "HH006:member:HH006-P1",
+        "text": "Taylor Mock (HH006-P1), employer Adventure Works Sample (not checked). Wages $110,000 (verified against taylor_w2_2025.pdf). 401(k) contribution $2,000 (verified against taylor_w2_2025.pdf).",
+        "metadata": {
+          "household_id": "HH006",
+          "person_ids": [
+            "HH006-P1"
+          ],
+          "member_roles": {
+            "HH006-P1": [
+              "joint",
+              "owner"
+            ]
+          },
+          "doc_type": null,
+          "topics": [
+            "income",
+            "retirement",
+            "tax"
+          ],
+          "fields_present": [
+            "wages",
+            "employer",
+            "employee_401k_contribution"
+          ],
+          "tax_year": 2025,
+          "source_document": null,
+          "page": null,
+          "textract_confidence_min": 0.972,
+          "attribution_status": "assigned",
+          "synthetic": true,
+          "chunk_type": "member",
+          "checklist_id": null,
+          "answer": null,
+          "dollar_impact": null,
+          "metrics": {},
+          "rule": null,
+          "checks": {
+            "wages": "verified",
+            "employee_401k_contribution": "verified"
+          },
+          "ruleset_version": "2025.1",
+          "model_scores": {
+            "HH006-P1.wages": [
+              {
+                "document": "taylor_w2_2025.pdf",
+                "relation": "supports",
+                "supports": 0.9607,
+                "contradicts": 0.019
+              }
+            ],
+            "HH006-P1.employee_401k_contribution": [
+              {
+                "document": "taylor_w2_2025.pdf",
+                "relation": "supports",
+                "supports": 0.9777,
+                "contradicts": 0.0038
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "HH006:checklist:retirement_can_improve",
+        "text": "Can retirement savings be improved? Taylor Mock contributes $2,000 to the 401(k) (verified against taylor_w2_2025.pdf): 1.8% of $110,000 pay, 9% of the $23,500 limit, leaving $21,500 of room. Rule: a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority). Result: flagged (yes). Dollar impact: $21,500. Flag for review, not advice.",
+        "metadata": {
+          "household_id": "HH006",
+          "person_ids": [
+            "HH006-P1"
+          ],
+          "member_roles": {},
+          "doc_type": null,
+          "topics": [
+            "retirement"
+          ],
+          "fields_present": [
+            "employee_401k_contribution",
+            "wages"
+          ],
+          "tax_year": 2025,
+          "source_document": null,
+          "page": null,
+          "textract_confidence_min": 0.972,
+          "attribution_status": null,
+          "synthetic": true,
+          "chunk_type": "checklist",
+          "checklist_id": "retirement_can_improve",
+          "answer": "yes",
+          "dollar_impact": 21500,
+          "metrics": {
+            "flag_below_pct_of_limit": 50,
+            "high_below_pct_of_limit": 15,
+            "limit": 23500,
+            "members": {
+              "HH006-P1": {
+                "contribution": 2000,
+                "wages": 110000,
+                "pct_of_pay": 1.8,
+                "pct_of_limit": 9,
+                "room": 21500
+              }
+            }
+          },
+          "rule": "a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority)",
+          "checks": {
+            "HH006-P1.employee_401k_contribution": "verified",
+            "HH006-P1.wages": "verified"
+          },
+          "ruleset_version": "2025.1",
+          "model_scores": {
+            "HH006-P1.employee_401k_contribution": [
+              {
+                "document": "taylor_w2_2025.pdf",
+                "relation": "supports",
+                "supports": 0.9777,
+                "contradicts": 0.0038
+              }
+            ],
+            "HH006-P1.wages": [
+              {
+                "document": "taylor_w2_2025.pdf",
+                "relation": "supports",
+                "supports": 0.9607,
+                "contradicts": 0.019
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "HH006:finding:F1",
+        "text": "Taylor could save more for retirement. Taylor contributed $2,000 to a 401(k), 1.8% of $110,000 wages and 9% of the $23,500 limit. Values: 401(k) contribution $2,000 (verified against taylor_w2_2025.pdf); wages $110,000 (verified against taylor_w2_2025.pdf). Rule: a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority). Result: high priority retirement finding. Dollar impact: $21,500. Action: Discuss savings. Flag for review, not advice.",
+        "metadata": {
+          "household_id": "HH006",
+          "person_ids": [
+            "HH006-P1"
+          ],
+          "member_roles": {},
+          "doc_type": null,
+          "topics": [],
+          "fields_present": [
+            "employee_401k_contribution",
+            "wages"
+          ],
+          "tax_year": 2025,
+          "source_document": null,
+          "page": null,
+          "textract_confidence_min": 0.972,
+          "attribution_status": null,
+          "synthetic": true,
+          "chunk_type": "finding",
+          "checklist_id": null,
+          "answer": "high",
+          "dollar_impact": 21500,
+          "metrics": {
+            "limit": 23500,
+            "flag_below_pct_of_limit": 50,
+            "high_below_pct_of_limit": 15,
+            "contribution": 2000,
+            "wages": 110000,
+            "pct_of_pay": 1.8,
+            "pct_of_limit": 9,
+            "room": 21500
+          },
+          "rule": "a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority)",
+          "checks": {
+            "HH006-P1.employee_401k_contribution": "verified",
+            "HH006-P1.wages": "verified"
+          },
+          "ruleset_version": "2025.1",
+          "finding_type": "retirement_contribution_review",
+          "category": "retirement",
+          "model_scores": {
+            "HH006-P1.employee_401k_contribution": [
+              {
+                "document": "taylor_w2_2025.pdf",
+                "relation": "supports",
+                "supports": 0.9777,
+                "contradicts": 0.0038
+              }
+            ],
+            "HH006-P1.wages": [
+              {
+                "document": "taylor_w2_2025.pdf",
+                "relation": "supports",
+                "supports": 0.9607,
+                "contradicts": 0.019
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

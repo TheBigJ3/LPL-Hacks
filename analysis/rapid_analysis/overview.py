@@ -35,6 +35,9 @@ UNCHECKED_FIELDS = {"employer"}
 class OverviewBuild:
     overview: dict
     evidence: dict[str, dict] = field(default_factory=dict)  # finding id -> FindingEvidence dict
+    # Internal only (RAG metadata): per-value document checks incl. audit scores, and per-document decisions.
+    value_checks: dict[str, Any] = field(default_factory=dict)
+    textract_confidence: dict[str, float] = field(default_factory=dict)
 
 
 def _display(fv: FieldValue | None) -> Any:
@@ -340,4 +343,14 @@ def overview_build_household(household: Household, documents: Mapping[str, Evide
             check=finding_check(f.value_keys), values=values,
         ).model_dump(mode="json")
 
-    return OverviewBuild(overview=overview.model_dump(mode="json"), evidence=evidence)
+    value_checks = {key: [{"document": d.document, "page": d.page, "check": d.check, "model_scores": d.model_scores}
+                          for d in fc.documents] for key, fc in field_checks.items()}
+    confidence: dict[str, float] = {}
+    for key, _, fv, _ in [(f"household.{n}", n, fv, None) for n, fv in household.fields.items()] + [
+            (f"{m.person_id}.{n}", n, fv, m) for m in household.members for n, fv in m.fields.items()]:
+        if fv is not None:
+            values = [c.textract_confidence for c in (fv.candidates or [fv]) if c.textract_confidence is not None]
+            if values:
+                confidence[key] = min(values)
+    return OverviewBuild(overview=overview.model_dump(mode="json"), evidence=evidence,
+                         value_checks=value_checks, textract_confidence=confidence)

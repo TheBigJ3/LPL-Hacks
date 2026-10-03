@@ -57,9 +57,17 @@ PLACEHOLDER_REASONS = {
 CHANGE_TYPES = tuple(fid for fid, cat in FINDING_CATEGORY.items() if cat == "life_event")
 FIELD_LABELS: dict[str, str] = {name: field_label(name) for name in [*HOUSEHOLD_FIELDS, *MEMBER_FIELDS]}
 
+# The numbers each rule text quotes, always present in that checklist item's metrics.
+RULE_THRESHOLDS: dict[str, dict[str, int]] = {
+    "retirement_can_improve": {"flag_below_pct_of_limit": 50, "high_below_pct_of_limit": 15},
+    "tax_savings_possible": {"self_employment_above": 0, "early_additional_tax_pct": 10, "flag_below_withholding_pct": 10},
+    "excess_cash": {"target_months": CASH_MONTHS_TARGET, "high_above_months": CASH_MONTHS_HIGH},
+    "major_changes": {"flag_change_pct": 25, "high_at_events": LIFE_EVENTS_FOR_HIGH},
+}
+
 
 def rule_text(item_id: str, limit: float | None = None) -> str:
-    limit_text = money_format(limit) if limit else "the IRS"
+    limit_text = money_format(limit) if limit else "IRS"
     return {
         "retirement_can_improve": (f"a 401(k) contribution under 50% of the {limit_text} limit flags retirement for review "
                                    "(under 15% is high priority)"),
@@ -499,7 +507,7 @@ def rules_evaluate(household: Household, checks: Mapping[str, Check] | None = No
         a = answers.get(item_id) or _Answer("not_assessed", PLACEHOLDER_REASONS.get(item_id, "No data or rules yet"))
         checklist.append(ChecklistItem(
             id=item_id, question=question, answer=a.answer, reason=a.reason, dollar_impact=num(a.impact),
-            finding_ids=[f.id for f in a.findings], metrics=a.metrics,
+            finding_ids=[f.id for f in a.findings], metrics={**RULE_THRESHOLDS.get(item_id, {}), **a.metrics},
             rule=rule_text(item_id, limit if item_id == "retirement_can_improve" else None),
         ))
     top = max((f.priority for f in findings), key=PRIORITY_RANK.__getitem__, default=None)
