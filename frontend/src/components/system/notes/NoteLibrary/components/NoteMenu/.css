@@ -1,0 +1,54 @@
+.note-menu {
+  --note-menu-button-color: var(--color-dark-gray);
+}
+
+.note-menu__button {
+  width: 28px;
+  height: 28px;
+  color: var(--note-menu-button-color);
+  font-size: 20px;
+  transition: background-color 150ms ease;
+}
+
+.note-menu__button:hover,
+.note-menu__button[aria-expanded="true"] {
+  background: rgba(0, 0, 0, .06);
+}
+
+.note-menu__popover {
+  top: calc(100% + 4px);
+  width: 160px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-200);
+  transform-origin: top right;
+}
+
+.note-menu__item {
+  color: var(--color-main-black);
+  font-size: 14px;
+  line-height: 1;
+  transition: background-color 150ms ease;
+}
+
+.note-menu__item-danger {
+  color: var(--color-error);
+}
+
+.note-menu__item:hover {
+  background: var(--color-surface-hover);
+}
+
+.note-menu__icon {
+  font-size: 18px;
+}
+
+.note-menu__button:focus-visible,
+.note-menu__item:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-menu__button, .note-menu__item { transition: none; }
+}

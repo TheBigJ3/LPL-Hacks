@@ -36,6 +36,7 @@ export const SIDEBAR_GROUPS: SidebarTabGroup[] = [
     tabs: [
       { label: 'Clients', icon: 'groups', path: '/', end: true },
       { label: 'Documents', icon: 'description', path: '/documents' },
+      { label: 'Notes', icon: 'sticky_note_2', path: '/notes' },
       { label: 'Review queue', icon: 'fact_check', path: '/review' },
     ],
   },
@@ -131,6 +132,7 @@ const sidebarClientGetGroups = (client: SidebarClient, member: SidebarClientMemb
       tabs: [
         { label: 'Overview', icon: 'space_dashboard', path: `${base}${search}`, end: true },
         { label: 'Documents', icon: 'description', path: `${base}/documents${search}` },
+        { label: 'Notes', icon: 'sticky_note_2', path: `${base}/notes${search}` },
         { label: 'Review queue', icon: 'fact_check', path: `${base}/review${search}` },
       ],
     },

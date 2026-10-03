@@ -42,6 +42,13 @@
   --color-review-text: #8A5A00;
   --color-error: #C4314B;
 
+  --color-note-yellow: #FFF89D;
+  --color-note-pink: #FFCCD7;
+  --color-note-mint: #E8F6F2;
+  --color-note-blue: #AACEEE;
+  --color-note-mauve: #EBE0E4;
+  --color-note-gray: #E2E2E2;
+
   --spacing: 4px;
   --spacing-gutter: clamp(16px, 1.5vw + 10px, 24px);
   --spacing-section: clamp(24px, 3vw + 12px, 48px);
