@@ -42,7 +42,7 @@ const InsightChat = () => {
         </div>
         <InsightComposer busy={chat.busy} error={chat.error} onSend={chat.send} />
       </div>
-      <InsightChatList chats={chat.chats} newChatHref={chat.newChatHref} newChatSelected={chat.newChatSelected} />
+      <InsightChatList chats={chat.chats} actions={chat.chatActions} newChatHref={chat.newChatHref} newChatSelected={chat.newChatSelected} />
     </div>
   </>
 }

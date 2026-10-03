@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, jsonb, pgTable, text, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import { index, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 import type { InsightCitation, InsightMessageRole, InsightMessageStatus, InsightSource } from "@lpl-hacks/shared/src/types/native/insight/insightMessage.js";
 import { clients } from "./clients.js";
 import { timestamps } from "./general.js";
@@ -8,6 +8,8 @@ export const insightConversations = pgTable("insight_conversations", {
   id: uuid("id").primaryKey().defaultRandom(),
   clientId: uuid("client_id").notNull().references(() => clients.id, { onDelete: "cascade" }),
   advisorId: text("advisor_id").notNull(),
+  title: text("title"),
+  pinnedAt: timestamp("pinned_at", { withTimezone: true }),
   ...timestamps,
 }, (table) => [
   index("insight_conversations_client_id_idx").on(table.clientId, table.advisorId),

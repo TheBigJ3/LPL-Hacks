@@ -36,28 +36,11 @@
   text-transform: uppercase;
 }
 
-.insight-chat-list__item {
-  color: var(--color-dark-gray);
-  font-size: 14px;
-  transition: background-color 150ms ease, color 150ms ease;
-}
-
-.insight-chat-list__item:hover {
-  background: rgba(9, 9, 11, 0.04);
-  color: var(--color-main-black);
-}
-
-.insight-chat-list__item[aria-current="page"] {
-  background: rgba(9, 9, 11, 0.07);
-  color: var(--color-main-black);
-}
-
-.insight-chat-list__new:focus-visible,
-.insight-chat-list__item:focus-visible {
+.insight-chat-list__new:focus-visible {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .insight-chat-list__new, .insight-chat-list__item { transition: none; }
+  .insight-chat-list__new { transition: none; }
 }

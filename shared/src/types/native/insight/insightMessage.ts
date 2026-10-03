@@ -43,5 +43,6 @@ export type InsightConversation = {
 export type InsightConversationSummary = {
   id: string;
   title: string;
+  pinned: boolean;
   updatedAt: string;
 };

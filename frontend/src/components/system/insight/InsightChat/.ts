@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router'
 import type { InsightMessage } from '@lpl-hacks/shared/src/types/native/insight/insightMessage'
 import type { Response as InsightGetResponse } from '@lpl-hacks/shared/src/types/native/api/v1/insight/get'
+import type { Response as InsightListResponse } from '@lpl-hacks/shared/src/types/native/api/v1/insight/list'
+import type { InsightConversationSummary } from '@lpl-hacks/shared/src/types/native/insight/insightMessage'
 import insightProgress from '@lpl-hacks/shared/src/types/native/sockets/insight/progress'
 import insightSettled from '@lpl-hacks/shared/src/types/native/sockets/insight/settled'
 import insightWatch from '@lpl-hacks/shared/src/types/native/sockets/insight/watch'
@@ -9,6 +11,9 @@ import listClientsApi from '@api/clients/listClientsApi'
 import askInsightApi from '@api/insight/askInsightApi'
 import getInsightApi from '@api/insight/getInsightApi'
 import listInsightApi from '@api/insight/listInsightApi'
+import deleteInsightApi from '@api/insight/deleteInsightApi'
+import pinInsightApi from '@api/insight/pinInsightApi'
+import renameInsightApi from '@api/insight/renameInsightApi'
 import { apiPostRequest, useApiGetQuery } from '@features/apiLayer'
 import { queryClient } from '@features/queryClient'
 import { socketWatch, useSocketEvent } from '@stores/socketStore'
@@ -27,6 +32,17 @@ export type InsightChatListItem = {
   title: string
   href: string
   selected: boolean
+  pinned: boolean
+}
+
+export type InsightChatActions = {
+  rename: (id: string, title: string) => void
+  togglePin: (id: string) => void
+  remove: (id: string) => void
+}
+
+function insightSortChats(chats: InsightConversationSummary[]): InsightConversationSummary[] {
+  return [...chats].sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.updatedAt.localeCompare(a.updatedAt))
 }
 
 function insightChatHref(searchParams: URLSearchParams, chatId: string | null): string {
@@ -138,11 +154,50 @@ export function useInsightChat() {
     title: summary.title,
     href: insightChatHref(searchParams, summary.id),
     selected: summary.id === chatId,
+    pinned: summary.pinned,
   }))
+
+  function updateChats(update: (chats: InsightConversationSummary[]) => InsightConversationSummary[]) {
+    queryClient.setQueryData<InsightListResponse>([listInsightApi.identifier, listParams], (current) =>
+      current ? { ...current, conversations: insightSortChats(update(current.conversations)) } : current)
+  }
+
+  async function settleChats(result: { success: boolean, error?: { message: string } }) {
+    if (!result.success) setError(result.error?.message ?? null)
+    await queryClient.invalidateQueries({ queryKey: [listInsightApi.identifier, listParams] })
+  }
+
+  async function renameChat(id: string, title: string) {
+    const trimmed = title.trim()
+    const current = listQuery.data?.conversations.find((chat) => chat.id === id)
+    if (!trimmed || trimmed === current?.title) return
+    updateChats((list) => list.map((chat) => chat.id === id ? { ...chat, title: trimmed } : chat))
+    await settleChats(await apiPostRequest(renameInsightApi, { conversationId: id, title: trimmed }))
+  }
+
+  async function togglePinChat(id: string) {
+    const pinned = !listQuery.data?.conversations.find((chat) => chat.id === id)?.pinned
+    updateChats((list) => list.map((chat) => chat.id === id ? { ...chat, pinned } : chat))
+    await settleChats(await apiPostRequest(pinInsightApi, { conversationId: id, pinned }))
+  }
+
+  async function removeChat(id: string) {
+    updateChats((list) => list.filter((chat) => chat.id !== id))
+    if (id === chatId) setSearchParams(insightChatHref(searchParams, null).slice(1))
+    queryClient.removeQueries({ queryKey: [getInsightApi.identifier, { clientId: client?.id ?? '', conversationId: id }] })
+    await settleChats(await apiPostRequest(deleteInsightApi, { conversationId: id }))
+  }
+
+  const chatActions: InsightChatActions = {
+    rename: (id, title) => void renameChat(id, title),
+    togglePin: (id) => void togglePinChat(id),
+    remove: (id) => void removeChat(id),
+  }
 
   return {
     clientSelected: !!clientSlug,
     chats,
+    chatActions,
     newChatHref: insightChatHref(searchParams, null),
     newChatSelected: !chatId,
     loading: clientsQuery.isPending || (!!client && !!chatId && conversationQuery.isPending),

@@ -43,6 +43,13 @@
       "when": 1791032420424,
       "tag": "0005_insight",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791035955501,
+      "tag": "0006_insight_chat_titles_pins",
+      "breakpoints": true
     }
   ]
 }

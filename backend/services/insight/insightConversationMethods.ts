@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, lt, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, lt, sql, type SQL } from "drizzle-orm";
 import type { InsightConversation, InsightConversationSummary, InsightMessage } from "@lpl-hacks/shared/src/types/native/insight/insightMessage.js";
 import { db } from "../../loaders/postgresLoader.js";
 import { AppError } from "../../modules/AppError.js";
@@ -31,23 +31,65 @@ export function insightMessageToView(record: InsightMessageRecord): InsightMessa
   };
 }
 
-export async function insightConversationList(advisorId: string, clientId: string): Promise<InsightConversationSummary[]> {
-  const records = await db.select({
+function insightConversationSelectSummaries(where: SQL) {
+  return db.select({
     id: insightConversations.id,
+    title: insightConversations.title,
+    pinnedAt: insightConversations.pinnedAt,
     updatedAt: insightConversations.updatedAt,
     // Drizzle drops table names from columns in a single-table select, so the subquery qualifies its own.
-    title: sql<string | null>`(select first_question.text from ${insightMessages} as first_question where first_question.conversation_id = ${insightConversations}.id and first_question.role = 'user' order by first_question.created_at limit 1)`,
+    firstQuestion: sql<string | null>`(select first_question.text from ${insightMessages} as first_question where first_question.conversation_id = ${insightConversations}.id and first_question.role = 'user' order by first_question.created_at limit 1)`,
   })
     .from(insightConversations)
-    .where(and(eq(insightConversations.clientId, clientId), eq(insightConversations.advisorId, advisorId)))
-    .orderBy(desc(insightConversations.updatedAt))
+    .where(where);
+}
+
+function insightConversationToSummary(record: Awaited<ReturnType<typeof insightConversationSelectSummaries>>[number]): InsightConversationSummary {
+  return {
+    id: record.id,
+    title: record.title ?? insightConversationTitle(record.firstQuestion ?? ""),
+    pinned: record.pinnedAt !== null,
+    updatedAt: record.updatedAt.toISOString(),
+  };
+}
+
+function insightConversationOwned(advisorId: string, conversationId: string): SQL {
+  return and(eq(insightConversations.id, conversationId), eq(insightConversations.advisorId, advisorId))!;
+}
+
+export async function insightConversationList(advisorId: string, clientId: string): Promise<InsightConversationSummary[]> {
+  const records = await insightConversationSelectSummaries(and(eq(insightConversations.clientId, clientId), eq(insightConversations.advisorId, advisorId))!)
+    .orderBy(sql`${insightConversations.pinnedAt} desc nulls last`, desc(insightConversations.updatedAt))
     .limit(LIST_LIMIT);
 
-  return records.map((record) => ({
-    id: record.id,
-    title: insightConversationTitle(record.title ?? ""),
-    updatedAt: record.updatedAt.toISOString(),
-  }));
+  return records.map(insightConversationToSummary);
+}
+
+// Renaming or pinning isn't using the chat, so it keeps its place among recent chats.
+async function insightConversationSetDetails(advisorId: string, conversationId: string, details: { title?: string; pinnedAt?: Date | null }): Promise<InsightConversationSummary> {
+  const updated = await db.update(insightConversations)
+    .set({ ...details, updatedAt: sql`${insightConversations.updatedAt}` })
+    .where(insightConversationOwned(advisorId, conversationId))
+    .returning({ id: insightConversations.id });
+  if (updated.length === 0) throw new AppError(INSIGHT_ERRORS.CONVERSATION_NOT_FOUND);
+
+  const [record] = await insightConversationSelectSummaries(eq(insightConversations.id, conversationId));
+  return insightConversationToSummary(record!);
+}
+
+export function insightConversationRename(advisorId: string, conversationId: string, title: string): Promise<InsightConversationSummary> {
+  return insightConversationSetDetails(advisorId, conversationId, { title });
+}
+
+export function insightConversationPin(advisorId: string, conversationId: string, pinned: boolean): Promise<InsightConversationSummary> {
+  return insightConversationSetDetails(advisorId, conversationId, { pinnedAt: pinned ? new Date() : null });
+}
+
+export async function insightConversationDelete(advisorId: string, conversationId: string): Promise<void> {
+  const deleted = await db.delete(insightConversations)
+    .where(insightConversationOwned(advisorId, conversationId))
+    .returning({ id: insightConversations.id });
+  if (deleted.length === 0) throw new AppError(INSIGHT_ERRORS.CONVERSATION_NOT_FOUND);
 }
 
 function insightConversationTitle(question: string): string {
