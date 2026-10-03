@@ -1,0 +1,73 @@
+{
+  "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+  "household_id": "HH003",
+  "tax_year": 2025,
+  "filing_status": "Single",
+  "adjusted_gross_income": {
+    "value": 81000,
+    "source_document": "hh003_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.984,
+    "verified": false
+  },
+  "dependents": 0,
+  "cash_balance": {
+    "value": 19000,
+    "source_document": "hh003_bank_statement_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "members": [
+    {
+      "person_id": "HH003-P1",
+      "name": "Morgan Lee",
+      "employer": {
+        "value": "Tailspin Sample Toys",
+        "source_document": "morgan_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.99,
+        "verified": false
+      },
+      "wages": {
+        "value": 92000,
+        "source_document": "morgan_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.982,
+        "verified": false
+      },
+      "employee_401k_contribution": {
+        "value": 18500,
+        "source_document": "morgan_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.975,
+        "verified": false
+      },
+      "hsa_contribution": {
+        "value": 4300,
+        "source_document": "morgan_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.971,
+        "verified": false
+      },
+      "hsa_eligible_health_plan": null
+    }
+  ],
+  "documents": [
+    {
+      "name": "morgan_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "hh003_1040_2025.pdf",
+      "type": "1040",
+      "date": "2026-04-05"
+    },
+    {
+      "name": "hh003_bank_statement_2025.pdf",
+      "type": "account_statement",
+      "date": "2025-12-31"
+    }
+  ]
+}

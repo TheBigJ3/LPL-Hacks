@@ -1,0 +1,65 @@
+{
+  "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+  "household_id": "HH008",
+  "tax_year": 2025,
+  "filing_status": "single",
+  "adjusted_gross_income": {
+    "value": 81000,
+    "source_document": "hh008_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.983,
+    "verified": false
+  },
+  "dependents": 0,
+  "cash_balance": {
+    "value": 15000,
+    "source_document": "hh008_bank_statement_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "members": [
+    {
+      "person_id": "HH008-P1",
+      "name": "Quinn Harper",
+      "employer": {
+        "value": "Margie's Sample Travel",
+        "source_document": "quinn_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.99,
+        "verified": false
+      },
+      "wages": {
+        "value": 88000,
+        "source_document": "quinn_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.98,
+        "verified": false
+      },
+      "employee_401k_contribution": {
+        "value": 8800,
+        "source_document": "quinn_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.975,
+        "verified": false
+      }
+    }
+  ],
+  "documents": [
+    {
+      "name": "quinn_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "hh008_1040_2025.pdf",
+      "type": "1040",
+      "date": "2026-04-03"
+    },
+    {
+      "name": "hh008_bank_statement_2025.pdf",
+      "type": "account_statement",
+      "date": "2025-12-31"
+    }
+  ]
+}

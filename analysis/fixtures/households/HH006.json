@@ -1,0 +1,90 @@
+{
+  "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+  "household_id": "HH006",
+  "tax_year": 2025,
+  "filing_status": "married_filing_jointly",
+  "adjusted_gross_income": 152000,
+  "dependents": 1,
+  "cash_balance": {
+    "value": 210000,
+    "source_document": "hh006_bank_statement_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "members": [
+    {
+      "person_id": "HH006-P1",
+      "name": "Taylor Mock",
+      "employer": {
+        "value": "Adventure Works Sample",
+        "source_document": "taylor_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.99,
+        "verified": false
+      },
+      "wages": {
+        "value": 110000,
+        "source_document": "taylor_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.981,
+        "verified": false
+      },
+      "employee_401k_contribution": {
+        "value": 2000,
+        "source_document": "taylor_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.972,
+        "verified": false
+      }
+    },
+    {
+      "person_id": "HH006-P2",
+      "name": "Sam Mock",
+      "self_employment_income": {
+        "value": 48000,
+        "source_document": "hh006_1040_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.97,
+        "verified": false
+      }
+    }
+  ],
+  "documents": [
+    {
+      "name": "taylor_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "hh006_1040_2025.pdf",
+      "type": "1040",
+      "date": "2026-04-14"
+    },
+    {
+      "name": "hh006_bank_statement_2025.pdf",
+      "type": "account_statement",
+      "date": "2025-12-31"
+    }
+  ],
+  "prior_year": {
+    "tax_year": 2024,
+    "filing_status": "married_filing_jointly",
+    "adjusted_gross_income": 140000,
+    "dependents": 0,
+    "members": [
+      {
+        "person_id": "HH006-P1",
+        "name": "Taylor Mock",
+        "employer": "Adventure Works Sample",
+        "wages": 104000,
+        "employee_401k_contribution": 2000
+      },
+      {
+        "person_id": "HH006-P2",
+        "name": "Sam Mock",
+        "self_employment_income": 36000
+      }
+    ]
+  }
+}
