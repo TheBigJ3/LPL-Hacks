@@ -61,11 +61,13 @@ export function retrievalChunkFromResult(result: KnowledgeBaseRetrievalResult): 
     text,
     score: result.score ?? null,
     citation: { documentId, sectionId, page: retrievalChunkReadNumber(metadata.page) },
+    sourceType: metadata.sourceType === "note" ? "note" : "document",
     clientId,
     fileName: retrievalChunkReadString(metadata.fileName),
     docType: retrievalChunkReadString(metadata.docType),
     tags: retrievalChunkReadStrings(metadata.tags),
     familyMembers: retrievalChunkReadStrings(metadata.familyMembers),
     taxYear: retrievalChunkReadNumber(metadata.taxYear),
+    date: retrievalChunkReadString(metadata.date),
   };
 }

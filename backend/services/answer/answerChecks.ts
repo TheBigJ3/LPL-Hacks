@@ -67,6 +67,7 @@ function answerCheckCitations(sourceIds: string[], sources: AnswerSource[]): Ans
     .map((source) => ({
       documentId: source.chunk.citation.documentId,
       sectionId: source.chunk.citation.sectionId,
+      sourceType: source.chunk.sourceType,
       page: source.chunk.citation.page,
       fileName: source.chunk.fileName,
       quote: source.quote,

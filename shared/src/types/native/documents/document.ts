@@ -1,4 +1,4 @@
-import type { DocumentIndexStatus, DocumentTagStatus } from "./documentTagging.js";
+import type { DocumentIndexStatus, DocumentTagging, DocumentTagStatus } from "./documentTagging.js";
 
 export type DocumentStatus = "uploaded" | "extracting" | "extracted" | "failed";
 
@@ -11,4 +11,9 @@ export type Document = {
   tagStatus: DocumentTagStatus | null;
   tagFailureMessage: string | null;
   indexStatus: DocumentIndexStatus | null;
+};
+
+export type DocumentListItem = Document & {
+  createdAt: string;
+  tagging: DocumentTagging | null;
 };

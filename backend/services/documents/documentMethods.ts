@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
 import type { Readable } from "stream";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
-import type { Document } from "@lpl-hacks/shared/src/types/native/documents/document.js";
+import { and, desc, eq, getTableColumns, inArray, isNull, ne, or } from "drizzle-orm";
+import type { Document, DocumentListItem } from "@lpl-hacks/shared/src/types/native/documents/document.js";
 import type { DocumentReview, DocumentReviewField } from "@lpl-hacks/shared/src/types/native/documents/documentReview.js";
 import type { DocumentTagging } from "@lpl-hacks/shared/src/types/native/documents/documentTagging.js";
 import type { ExtractedAnalysis } from "@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis.js";
@@ -13,6 +13,7 @@ import { AppError } from "../../modules/AppError.js";
 import { isForeignKeyViolation } from "../../modules/pgError.js";
 import type { UploadRequest } from "../../modules/readUploadRequest.js";
 import { socketRoom } from "../../modules/socketRoom.js";
+import { clients } from "../../schemas/clients.js";
 import { documents } from "../../schemas/documents.js";
 import { CLIENT_ERRORS } from "../../types/native/clients/errors.js";
 import { DOCUMENT_ERRORS } from "../../types/native/documents/errors.js";
@@ -113,6 +114,20 @@ export async function documentConfirm(documentId: string, fields: Record<string,
   if (!updated) throw new AppError(DOCUMENT_ERRORS.TAGGING_IN_PROGRESS);
 
   return { document: documentToView(updated), reviewedAt: reviewedAt.toISOString() };
+}
+
+export async function documentList(advisorId: string, clientId: string): Promise<DocumentListItem[]> {
+  const rows = await db.select({ record: getTableColumns(documents) })
+    .from(documents)
+    .innerJoin(clients, eq(clients.id, documents.clientId))
+    .where(and(eq(documents.clientId, clientId), eq(clients.advisorId, advisorId)))
+    .orderBy(desc(documents.createdAt));
+
+  return rows.map(({ record }) => ({
+    ...documentToView(record),
+    createdAt: record.createdAt.toISOString(),
+    tagging: record.tagging ?? null,
+  }));
 }
 
 export async function documentGetRecord(documentId: string): Promise<DocumentRecord | null> {

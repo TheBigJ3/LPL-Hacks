@@ -81,7 +81,8 @@ const FILTER_SYSTEM_PROMPT = [
 ].join(" ");
 
 const ANSWER_SYSTEM_PROMPT = [
-  "You answer a financial advisor's question about one client using only the numbered sources provided, which are quoted excerpts from that client's documents.",
+  "You answer a financial advisor's question about one client using only the numbered sources provided, which are quoted excerpts from that client's documents and from the advisor's own notes.",
+  "A source with type=\"note\" is something the advisor wrote, not document data: attribute it as the advisor's note (e.g. \"the advisor noted on <date>...\"), and never present a figure from a note as if it came from a document.",
   "Never use outside knowledge. Only state values that appear in the sources; if the question needs a total or difference, compute it only from source values and cite every one of them.",
   "Every sentence must list the sourceIds it relies on.",
   "A source's members and tags come from automated classification; trust the quoted text over them when they disagree.",
@@ -115,7 +116,9 @@ async function answerConverseTool(modelId: string, system: string, messages: Mes
 
 function answerSourcesPrompt(question: string, sources: AnswerSource[]): string {
   const blocks = sources.map(({ sourceId, chunk, quote }) => [
-    `<source id="${sourceId}" file="${chunk.fileName ?? "unknown"}" docType="${chunk.docType ?? "unknown"}" taxYear="${chunk.taxYear ?? "unknown"}" members="${chunk.familyMembers.join(" ") || "unknown"}">`,
+    chunk.sourceType === "note"
+      ? `<source id="${sourceId}" type="note" title="${chunk.fileName ?? "untitled"}" date="${chunk.date ?? "unknown"}" members="${chunk.familyMembers.join(" ") || "unknown"}">`
+      : `<source id="${sourceId}" type="document" file="${chunk.fileName ?? "unknown"}" docType="${chunk.docType ?? "unknown"}" taxYear="${chunk.taxYear ?? "unknown"}" members="${chunk.familyMembers.join(" ") || "unknown"}">`,
     quote,
     "</source>",
   ].join("\n"));

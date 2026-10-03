@@ -20,12 +20,26 @@ const CHUNK = {
   text: JSON.stringify({ documentId: "doc-1", sectionId: "document", text: "Wages: 100.00" }),
   score: 0.5,
   citation: { documentId: "doc-1", sectionId: "document", page: null },
+  sourceType: "document" as const,
   clientId: "h-1",
   fileName: "w2.pdf",
   docType: "w2",
   tags: ["tag_tax"],
   familyMembers: [],
   taxYear: 2025,
+  date: null,
+};
+
+const NOTE_CHUNK = {
+  ...CHUNK,
+  text: JSON.stringify({ title: "Roth conversion", body_text: "Wants to revisit the Roth conversion." }),
+  citation: { documentId: "note-1", sectionId: "note", page: null },
+  sourceType: "note" as const,
+  fileName: "Roth conversion",
+  docType: null,
+  tags: [],
+  taxYear: null,
+  date: "2026-10-03T14:05:00.000Z",
 };
 
 function toolReply(input: unknown) {
@@ -53,9 +67,22 @@ describe("answerAsk", () => {
     expect([modelOf(0), modelOf(1)]).toEqual(["filter-model", "answer-model"]);
     expect(result).toEqual({
       answerable: true,
-      statements: [{ text: "Wages were 100.", citations: [{ documentId: "doc-1", sectionId: "document", page: null, fileName: "w2.pdf", quote: "Wages: 100.00", verified: false }] }],
+      statements: [{ text: "Wages were 100.", citations: [{ documentId: "doc-1", sectionId: "document", sourceType: "document", page: null, fileName: "w2.pdf", quote: "Wages: 100.00", verified: false }] }],
       filters: { clientId: "h-1", taxYear: 2025 },
     });
+  });
+
+  it("frames an advisor note as a note and cites it as one", async () => {
+    send
+      .mockResolvedValueOnce(toolReply({ taxYear: null }))
+      .mockResolvedValueOnce(toolReply({ answerable: true, statements: [{ text: "The advisor noted a Roth review.", sourceIds: ["S1"] }] }));
+    retrievalChunkSearch.mockResolvedValue([NOTE_CHUNK]);
+
+    const result = await answerAsk("What's planned for the Roth?", "h-1");
+
+    const prompt = send.mock.calls[1]![0].input.messages[0].content[0].text;
+    expect(prompt).toContain('<source id="S1" type="note" title="Roth conversion" date="2026-10-03T14:05:00.000Z"');
+    expect(result.statements[0]!.citations[0]).toMatchObject({ documentId: "note-1", sectionId: "note", sourceType: "note", fileName: "Roth conversion" });
   });
 
   it("retries with only the client when the narrowed search finds nothing", async () => {

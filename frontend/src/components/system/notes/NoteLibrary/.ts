@@ -1,11 +1,19 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useParams, useSearchParams } from 'react-router'
 import type { Variants } from 'motion/react'
 import type { Client } from '@lpl-hacks/shared/src/types/native/clients/client'
+import type { Note, NoteColor } from '@lpl-hacks/shared/src/types/native/notes/note'
+import type { Response as NoteListResponse } from '@lpl-hacks/shared/src/types/native/api/v1/notes/list'
 import listClientsApi from '@api/clients/listClientsApi'
-import { useApiGetQuery } from '@features/apiLayer'
+import createNoteApi from '@api/notes/createNoteApi'
+import deleteNoteApi from '@api/notes/deleteNoteApi'
+import listNotesApi from '@api/notes/listNotesApi'
+import updateNoteApi from '@api/notes/updateNoteApi'
+import { apiPostRequest, useApiGetQuery } from '@features/apiLayer'
+import { queryClient } from '@features/queryClient'
+import { NOTE_ERRORS } from '@typings/native/notes/errors'
 
-export type NoteColor = 'yellow' | 'pink' | 'mint' | 'blue' | 'mauve' | 'gray'
+export type { NoteColor }
 
 export type NoteView = 'grid' | 'list'
 
@@ -44,17 +52,6 @@ export type NoteCardView = {
   color: NoteColor
 }
 
-type NoteRecord = {
-  id: string
-  clientId: string
-  memberId: string | null
-  title: string
-  body: string
-  html: string
-  createdAt: Date
-  color: NoteColor
-}
-
 const NOTE_UNTITLED = 'Untitled note'
 
 export const NOTE_COLOR_OPTIONS: { color: NoteColor; label: string }[] = [
@@ -67,29 +64,6 @@ export const NOTE_COLOR_OPTIONS: { color: NoteColor; label: string }[] = [
 ]
 
 const NOTE_COLORS: NoteColor[] = ['yellow', 'pink', 'mint', 'blue', 'mauve', 'blue', 'yellow', 'gray']
-
-const NOTE_DEMO_CONTENT: [string, string][] = [
-  ['Mr. Johnson has a couple key notes to go over next meeting.', 'Wants to revisit the Roth conversion plan and confirm the beneficiary updates on the IRA before year end.'],
-  ['Follow up on 2025 tax documents', 'Still missing the 1099-B from the brokerage account and the K-1 from the rental partnership.'],
-  ['College savings for the kids', 'Discussed bumping 529 contributions once the mortgage refinance closes. Run projections for both plans.'],
-  ['Estate plan review', 'Trust was last updated in 2019. Suggest a meeting with their attorney to review successor trustees.'],
-  ['Insurance coverage check', 'Umbrella policy may be under-insured after the home purchase. Request current declarations page.'],
-  ['Rebalance before Q4', 'Equity allocation drifted to 72%. Target is 65/35; harvest losses in the taxable account first.'],
-  ['RMD reminder', 'First required minimum distribution due next year. Confirm withholding preference.'],
-  ['Cash flow questions', 'Asked about setting up a monthly ACH from the brokerage account to cover living expenses.'],
-]
-
-const NOTE_DEMO_OWNERS: [string, string | null][] = [
-  ['johnson', null], ['johnson', 'jess'], ['patel', null], ['johnson', 'michelle'],
-  ['dana-whitfield', null], ['johnson', 'adam'], ['nguyen', 'linh'], ['johnson', null],
-  ['marcus-reed', null], ['johnson', 'kim'], ['garcia', 'sofia'], ['patel', 'priya'],
-  ['elena-rossi', null], ['kenji-sato', null], ['nguyen', null], ['garcia', null],
-]
-
-const NOTE_DEMO_PER_OWNER = 3
-
-const NOTE_DAY_MS = 86_400_000
-const NOTE_DEMO_LATEST = Date.UTC(2026, 8, 24, 22, 36)
 
 const NOTE_DATE_FORMAT = new Intl.DateTimeFormat('en-US', { month: 'numeric', day: 'numeric', year: '2-digit', timeZone: 'UTC' })
 const NOTE_TIME_FORMAT = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'UTC' })
@@ -116,49 +90,37 @@ export const NOTE_LIBRARY_VIEW_VARIANTS: Variants = {
   exit: { opacity: 0, transition: { duration: 0.14, ease: 'easeInOut' } },
 }
 
-const NOTE_DEMO_RECORDS: NoteRecord[] = Array.from({ length: NOTE_DEMO_OWNERS.length * NOTE_DEMO_PER_OWNER }, (_, index) => {
-  const [clientId, memberId] = NOTE_DEMO_OWNERS[index % NOTE_DEMO_OWNERS.length]
-  const [title, body] = NOTE_DEMO_CONTENT[(index * 3) % NOTE_DEMO_CONTENT.length]
-  return {
-    id: `note-${index + 1}`,
-    clientId,
-    memberId,
-    title,
-    body,
-    html: `<p>${body}</p>`,
-    createdAt: new Date(NOTE_DEMO_LATEST - index * NOTE_DAY_MS),
-    color: NOTE_COLORS[index % NOTE_COLORS.length],
-  }
-})
-
 const noteFormatDate = (date: Date) => `${NOTE_DATE_FORMAT.format(date)} ${NOTE_TIME_FORMAT.format(date).replace(' ', '').toLowerCase()}`
 
-const noteGetMemberLabel = (record: NoteRecord, client: Client | null) =>
-  client?.members.find((member) => member.slug === record.memberId)?.name ?? client?.name ?? 'Household'
+const noteGetMemberLabel = (record: Note, client: Client | null) =>
+  client?.members.find((member) => member.id === record.memberId)?.name ?? client?.name ?? 'Household'
 
-const noteBuildCard = (record: NoteRecord, client: Client | null): NoteCardView => {
+const noteBuildCard = (record: Note, client: Client | null): NoteCardView => {
   const member = noteGetMemberLabel(record, client)
   return {
     id: record.id,
     member,
     memberInitial: member.charAt(0).toUpperCase(),
     title: record.title,
-    body: record.body,
-    date: noteFormatDate(record.createdAt),
+    body: record.text,
+    date: noteFormatDate(new Date(record.createdAt)),
     color: record.color,
   }
 }
 
-const noteMatchesQuery = (record: NoteRecord, client: Client | null, needle: string) =>
-  [record.title, record.body, noteGetMemberLabel(record, client)].some((field) => field.toLowerCase().includes(needle))
+const noteMatchesQuery = (record: Note, client: Client | null, needle: string) =>
+  [record.title, record.text, noteGetMemberLabel(record, client)].some((field) => field.toLowerCase().includes(needle))
 
 export function useNoteLibrary() {
   const { clientId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
-  const memberId = searchParams.get('member')
+  const memberSlug = searchParams.get('member')
   const query = (searchParams.get(NOTE_SEARCH_PARAM) ?? '').trim()
   const clientsQuery = useApiGetQuery(listClientsApi)
   const client = clientsQuery.data?.clients.find((item) => item.slug === clientId) ?? null
+  const member = client?.members.find((item) => item.slug === memberSlug) ?? null
+  const listParams = { clientId: client?.id ?? '' }
+  const notesQuery = useApiGetQuery(listNotesApi, listParams, { enabled: !!client })
   const view: NoteView = searchParams.get(NOTE_VIEW_PARAM) === 'list' ? 'list' : 'grid'
 
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -167,13 +129,14 @@ export function useNoteLibrary() {
   const [editorSession, setEditorSession] = useState(0)
   const [seenViews, setSeenViews] = useState<NoteView[]>([view])
   const [staggerView, setStaggerView] = useState<NoteView | null>(view)
-  const [records, setRecords] = useState(NOTE_DEMO_RECORDS)
+  const [error, setError] = useState<string | null>(null)
   const [viewedClientId, setViewedClientId] = useState(clientId)
   if (clientId !== viewedClientId) {
     setViewedClientId(clientId)
     setSeenViews([view])
     setStaggerView(view)
     setEditorOpen(false)
+    setError(null)
   }
 
   const [draft, setDraft] = useState(query)
@@ -183,11 +146,9 @@ export function useNoteLibrary() {
     setDraft(query)
   }
 
-  const nextIdRef = useRef(1)
-
   useEffect(() => {
     document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [clientId, memberId])
+  }, [clientId, memberSlug])
 
   const updateParam = (key: string, value: string | null) => {
     setSearchParams((params) => {
@@ -200,7 +161,8 @@ export function useNoteLibrary() {
 
   const applySearch = (value: string) => updateParam(NOTE_SEARCH_PARAM, value || null)
 
-  const scoped = records.filter((record) => record.clientId === clientId && (!memberId || record.memberId === memberId))
+  const records = notesQuery.data?.notes ?? []
+  const scoped = member ? records.filter((record) => record.memberId === member.id) : records
   const visible = query ? scoped.filter((record) => noteMatchesQuery(record, client, query.toLowerCase())) : scoped
 
   const editing = editingId ? scoped.find((record) => record.id === editingId) ?? null : null
@@ -212,22 +174,34 @@ export function useNoteLibrary() {
     setEditorOpen(true)
   }
 
-  // Demo only: notes live in memory until a notes API exists.
-  const saveNote = (saved: NoteSaved) => {
-    const fields = { title: saved.title.trim() || NOTE_UNTITLED, body: saved.text.trim(), html: saved.html, color: saved.color, memberId: saved.memberId }
-    if (!clientId) return
-    if (editing) {
-      setRecords((current) => current.map((record) => record.id === editing.id ? { ...record, ...fields } : record))
-    } else {
-      const id = `${clientId}-new-${nextIdRef.current++}`
-      setRecords((current) => [{
-        id,
-        clientId,
-        ...fields,
-        createdAt: new Date(),
-      }, ...current])
-      if (query) applySearch('')
+  const setCachedNotes = (change: (notes: Note[]) => Note[]) =>
+    queryClient.setQueryData<NoteListResponse>([listNotesApi.identifier, listParams], (current) =>
+      current && { ...current, notes: change(current.notes) })
+
+  const saveNote = async (saved: NoteSaved) => {
+    if (!client) return
+    setError(null)
+    const fields = {
+      title: saved.title.trim() || NOTE_UNTITLED,
+      html: saved.html,
+      text: saved.text.trim(),
+      color: saved.color,
+      memberId: client.members.find((item) => item.slug === saved.memberId)?.id ?? null,
     }
+    const res = editing
+      ? await apiPostRequest(updateNoteApi, { noteId: editing.id, ...fields })
+      : await apiPostRequest(createNoteApi, { clientId: client.id, ...fields })
+    if (!res.success) return setError(res.error.message)
+    const note = res.data.note
+    setCachedNotes((notes) => editing ? notes.map((item) => item.id === note.id ? note : item) : [note, ...notes])
+    if (!editing && query) applySearch('')
+  }
+
+  const deleteNote = async (id: string) => {
+    setError(null)
+    const res = await apiPostRequest(deleteNoteApi, { noteId: id })
+    if (!res.success) return setError(res.error.message)
+    setCachedNotes((notes) => notes.filter((item) => item.id !== id))
   }
 
   return {
@@ -243,7 +217,7 @@ export function useNoteLibrary() {
     itemVariants: staggerView === view ? NOTE_ITEM_ENTRY_VARIANTS : undefined,
     notes: visible.map((record) => noteBuildCard(record, client)),
     query,
-    search: <NoteSearch>{
+    search: {
       draft,
       setDraft,
       showClear: !!query && draft.trim() === query,
@@ -258,7 +232,7 @@ export function useNoteLibrary() {
         setDraft('')
         applySearch('')
       },
-    },
+    } satisfies NoteSearch,
     createNote: () => openEditor(null, true),
     editNote: (id: string) => openEditor(id, true),
     viewNote: (id: string) => openEditor(id, false),
@@ -266,20 +240,22 @@ export function useNoteLibrary() {
       open: editorOpen,
       key: editorSession,
       startsEditing: editorStartsEditing,
-      draft: <NoteDraft>{
+      draft: {
         title: editing?.title ?? '',
         html: editing?.html ?? '',
         color: editing?.color ?? NOTE_COLORS[scoped.length % NOTE_COLORS.length],
-        memberId: editing ? editing.memberId : memberId,
-      },
-      members: <NoteMemberOption[]>[
+        memberId: editing ? client?.members.find((item) => item.id === editing.memberId)?.slug ?? null : memberSlug,
+      } satisfies NoteDraft,
+      members: [
         { id: null, label: client?.name ?? 'Household' },
-        ...(client?.members.map((member) => ({ id: member.slug, label: member.name })) ?? []),
-      ],
-      save: saveNote,
+        ...(client?.members.map((item) => ({ id: item.slug, label: item.name })) ?? []),
+      ] satisfies NoteMemberOption[],
+      save: (saved: NoteSaved) => void saveNote(saved),
       close: () => setEditorOpen(false),
     },
-    deleteNote: (id: string) => setRecords((current) => current.filter((record) => record.id !== id)),
+    deleteNote: (id: string) => void deleteNote(id),
+    loading: clientsQuery.isPending || (!!client && notesQuery.isPending),
+    error: error ?? (notesQuery.isError ? NOTE_ERRORS.LOAD_FAILED.MESSAGE : null),
     empty: query
       ? { title: `No notes match “${query}”`, subtitle: 'Try a different search' }
       : { title: 'No notes yet', subtitle: 'Create one to get started' },

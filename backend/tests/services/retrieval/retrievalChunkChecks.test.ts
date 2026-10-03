@@ -27,13 +27,21 @@ describe("retrievalChunkFromResult", () => {
       text: "body",
       score: 0.4,
       citation: { documentId: "doc-1", sectionId: "document", page: null },
+      sourceType: "document",
       clientId: "h-1",
       fileName: "w2.pdf",
       docType: "w2",
       tags: ["tag_tax"],
       familyMembers: ["member_a"],
       taxYear: 2025,
+      date: null,
     });
+  });
+
+  it("marks a note as a note and keeps its date", () => {
+    const chunk = retrievalChunkFromResult({ content: { text: "body" }, metadata: { ...METADATA, sourceType: "note", date: "2026-10-03T14:05:00.000Z" } });
+
+    expect(chunk).toMatchObject({ sourceType: "note", date: "2026-10-03T14:05:00.000Z" });
   });
 
   it.each([

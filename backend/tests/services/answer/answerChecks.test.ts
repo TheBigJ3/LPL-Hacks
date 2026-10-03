@@ -10,7 +10,7 @@ import {
 
 function chunk(documentId: string, sectionId: string, quote: string) {
   const text = JSON.stringify({ documentId, sectionId, text: quote });
-  return { text, score: 0.5, citation: { documentId, sectionId, page: null }, clientId: "h-1", fileName: `${documentId}.pdf`, docType: "w2", tags: [], familyMembers: [], taxYear: 2025 };
+  return { text, score: 0.5, citation: { documentId, sectionId, page: null }, sourceType: "document", clientId: "h-1", fileName: `${documentId}.pdf`, docType: "w2", tags: [], familyMembers: [], taxYear: 2025, date: null };
 }
 
 describe("answerCheckFilters", () => {
@@ -57,7 +57,7 @@ describe("answerCheckStatements", () => {
   it("turns source ids into section citations with the quote, unverified", () => {
     expect(answerCheckStatements({ answerable: true, statements: [{ text: "Wages were 100.", sourceIds: ["S1"] }] }, sources)).toEqual({
       answerable: true,
-      statements: [{ text: "Wages were 100.", citations: [{ documentId: "doc-1", sectionId: "document", page: null, fileName: "doc-1.pdf", quote: "Wages: 100.00", verified: false }] }],
+      statements: [{ text: "Wages were 100.", citations: [{ documentId: "doc-1", sectionId: "document", sourceType: "document", page: null, fileName: "doc-1.pdf", quote: "Wages: 100.00", verified: false }] }],
     });
   });
 
