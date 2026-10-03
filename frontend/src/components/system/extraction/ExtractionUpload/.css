@@ -1,5 +1,5 @@
 .extraction-upload {
-  --extraction-upload-padding-top: 72px;
+  --extraction-upload-padding-top: 24px;
   --extraction-upload-padding-x: 16px;
   --extraction-upload-workspace-columns: minmax(0, 1fr);
   min-height: 100%;
@@ -9,7 +9,6 @@
 
 @media (min-width: 640px) {
   .extraction-upload {
-    --extraction-upload-padding-top: 24px;
     --extraction-upload-padding-x: var(--spacing-section);
   }
 }

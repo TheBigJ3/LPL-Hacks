@@ -1,5 +1,5 @@
 .document-library {
-  --document-library-padding-top: 72px;
+  --document-library-padding-top: 24px;
   --document-library-padding-x: 16px;
   --document-library-sections-gap: 48px;
   min-height: 100%;
@@ -9,7 +9,6 @@
 
 @media (min-width: 640px) {
   .document-library {
-    --document-library-padding-top: 24px;
     --document-library-padding-x: var(--spacing-section);
     --document-library-sections-gap: 60px;
   }
