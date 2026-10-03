@@ -21,11 +21,7 @@ export type ExtractionLayout = 'scan' | 'rebuilt'
 
 export type ExtractionEditValue = string | boolean
 
-type ExtractionItemStatus = 'review' | 'edited' | 'confirmed' | 'plain'
-
-type ExtractionValueTone = 'filled' | 'blank' | 'missing'
-
-type ExtractionCellTone = 'header' | 'label' | ExtractionItemStatus
+export type ExtractionItemStatus = 'review' | 'edited' | 'confirmed' | 'plain'
 
 type ExtractionItem = {
   id: string
@@ -42,119 +38,11 @@ type ExtractionItem = {
   status: ExtractionItemStatus
 }
 
-export const EXTRACTION_VALUE_TONE_CLASSES: Record<ExtractionValueTone, string> = {
-  filled: 'break-words text-main-white tabular-nums',
-  blank: 'italic text-placeholder-gray',
-  missing: 'italic text-placeholder-gray',
-}
-
-export const EXTRACTION_CONFIDENCE_PILL_CLASSES: Record<ExtractedConfidenceLevel, string> = {
-  high: 'border-card-outlines text-paragraph-off-white',
-  medium: 'border-paragraph-off-white/40 text-main-white',
-  low: 'border-review-yellow/60 bg-review-yellow/15 text-review-yellow',
-  unknown: 'border-card-outlines text-placeholder-gray',
-}
-
-export const EXTRACTION_CONFIDENCE_DOT_CLASSES: Record<ExtractedConfidenceLevel, string> = {
-  high: 'bg-paragraph-off-white',
-  medium: 'bg-main-white',
-  low: 'bg-review-yellow',
-  unknown: 'bg-placeholder-gray',
-}
-
-export const EXTRACTION_CELL_TONE_CLASSES: Record<ExtractionCellTone, string> = {
-  header: 'bg-card-outlines-faint text-xs font-bold uppercase tracking-wider text-placeholder-gray',
-  label: 'text-xs text-placeholder-gray',
-  review: 'bg-review-yellow/15 text-review-yellow',
-  edited: 'text-main-white shadow-[inset_0_-2px_0_0_var(--color-main-pink)]',
-  confirmed: 'text-main-white',
-  plain: 'text-main-white',
-}
-
-export const EXTRACTION_ROW_STATUS_CLASSES: Record<ExtractionItemStatus, string> = {
-  review: 'shadow-[inset_3px_0_0_0_var(--color-review-yellow)]',
-  edited: 'shadow-[inset_3px_0_0_0_var(--color-main-pink)]',
-  confirmed: '',
-  plain: '',
-}
-
-export const EXTRACTION_STATUS_BADGE_CLASSES: Record<ExtractionItemStatus, string> = {
-  review: 'border-review-yellow/60 bg-review-yellow/15 text-review-yellow',
-  edited: 'border-main-pink/50 bg-main-pink/10 text-main-pink',
-  confirmed: 'border-card-outlines text-paragraph-off-white',
-  plain: 'border-card-outlines text-placeholder-gray',
-}
-
 const EXTRACTION_STATUS_LABELS: Record<ExtractionItemStatus, string> = {
   review: 'Needs review',
   edited: 'Edited',
   confirmed: 'Approved',
   plain: 'Looks fine',
-}
-
-const EXTRACTION_OVERLAY_BASE_CLASSES: Record<ExtractionOverlayKind, string> = {
-  text: 'absolute rounded-[2px] px-[0.2em] leading-none text-main-black transition-shadow [field-sizing:content] focus:outline-none',
-  multiline: 'absolute resize-none overflow-hidden rounded-[2px] px-[0.2em] py-[0.1em] leading-[1.25] text-main-black transition-shadow [field-sizing:content] focus:outline-none',
-  checkbox: 'absolute flex items-center justify-center rounded-[2px] text-main-black transition-shadow focus:outline-none',
-}
-
-const EXTRACTION_OVERLAY_TONE_CLASSES: Record<ExtractionItemStatus, string> = {
-  review: 'bg-review-yellow-soft ring-2 ring-review-yellow hover:ring-[3px]',
-  edited: 'bg-white ring-2 ring-main-pink/70',
-  confirmed: 'bg-white ring-1 ring-black/15 hover:ring-black/40',
-  plain: 'bg-white ring-1 ring-black/15 hover:ring-black/40',
-}
-
-const EXTRACTION_OVERLAY_EMPTY_CLASS = 'border border-dashed border-black/25 bg-transparent hover:bg-white/70 focus:bg-white'
-
-const EXTRACTION_OVERLAY_CHECKBOX_CLASS = 'bg-white ring-1 ring-black/70 hover:ring-black'
-
-const EXTRACTION_OVERLAY_PEEK_CLASSES: Record<ExtractionItemStatus, string> = {
-  review: 'pointer-events-none bg-review-yellow/20 text-transparent ring-2 ring-review-yellow',
-  edited: 'pointer-events-none bg-transparent text-transparent ring-2 ring-main-pink/70',
-  confirmed: 'pointer-events-none bg-transparent text-transparent ring-1 ring-black/20',
-  plain: 'pointer-events-none bg-transparent text-transparent ring-1 ring-black/20',
-}
-
-const EXTRACTION_OVERLAY_SELECTED_CLASS = 'outline-2 outline-offset-2 outline-main-pink'
-
-const EXTRACTION_LAYOUT_ACTIVE_CLASS = 'bg-card-outlines text-main-white'
-const EXTRACTION_LAYOUT_INACTIVE_CLASS = 'text-placeholder-gray hover:text-main-white disabled:opacity-40 disabled:hover:text-placeholder-gray'
-
-export type ExtractionFieldRow = {
-  id: string
-  label: string
-  page: number
-  displayValue: string
-  valueTone: ExtractionValueTone
-  normalizedLabel: string | null
-  originalLabel: string | null
-  confidencePercent: string
-  confidenceLevel: ExtractedConfidenceLevel
-  status: ExtractionItemStatus
-  statusLabel: string
-  issues: string[]
-}
-
-export type ExtractionLineRow = ExtractedLine & {
-  confidenceLabel: string
-  requiresReview: boolean
-}
-
-export type ExtractionTableCellView = {
-  id: string
-  text: string
-  normalizedLabel: string | null
-  tone: ExtractionCellTone
-  tooltip: string
-}
-
-export type ExtractionTableView = {
-  page: number
-  confidencePercent: string
-  confidenceLevel: ExtractedConfidenceLevel
-  requiresReview: boolean
-  rows: ExtractionTableCellView[][]
 }
 
 type ExtractionOverlayKind = 'text' | 'multiline' | 'checkbox'
@@ -163,10 +51,12 @@ export type ExtractionOverlayView = {
   id: string
   domId: string
   kind: ExtractionOverlayKind
+  status: ExtractionItemStatus
+  empty: boolean
+  selected: boolean
   label: string
   text: string
   checked: boolean
-  className: string
   style: CSSProperties
 }
 
@@ -188,7 +78,7 @@ export type ExtractionLayoutOption = {
   value: ExtractionLayout
   label: string
   disabled: boolean
-  className: string
+  active: boolean
 }
 
 export type ExtractionDocumentView = {
@@ -203,8 +93,8 @@ export type ExtractionReviewListItem = {
   label: string
   summary: string
   icon: string
-  iconClassName: string
-  className: string
+  open: boolean
+  selected: boolean
 }
 
 export type ExtractionCropView = {
@@ -333,7 +223,6 @@ function extractionBuildOverlay(
   aspect: number,
   pageLines: ExtractedLine[],
   lineHeight: number,
-  showValues: boolean,
   selectedId: string | null,
 ): ExtractionOverlayView {
   const printed = item.source.rawValue ?? ''
@@ -342,7 +231,6 @@ function extractionBuildOverlay(
   const lineBreaks = kind === 'multiline' && rows.join(' ') === printed
   const text = lineBreaks && !item.edited ? rows.join('\n') : item.text
 
-  // An empty box's region often runs up over its own label; keep the input to the blank space beneath it.
   const labelBottom = item.labelBox && item.labelBox.top < box.top + box.height / 2 ? item.labelBox.top + item.labelBox.height : 0
   const region = !printed && labelBottom > box.top
     ? { ...box, top: labelBottom + lineHeight * 0.3, height: Math.max(lineHeight, box.top + box.height - labelBottom - lineHeight * 0.3) }
@@ -351,7 +239,6 @@ function extractionBuildOverlay(
     ? { ...region, top: region.top + (region.height - lineHeight * 1.6) / 2, height: lineHeight * 1.6 }
     : region
 
-  // Textract boxes hug the ink, so caps and digits fill ~3/4 of an em while text with descenders fills nearly all of it.
   const inkRatio = /[gjpqy$(),;]/.test(printed) ? 0.92 : 0.74
   const glyphHeight = kind === 'multiline' ? box.height / rows.length * 0.72
     : item.origin === 'cell' || !printed ? lineHeight * 0.95
@@ -362,21 +249,18 @@ function extractionBuildOverlay(
   const pad = kind === 'checkbox' ? { x: 0.002, y: 0.002 * aspect }
     : item.origin === 'cell' ? { x: -0.004, y: -Math.max(0, (target.height - lineHeight * 1.6) / 2) }
       : { x: 0.004, y: kind === 'multiline' ? 0.004 : target.height * 0.2 }
-  const empty = text === '' && item.status !== 'review'
-  const tone = !showValues ? EXTRACTION_OVERLAY_PEEK_CLASSES[item.status]
-    : kind === 'checkbox' && item.status === 'plain' ? EXTRACTION_OVERLAY_CHECKBOX_CLASS
-      : empty && kind !== 'checkbox' ? EXTRACTION_OVERLAY_EMPTY_CLASS
-        : EXTRACTION_OVERLAY_TONE_CLASSES[item.status]
   const width = extractionFormatRatio(target.width + pad.x * 2)
   const height = extractionFormatRatio(target.height + pad.y * 2)
   return {
     id: item.id,
     domId: extractionOverlayDomId(item.id),
     kind,
+    status: item.status,
+    empty: kind !== 'checkbox' && text === '' && item.status !== 'review',
+    selected: item.id === selectedId,
     label: item.label,
     text,
     checked: item.checked,
-    className: [EXTRACTION_OVERLAY_BASE_CLASSES[kind], tone, item.id === selectedId ? EXTRACTION_OVERLAY_SELECTED_CLASS : ''].join(' '),
     style: {
       left: extractionFormatRatio(target.left - pad.x),
       top: extractionFormatRatio(target.top - pad.y),
@@ -396,7 +280,6 @@ function extractionBuildPages(
   items: ExtractionItem[],
   previews: DocumentPreviewPage[] | null,
   layout: ExtractionLayout,
-  showValues: boolean,
   selectedId: string | null,
 ): ExtractionPageView[] {
   const pageCount = previews?.length ?? Math.max(1, ...data.fields.map((field) => field.page), ...data.lines.map((line) => line.page))
@@ -412,7 +295,7 @@ function extractionBuildPages(
       number,
       imageUrl: layout === 'scan' ? preview?.url ?? null : null,
       style: { aspectRatio: `1 / ${aspect}` },
-      overlays: overlays.map(({ item, box }) => extractionBuildOverlay(item, box, aspect, pageLines, lineHeight, showValues, selectedId)),
+      overlays: overlays.map(({ item, box }) => extractionBuildOverlay(item, box, aspect, pageLines, lineHeight, selectedId)),
       lines: layout === 'scan' ? [] : data.lines.flatMap((line, lineIndex): ExtractionRebuiltLineView[] => {
         if (line.page !== number || !line.box || overlayBoxes.some((box) => extractionBoxContainsCenter(box, line.box!))) return []
         return [{
@@ -475,8 +358,8 @@ function extractionBuildReviewListItem(item: ExtractionItem, selectedId: string 
     label: item.label,
     summary,
     icon: open ? 'error' : 'check_circle',
-    iconClassName: open ? 'text-review-yellow' : 'text-paragraph-off-white',
-    className: item.id === selectedId ? 'bg-card-outlines' : '',
+    open,
+    selected: item.id === selectedId,
   }
 }
 
@@ -502,56 +385,6 @@ function extractionBuildReview(items: ExtractionItem[], previews: DocumentPrevie
   }
 }
 
-function extractionBuildFieldRow(item: ExtractionItem): ExtractionFieldRow {
-  const { source } = item
-  const valueTone: ExtractionValueTone = item.kind === 'checkbox'
-    ? (source.value === null && !item.edited ? 'blank' : 'filled')
-    : item.edited ? (item.text.trim() ? 'filled' : 'blank')
-      : source.rawValue === null ? 'missing' : source.value === null ? 'blank' : 'filled'
-  const displayValue = item.kind === 'checkbox'
-    ? (valueTone === 'blank' ? 'Unclear' : item.checked ? 'Checked' : 'Unchecked')
-    : valueTone === 'missing' ? 'Not found' : valueTone === 'blank' ? 'Blank' : item.text
-  return {
-    id: item.id,
-    label: item.label,
-    page: item.page,
-    displayValue,
-    valueTone,
-    normalizedLabel: item.edited ? null : extractionFormatNormalized(source),
-    originalLabel: item.edited ? `OCR read: ${source.rawValue || 'nothing'}` : null,
-    confidencePercent: extractionFormatPercent(source.confidence),
-    confidenceLevel: source.confidenceLevel,
-    status: item.status,
-    statusLabel: EXTRACTION_STATUS_LABELS[item.status],
-    issues: item.status === 'review' ? source.issues : [],
-  }
-}
-
-function extractionBuildTables(data: ExtractionAnalyzeResponse, itemsById: Map<string, ExtractionItem>): ExtractionTableView[] {
-  return data.tables.map((table) => {
-    const rows = Array.from({ length: table.rowCount }, () =>
-      Array.from({ length: table.columnCount }, (): ExtractionTableCellView => ({ id: '', text: '', normalizedLabel: null, tone: 'plain', tooltip: '' })))
-    for (const cell of table.cells) {
-      const item = itemsById.get(cell.fieldId ?? cell.id)
-      const source = item?.source ?? cell
-      rows[cell.row - 1]![cell.column - 1] = {
-        id: item?.id ?? cell.id,
-        text: item?.text ?? cell.rawValue ?? '',
-        normalizedLabel: item && !item.edited ? extractionFormatNormalized(source) : null,
-        tone: item ? item.status : cell.role === 'value' ? 'plain' : cell.role,
-        tooltip: [`${extractionFormatPercent(source.confidence)} · ${source.confidenceLevel}`, ...source.issues].join('\n'),
-      }
-    }
-    return {
-      page: table.page,
-      rows,
-      confidencePercent: extractionFormatPercent(table.confidence),
-      confidenceLevel: table.confidenceLevel,
-      requiresReview: table.requiresReview,
-    }
-  })
-}
-
 export function useExtractionUpload() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -571,32 +404,23 @@ export function useExtractionUpload() {
     if (!analysis) return null
     const { data } = analysis
     const items = extractionBuildItems(data, edits, confirmed)
-    const itemsById = new Map(items.map((item) => [item.id, item]))
     const effectiveLayout: ExtractionLayout = previews ? layout : 'rebuilt'
     const review = extractionBuildReview(items, previews, selectedId)
     return {
-      fileName: analysis.fileName,
       items,
       review,
+      summary: `${analysis.fileName} · ${review.unresolved} of ${review.total} left to review`,
       document: {
-        pages: extractionBuildPages(data, items, previews, effectiveLayout, showValues, selectedId),
+        pages: extractionBuildPages(data, items, previews, effectiveLayout, selectedId),
         layoutOptions: (['scan', 'rebuilt'] as const).map((value): ExtractionLayoutOption => ({
           value,
           label: value === 'scan' ? 'Scan' : 'Rebuilt',
           disabled: value === 'scan' && !previews,
-          className: value === effectiveLayout ? EXTRACTION_LAYOUT_ACTIVE_CLASS : EXTRACTION_LAYOUT_INACTIVE_CLASS,
+          active: value === effectiveLayout,
         })),
         showValues,
         showValuesLabel: showValues ? 'Hide values' : 'Show values',
       } satisfies ExtractionDocumentView,
-      fields: items.filter((item) => item.origin === 'field').map(extractionBuildFieldRow),
-      fieldsToReview: items.filter((item) => item.origin === 'field' && item.status === 'review').length,
-      tables: extractionBuildTables(data, itemsById),
-      lines: data.lines.map((line): ExtractionLineRow => ({
-        ...line,
-        confidenceLabel: `${extractionFormatPercent(line.confidence)} · ${line.confidenceLevel}`,
-        requiresReview: line.confidenceLevel === 'low',
-      })),
     }
   }, [analysis, previews, edits, confirmed, selectedId, layout, showValues])
 

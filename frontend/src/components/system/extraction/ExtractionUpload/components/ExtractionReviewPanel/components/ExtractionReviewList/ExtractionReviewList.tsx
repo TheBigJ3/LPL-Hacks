@@ -1,22 +1,26 @@
-import type { ExtractionReviewListItem } from '@components/system/extraction/ExtractionUpload/.ts'
+import './.css'
+import type { ExtractionReviewListItem } from '../../../../.ts'
 
-export default function ExtractionReviewList({ title, items, onFocusItem }: {
+const ExtractionReviewList = ({ title, items, onFocusItem }: {
   title: string
   items: ExtractionReviewListItem[]
   onFocusItem: (id: string) => void
-}) {
-  return <section className="flex flex-col gap-1.5 rounded-xl border border-card-outlines bg-card-bg p-2">
-    <h6 className="px-2 pt-1 text-xs uppercase tracking-wider text-placeholder-gray">{title}</h6>
+}) =>
+  <section className="extraction-review-list flex flex-col gap-1.5 rounded-lg p-2" aria-label={title}>
+    <h3 className="extraction-review-list__title px-2 pt-1">{title}</h3>
     <ul className="flex flex-col">
-      {items.map((item) => <li key={item.id}>
-        <button type="button" onClick={() => onFocusItem(item.id)} className={`flex w-full items-start gap-2 rounded-lg px-2 py-2 text-left text-sm transition-colors hover:bg-card-outlines-faint ${item.className}`}>
-          <span className={`material-symbols-outlined pt-0.5 text-base ${item.iconClassName}`}>{item.icon}</span>
-          <span className="flex min-w-0 flex-col">
-            <span className="truncate text-main-white">{item.label}</span>
-            <span className="line-clamp-2 text-xs text-placeholder-gray">{item.summary}</span>
-          </span>
-        </button>
-      </li>)}
+      {items.map((item) =>
+        <li key={item.id}>
+          <button type="button" className="extraction-review-list__item flex w-full items-start gap-2 rounded-md px-2 py-2 text-left" data-selected={item.selected} onClick={() => onFocusItem(item.id)}>
+            <span className="material-symbols-outlined extraction-review-list__icon pt-0.5" data-open={item.open} aria-hidden="true">{item.icon}</span>
+            <span className="flex min-w-0 flex-col">
+              <span className="extraction-review-list__label truncate">{item.label}</span>
+              <span className="extraction-review-list__summary line-clamp-2">{item.summary}</span>
+            </span>
+          </button>
+        </li>
+      )}
     </ul>
   </section>
-}
+
+export default ExtractionReviewList

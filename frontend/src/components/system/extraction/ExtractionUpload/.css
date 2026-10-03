@@ -1,0 +1,86 @@
+.extraction-upload {
+  --extraction-upload-padding-top: 72px;
+  --extraction-upload-padding-x: 16px;
+  --extraction-upload-workspace-columns: minmax(0, 1fr);
+  min-height: 100%;
+  padding: var(--extraction-upload-padding-top) var(--extraction-upload-padding-x) 60px;
+  gap: 24px;
+}
+
+@media (min-width: 640px) {
+  .extraction-upload {
+    --extraction-upload-padding-top: 24px;
+    --extraction-upload-padding-x: var(--spacing-section);
+  }
+}
+
+@media (min-width: 1100px) {
+  .extraction-upload {
+    --extraction-upload-workspace-columns: minmax(0, 1fr) 22rem;
+  }
+}
+
+.extraction-upload__dropzone {
+  max-width: 1237px;
+  padding: 32px 24px;
+  border: 1px dashed var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.extraction-upload__dropzone:hover,
+.extraction-upload__dropzone:focus-within {
+  border-color: var(--color-accent-blue);
+  background: var(--color-surface-hover);
+}
+
+.extraction-upload__dropzone[aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.extraction-upload__dropzone-icon {
+  color: var(--color-dark-gray);
+  font-size: 28px;
+}
+
+.extraction-upload__dropzone-title {
+  color: var(--color-text-default);
+  font-size: 16px;
+}
+
+.extraction-upload__dropzone-hint {
+  color: var(--color-dark-gray);
+  font-size: 14px;
+}
+
+.extraction-upload__error {
+  max-width: 1237px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-error);
+  background: color-mix(in srgb, var(--color-error) 8%, transparent);
+  color: var(--color-text-default);
+  font-size: 14px;
+}
+
+.extraction-upload__content {
+  max-width: 1237px;
+  gap: 20px;
+}
+
+.extraction-upload__summary {
+  color: var(--color-dark-gray);
+  font-size: 14px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.extraction-upload__workspace {
+  grid-template-columns: var(--extraction-upload-workspace-columns);
+  gap: 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .extraction-upload__dropzone { transition: none; }
+}

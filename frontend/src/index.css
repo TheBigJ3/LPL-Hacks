@@ -40,6 +40,7 @@
   --color-review: #FACC4B;
   --color-review-soft: #FFF3C4;
   --color-review-text: #8A5A00;
+  --color-error: #C4314B;
 
   --spacing: 4px;
   --spacing-gutter: clamp(16px, 1.5vw + 10px, 24px);
@@ -119,6 +120,7 @@ html {
   --color-heading: #BBCFFC;
   --color-review-soft: #3A2F0B;
   --color-review-text: #FACC4B;
+  --color-error: #FF6B81;
   --shadow-100: 0 1px 4px #00000066;
   --shadow-200: 0 1px 4px #00000080, 0 1px 4px #00000066;
   color-scheme: dark;

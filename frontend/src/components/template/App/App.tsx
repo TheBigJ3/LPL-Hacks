@@ -5,6 +5,7 @@ import { socketLayer } from '@stores/socketStore'
 import { themeLayer } from '@stores/themeStore'
 import AppLayout from '@components/template/AppLayout/AppLayout'
 import DocumentLibrary from '@components/system/documents/DocumentLibrary/DocumentLibrary'
+import ExtractionUpload from '@components/system/extraction/ExtractionUpload/ExtractionUpload'
 
 socketLayer.init()
 themeLayer.init()
@@ -15,6 +16,8 @@ const router = createBrowserRouter([
     children: [
       { path: 'documents', element: <DocumentLibrary /> },
       { path: 'clients/:clientId/documents', element: <DocumentLibrary /> },
+      { path: 'extract', element: <ExtractionUpload /> },
+      { path: 'clients/:clientId/extract', element: <ExtractionUpload /> },
       { path: '*', element: <div /> },
     ],
   },
