@@ -730,6 +730,13 @@
             "title": "Name",
             "type": "string"
           },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
           "review_reasons": {
             "items": {
               "type": "string"
@@ -1991,7 +1998,7 @@
             "title": "Priority"
           },
           "ruleset_version": {
-            "default": "2025.1",
+            "default": "2025.2",
             "title": "Ruleset Version",
             "type": "string"
           },
@@ -2229,6 +2236,21 @@
         "title": "RagChunks",
         "type": "object"
       },
+      "RawDocumentDecision": {
+        "description": "The raw OpenDecision document decision (docType, tag_*, member_* answers with probabilities, scores and\nevidence). Uncalibrated, for audit and downstream experiments; never shown to advisors or fed to an LLM as fact.",
+        "properties": {
+          "answers": {
+            "additionalProperties": true,
+            "title": "Answers",
+            "type": "object"
+          }
+        },
+        "required": [
+          "answers"
+        ],
+        "title": "RawDocumentDecision",
+        "type": "object"
+      },
       "SourceCandidate": {
         "additionalProperties": false,
         "properties": {
@@ -2433,6 +2455,17 @@
             ],
             "title": "Dependents Check",
             "type": "string"
+          },
+          "dependents_source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dependents Source Document"
           },
           "filing_status": {
             "anyOf": [
@@ -2780,6 +2813,78 @@
         "summary": "Document Ingest",
         "tags": [
           "ingest"
+        ]
+      }
+    },
+    "/api/households/{household_id}/documents/{name}/decision": {
+      "get": {
+        "description": "RAW OpenDecision answers for one stored document: the same response the strict document decision used.\n\nProbabilities and scores are uncalibrated. For audit and RAG experiments only; the overview, Ask and the\nfrontend never use this. 503 when the model is off or failing (no answers to show).",
+        "operationId": "document_raw_decision_api_households__household_id__documents__name__decision_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "household_id",
+            "required": true,
+            "schema": {
+              "title": "Household Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "title": "Name",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawDocumentDecision"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Document Raw Decision",
+        "tags": [
+          "raw"
         ]
       }
     },

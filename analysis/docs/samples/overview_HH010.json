@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "ruleset_version": "2025.1",
+  "ruleset_version": "2025.2",
   "household_id": "HH010",
   "tax_year": 2026,
   "status": "no_findings",
@@ -10,6 +10,7 @@
     "filing_status": "single",
     "dependents": null,
     "dependents_check": "not_checked",
+    "dependents_source_document": null,
     "agi": {
       "value": null,
       "check": "not_checked",
@@ -170,7 +171,7 @@
         "hsa_without_plan": 0,
         "mismatches": 0
       },
-      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value its document contradicts means more documentation is needed"
+      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value contradicted by the document it came from means more documentation is needed"
     },
     {
       "id": "major_changes",
@@ -181,7 +182,8 @@
       "finding_ids": [],
       "metrics": {
         "flag_change_pct": 25,
-        "high_at_events": 3
+        "high_at_events": 3,
+        "events": []
       },
       "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
@@ -247,15 +249,7 @@
     "unchecked_values": 0,
     "missing_documents": [],
     "unassigned_documents": [],
-    "documents_needing_review": [
-      {
-        "name": "alex_example_1099r_2026.pdf",
-        "review_reasons": [
-          "tag_uncertain:tax",
-          "tag_uncertain:income"
-        ]
-      }
-    ]
+    "documents_needing_review": []
   },
   "errors": [],
   "prior_year": null,
@@ -330,8 +324,9 @@
           }
         ],
         "attribution_status": "assigned",
-        "status": "needs_review",
-        "review_reasons": [
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
           "tag_uncertain:tax",
           "tag_uncertain:income"
         ]

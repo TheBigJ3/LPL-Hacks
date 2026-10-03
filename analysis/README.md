@@ -5,7 +5,7 @@ members for fast checks and look-ups. It consumes normalized household data from
 the Textract output of the documents that data came from (the same `AnalyzeDocument` FORMS response
 `backend/api/v1/extraction/analyze` produces). It never retrieves files.
 
-- Python rules (ruleset `2025.1`) decide every checklist answer, finding, priority and dollar figure.
+- Python rules (ruleset `2025.2`) decide every checklist answer, finding, priority and dollar figure.
 - OpenDecision (`MoritzLaurer/ModernBERT-large-zeroshot-v2.0`) does one thing: check each displayed
   value against its own source document → `verified` / `mismatch` / `unconfirmed` / `conflicted` / `not_checked`.
 - If the model is off or failing, every check is `not_checked` and the overview still renders.

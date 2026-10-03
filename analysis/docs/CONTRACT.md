@@ -1,4 +1,4 @@
-# Rapid analysis contract (schema 1.1, ruleset 2025.1)
+# Rapid analysis contract (schema 1.1, ruleset 2025.2)
 
 The frontend renders `GET /api/households/{id}/overview` directly. Pydantic models in
 `rapid_analysis/contract.py` are the source of truth; `openapi.json` is exported from them and
@@ -40,11 +40,11 @@ Ingest error codes: `malformed_json`, `body_too_large`, `invalid_household`, `mi
 ## Overview
 
 ```
-schema_version "1.1" · ruleset_version "2025.1" · household_id · tax_year
+schema_version "1.1" · ruleset_version "2025.2" · household_id · tax_year
 status        findings | no_findings | needs_review
 priority      informational | low | medium | high | null   (highest finding priority)
 checklist_label "Flags for review, not advice"
-summary       {filing_status, dependents, dependents_check, agi, cash (+months_of_income), mortgage_interest}
+summary       {filing_status, dependents, dependents_check, dependents_source_document, agi, cash (+months_of_income), mortgage_interest}
 members[]     {person_id, name, employer, numbers[] {field, label, value, check, source_document, page, context, candidates}}
 checklist[]   {id, question, answer, reason, dollar_impact, finding_ids, metrics, rule}
 changes_since_last_year[] {type, text}
@@ -68,7 +68,7 @@ prior_year    {tax_year, filing_status, numbers[] {field, label, value}, members
 tags.household  {topics[], categories_flagged[], checklist_yes[], checklist_not_assessed[], life_events[], data_quality[]}
 tags.members[]  {person_id, name, topics[], fields_present[], documents[], findings[], checks {verified, unconfirmed, mismatch, conflicted, not_checked}}
 tags.documents[] {name, doc_type, doc_subtype, doc_type_method, suggested_doc_type, topics[], model_tags[],
-                  members[] {person_id, name, role, method}, attribution_status, status, review_reasons[]}
+                  members[] {person_id, name, role, method}, attribution_status, status, review_reasons[], notes[]}
 data_quality.unassigned_documents[]       names of documents not assigned to a member
 data_quality.documents_needing_review[]   {name, review_reasons[]}
 ```
@@ -76,20 +76,22 @@ data_quality.documents_needing_review[]   {name, review_reasons[]}
 Every id is a `config/tags.json` id. `household.topics` is the union of document topics; `categories_flagged` are
 categories of non-informational findings; `data_quality` uses the tag file's data-quality ids.
 
-Per-document decisions are strict (anything uncertain is `needs_review` with a reason):
+Per-document decisions are strict. Only an unknown type or an unsettled owner makes a document `needs_review`;
+everything else uncertain is recorded in `notes[]` and leaves `status` alone:
 - `doc_type` comes from form-number patterns (`doc_type_method: "pattern"`); with no match it is `unknown`
   (`doc_type_unknown`). The model's guess is only stored as `suggested_doc_type`. A pattern result the model
-  contradicts with probability ≥ 0.90 keeps the pattern and adds `doc_type_model_disagrees`.
+  contradicts with probability ≥ 0.90 keeps the pattern and adds the note `doc_type_model_disagrees`.
 - `topics` come from the tag file's `doc_types[].topics`; `model_tags` (`tax`, `income`) only when the model's
-  status is `confirmed` (else `tag_uncertain:<topic>`).
+  status is `confirmed` (else the note `tag_uncertain:<topic>`).
 - `members` come from name matching (`method: "name_match"`, `owner` or `joint`). Surname/initial-only is
   `ambiguous` (`member_ambiguous`); no match is `unassigned` (`member_unassigned` if it carries amounts). The model can
-  only veto (`member_model_disagrees`); a model-only yes is ignored (`member_model_only`).
+  only veto (`member_model_disagrees`); a model-only yes is ignored (note `member_model_only`).
 - Value checks use only documents assigned to that member; household values use joint documents (or, in a
   one-member household, that member's documents).
 
-Review reasons: `doc_type_unknown`, `doc_type_model_disagrees`, `tag_uncertain:tax`, `tag_uncertain:income`,
-`member_ambiguous`, `member_unassigned`, `member_model_disagrees`, `member_model_only`.
+Review reasons (the only ones that set `status: "needs_review"`): `doc_type_unknown`, `member_ambiguous`,
+`member_unassigned`, `member_model_disagrees`. Notes (never change `status`): `tag_uncertain:tax`,
+`tag_uncertain:income`, `member_model_only`, `doc_type_model_disagrees`.
 - Findings are sorted by priority, highest first. A finding's `check` is the worst check of the values it rests on.
 - A conflicted value has `value: null`, `check: "conflicted"` and every `candidates[]` entry with its source document.
 - `errors` with `severity: "error"` (input could not be normalized) means `status: "needs_review"`, `summary: null`,
@@ -146,9 +148,31 @@ suggestions[]
   "unconfirmed: not found in <doc>", "documents disagree: $120,000 (…) vs $165,000 (…)", "not checked").
   Checklist and finding chunks state the exact metrics, then `Rule: …`, then `Result: …`, and end with
   "Flag for review, not advice." Placeholders say "has not been assessed".
+- Every checklist chunk states its reason before `Rule:`, including `no` ("No self-employment income or 1099-R on
+  file."), `needs_data` ("Jordan's wages conflict ($120,000 vs $165,000), so this can't be assessed.") and
+  `not_assessed` ("No wage earners in this household."). A verified value always names its document.
+- Document chunks say "needs review" only for the four review reasons; `notes` are in `metadata.notes` only.
+- `metadata.member_roles` is always `{person_id: [roles]}`; `metadata.metrics.events` (major_changes, changes) is
+  always a list of change types, with `event_count` when a prior year is on file.
 - `metadata` has the tag file's `rag_chunk_metadata` fields plus `chunk_type`, `checklist_id`, `answer`, `dollar_impact`,
   `metrics`, `rule`, `checks` and `ruleset_version`. **`model_scores`** (raw OpenDecision relation and scores) appears
   only here, for audit. It is uncalibrated and never appears in `text`; the LLM must not see or repeat it.
+
+## Raw document decision (`GET /api/households/{id}/documents/{name}/decision`)
+
+`{answers: {docType, tag_tax, tag_earnings, member_<first>_<last>...}}`: the raw OpenDecision response for one
+stored document, exactly as the model returned it; sample `samples/raw_decision_HH006_taylor_w2.json`.
+
+- `docType`: `{type: "choice", choice, probabilities, confidence, evidence[] {id, text, relevance}}`.
+- `tag_*`, `member_*`: `{type: "document_noul", mode, answer, status, binary {answer, probabilities, confidence},
+  three_way {answer, relation, scores}, evidence[]}`.
+- It is the same response the strict document decision used (memoized; no second model call), so it always agrees
+  with `tags.documents[]`. Evidence text is redacted (no SSNs, TINs, account numbers or addresses).
+- **Raw and uncalibrated.** For audit and RAG experiments only: the overview, Ask and frontend never use it, and the
+  decided values (type, owner, tags, status) are in `tags.documents[]`. Do not show these numbers to advisors as
+  confidence, and do not let an LLM quote them.
+- 404 for an unknown household or document; 503 `validator_unavailable` when the model is off or failing.
+  `rag-chunks` is unchanged and remains available.
 
 ## Schema 1.0 → 1.1 id mapping
 

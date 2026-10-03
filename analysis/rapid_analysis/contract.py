@@ -50,6 +50,7 @@ class Summary(_Model):
     filing_status: str | None
     dependents: int | None
     dependents_check: Check = "not_checked"
+    dependents_source_document: str | None = None
     agi: CheckedValue
     cash: CashValue
     mortgage_interest: CheckedValue
@@ -200,6 +201,14 @@ class DocumentResult(_Model):
     attribution_status: Literal["assigned", "ambiguous", "unassigned"]
     status: Literal["accepted", "needs_review"]
     review_reasons: list[str]
+    notes: list[str] = Field(default_factory=list)  # tag_uncertain:*, member_model_only, doc_type_model_disagrees; never change status
+
+
+class RawDocumentDecision(BaseModel):
+    """The raw OpenDecision document decision (docType, tag_*, member_* answers with probabilities, scores and
+    evidence). Uncalibrated, for audit and downstream experiments; never shown to advisors or fed to an LLM as fact."""
+
+    answers: dict[str, Any]
 
 
 class CheckCounts(_Model):

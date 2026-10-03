@@ -20,6 +20,7 @@ from fastapi.responses import JSONResponse
 
 from rapid_analysis import RULESET_VERSION, SCHEMA_VERSION, contract
 from rapid_analysis.ask import ask
+from rapid_analysis.documents import MemberRef, document_decision
 from rapid_analysis.rag import rag_chunks
 from rapid_analysis.engine import engine_info, engine_load
 from rapid_analysis.evidence import CHECK_VALUES
@@ -288,6 +289,33 @@ def household_rag_chunks(household_id: str):
         return _needs_review(entry["overview"]["errors"])
     chunks = rag_chunks(entry["overview"], entry["evidence"], entry.get("value_checks"), entry.get("textract_confidence"))
     return {"household_id": household_id, "chunks": chunks}
+
+
+@app.get("/api/households/{household_id}/documents/{name}/decision", response_model=contract.RawDocumentDecision,
+         tags=["raw"], responses={404: {"model": contract.ErrorResponse}, 422: {"model": contract.ErrorResponse},
+                                  503: {"model": contract.ErrorResponse}})
+def document_raw_decision(household_id: str, name: str):
+    """RAW OpenDecision answers for one stored document: the same response the strict document decision used.
+
+    Probabilities and scores are uncalibrated. For audit and RAG experiments only; the overview, Ask and the
+    frontend never use this. 503 when the model is off or failing (no answers to show).
+    """
+    raw = STORE.household_get(household_id)
+    if raw is None:
+        return _not_found("household", household_id)
+    doc = STORE.documents_for(household_id).get(name)
+    if doc is None:
+        return _not_found("document", f"{household_id}/{name}")
+    normalized = normalize_household(raw)
+    if normalized.errors or normalized.household is None:
+        return _needs_review([_error(e.code, e.message, e.path) for e in normalized.errors])
+    members = [MemberRef(m.person_id, m.name) for m in normalized.household.members if m.name]
+    decision = document_decision(name, doc.text, members)
+    if decision.response is None:
+        return JSONResponse(status_code=503, content={"status": "needs_review", "errors": [{
+            "code": "validator_unavailable", "path": name, "severity": "error",
+            "message": "The decision model is off or failing; no raw answers for this document"}]})
+    return {"answers": decision.response.get("answers") or {}}
 
 
 @app.post("/api/households/{household_id}/documents", response_model=contract.DocumentIngestResult, tags=["ingest"],

@@ -3,8 +3,20 @@
   "household_id": "HH006",
   "tax_year": 2025,
   "filing_status": "married_filing_jointly",
-  "adjusted_gross_income": 152000,
-  "dependents": 1,
+  "adjusted_gross_income": {
+    "value": 152000,
+    "source_document": "hh006_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.983,
+    "verified": false
+  },
+  "dependents": {
+    "value": 1,
+    "source_document": "hh006_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
   "cash_balance": {
     "value": 210000,
     "source_document": "hh006_bank_statement_2025.pdf",

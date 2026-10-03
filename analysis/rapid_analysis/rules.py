@@ -74,8 +74,8 @@ def rule_text(item_id: str, limit: float | None = None) -> str:
         "tax_savings_possible": ("self-employment income above $0, a 1099-R code 1 early distribution (estimated 10% additional tax), "
                                  "or a code 7 distribution with federal withholding under 10% of the taxable amount flags tax for review"),
         "excess_cash": "cash above 6 months of income (AGI / 12) flags excess cash for review (above 12 months is high priority)",
-        "needs_documents": ("documents that disagree, an HSA contribution with no documented eligible plan, or a value its document "
-                            "contradicts means more documentation is needed"),
+        "needs_documents": ("documents that disagree, an HSA contribution with no documented eligible plan, or a value contradicted by "
+                            "the document it came from means more documentation is needed"),
         "major_changes": ("with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more "
                           "is a major change (3 or more together is high priority)"),
     }.get(item_id, "not assessed: no data or rules yet")
@@ -425,7 +425,7 @@ def _documents(household: Household, findings: list[Finding], checks: Mapping[st
 def _changes(household: Household, findings: list[Finding]) -> tuple[_Answer, list[Change]]:
     prior = household.prior_year
     if prior is None:
-        return _Answer("not_assessed", "No prior year on file"), []
+        return _Answer("not_assessed", "No prior year on file", metrics={"events": []}), []
     events: list[tuple[Change, Member | None, list[str], dict[str, Any]]] = []
 
     now_deps, then_deps = household.value("dependents"), prior.value("dependents")
@@ -456,7 +456,8 @@ def _changes(household: Household, findings: list[Finding]) -> tuple[_Answer, li
                            None, ["household.adjusted_gross_income"],
                            {"before": num(then_agi), "after": num(now_agi), "change_pct": pct_num(change), "flag_change_pct": 25}))
 
-    metrics = {"prior_tax_year": prior.tax_year, "events": len(events), "high_at_events": LIFE_EVENTS_FOR_HIGH}
+    metrics = {"prior_tax_year": prior.tax_year, "events": [c.type for c, *_ in events], "event_count": len(events),
+               "high_at_events": LIFE_EVENTS_FOR_HIGH}
     if not events:
         return _Answer("no", "No major changes since last year", metrics=metrics), []
     priority = "high" if len(events) >= LIFE_EVENTS_FOR_HIGH else "medium"

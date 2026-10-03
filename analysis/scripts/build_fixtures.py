@@ -78,7 +78,7 @@ HOUSEHOLDS = [
     {
         "household_id": "HH003", "tax_year": 2025, "filing_status": "Single",
         "adjusted_gross_income": fv(81000, "hh003_1040_2025.pdf", 0.984),
-        "dependents": 0,
+        "dependents": fv(0, "hh003_1040_2025.pdf", 0.99),
         "cash_balance": fv(19000, "hh003_bank_statement_2025.pdf", 0.99),
         "members": [
             {"person_id": "HH003-P1", "name": "Morgan Lee",
@@ -132,8 +132,8 @@ HOUSEHOLDS = [
     },
     {
         "household_id": "HH006", "tax_year": 2025, "filing_status": "married_filing_jointly",
-        "adjusted_gross_income": 152000,
-        "dependents": 1,
+        "adjusted_gross_income": fv(152000, "hh006_1040_2025.pdf", 0.983),
+        "dependents": fv(1, "hh006_1040_2025.pdf", 0.99),
         "cash_balance": fv(210000, "hh006_bank_statement_2025.pdf", 0.99),
         "members": [
             {"person_id": "HH006-P1", "name": "Taylor Mock",
@@ -246,8 +246,11 @@ def documents() -> dict[str, dict]:
         "jordan_w2_2025.pdf": textract_w2("Jordan Park", "Wingtip Sample Systems", "120,000.00", "19,800.00", ["D 15,000.00"]),
         "hh004_1040_2025.pdf": textract_1040("Jordan Park", "165,000.00", "158,000.00", "0"),
         "morgan_w2_2025.pdf": textract_w2("Morgan Lee", "Tailspin Sample Toys", "92,000.00", "12,880.00", ["D 18,500.00", "W 4,300.00"]),
+        "hh003_1040_2025.pdf": textract_1040("Morgan Lee", "92,000.00", "81,000.00", "0"),
+        "hh003_bank_statement_2025.pdf": textract_statement("Morgan Lee", "$19,000.00"),
         "taylor_w2_2025.pdf": textract_w2("Taylor Mock", "Adventure Works Sample", "110,000.00", "14,300.00", ["D 2,000.00"]),
         "hh006_1040_2025.pdf": textract_1040("Taylor Mock and Sam Mock", "110,000.00", "152,000.00", "1", business_income="48,000.00"),
+        "hh006_bank_statement_2025.pdf": textract_statement("Taylor Mock and Sam Mock", "$210,000.00"),
         "pat_1099r_2025.pdf": textract_1099r("Pat Rowe", "$ 12,000.00", "$ 12,000.00", "$ 600.00", "1", "$ 240.00", "03/14/2025"),
         "alex_w2_2025.pdf": textract_w2("Alex Rivera", "Northwind Sample Traders", "98,000.00", "11,760.00", ["D 23,500.00", "W 4,300.00"]),
         "hh002_1040_2025.pdf": textract_1040("Alex Rivera", "98,000.00", "74,500.00", "0"),

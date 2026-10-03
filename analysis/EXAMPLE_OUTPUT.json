@@ -1,15 +1,15 @@
 {
-  "_about": "SYNTHETIC TEST DATA. Real responses from the rapid analysis service for household HH006 (schema 1.1, ruleset 2025.1, model on). Full samples for all households are in docs/samples/.",
+  "_about": "SYNTHETIC TEST DATA. Real responses from the rapid analysis service for household HH006 (schema 1.1, ruleset 2025.2, model on). Full samples for all households are in docs/samples/.",
   "GET /health": {
     "status": "ok",
     "model_loaded": true,
     "device": "cuda",
-    "ruleset_version": "2025.1",
+    "ruleset_version": "2025.2",
     "schema_version": "1.1"
   },
   "GET /api/households/HH006/overview": {
     "schema_version": "1.1",
-    "ruleset_version": "2025.1",
+    "ruleset_version": "2025.2",
     "household_id": "HH006",
     "tax_year": 2025,
     "status": "findings",
@@ -18,16 +18,17 @@
     "summary": {
       "filing_status": "married_filing_jointly",
       "dependents": 1,
-      "dependents_check": "not_checked",
+      "dependents_check": "verified",
+      "dependents_source_document": "hh006_1040_2025.pdf",
       "agi": {
         "value": 152000,
-        "check": "not_checked",
-        "source_document": null,
-        "page": null
+        "check": "verified",
+        "source_document": "hh006_1040_2025.pdf",
+        "page": 1
       },
       "cash": {
         "value": 210000,
-        "check": "not_checked",
+        "check": "verified",
         "source_document": "hh006_bank_statement_2025.pdf",
         "page": 1,
         "months_of_income": 16.6
@@ -166,7 +167,7 @@
           "hsa_without_plan": 0,
           "mismatches": 0
         },
-        "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value its document contradicts means more documentation is needed"
+        "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value contradicted by the document it came from means more documentation is needed"
       },
       {
         "id": "major_changes",
@@ -181,7 +182,10 @@
           "flag_change_pct": 25,
           "high_at_events": 3,
           "prior_tax_year": 2024,
-          "events": 1
+          "events": [
+            "life_event_new_dependent"
+          ],
+          "event_count": 1
         },
         "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
       },
@@ -276,7 +280,7 @@
         "member": null,
         "person_id": null,
         "action_label": "Discuss cash",
-        "check": "not_checked",
+        "check": "verified",
         "metrics": {
           "cash": 210000,
           "agi": 152000,
@@ -300,7 +304,7 @@
         "member": null,
         "person_id": null,
         "action_label": "Schedule review",
-        "check": "not_checked",
+        "check": "verified",
         "metrics": {
           "before": 0,
           "after": 1
@@ -312,17 +316,10 @@
       "documents": 3,
       "conflicts": [],
       "low_confidence_fields": [],
-      "unchecked_values": 3,
+      "unchecked_values": 0,
       "missing_documents": [],
       "unassigned_documents": [],
-      "documents_needing_review": [
-        {
-          "name": "taylor_w2_2025.pdf",
-          "review_reasons": [
-            "tag_uncertain:tax"
-          ]
-        }
-      ]
+      "documents_needing_review": []
     },
     "errors": [],
     "prior_year": {
@@ -380,7 +377,8 @@
         "topics": [
           "income",
           "retirement",
-          "tax"
+          "tax",
+          "banking_cash"
         ],
         "categories_flagged": [
           "retirement",
@@ -402,9 +400,7 @@
         "life_events": [
           "life_event_new_dependent"
         ],
-        "data_quality": [
-          "unchecked_value"
-        ]
+        "data_quality": []
       },
       "members": [
         {
@@ -413,7 +409,8 @@
           "topics": [
             "income",
             "retirement",
-            "tax"
+            "tax",
+            "banking_cash"
           ],
           "fields_present": [
             "wages",
@@ -422,6 +419,7 @@
           ],
           "documents": [
             "hh006_1040_2025.pdf",
+            "hh006_bank_statement_2025.pdf",
             "taylor_w2_2025.pdf"
           ],
           "findings": [
@@ -441,13 +439,15 @@
           "topics": [
             "income",
             "tax",
-            "self_employment"
+            "self_employment",
+            "banking_cash"
           ],
           "fields_present": [
             "self_employment_income"
           ],
           "documents": [
-            "hh006_1040_2025.pdf"
+            "hh006_1040_2025.pdf",
+            "hh006_bank_statement_2025.pdf"
           ],
           "findings": [
             "F2"
@@ -492,7 +492,40 @@
           ],
           "attribution_status": "assigned",
           "status": "accepted",
-          "review_reasons": []
+          "review_reasons": [],
+          "notes": []
+        },
+        {
+          "name": "hh006_bank_statement_2025.pdf",
+          "doc_type": "account_statement",
+          "doc_subtype": null,
+          "doc_type_method": "pattern",
+          "suggested_doc_type": null,
+          "topics": [
+            "banking_cash"
+          ],
+          "model_tags": [],
+          "members": [
+            {
+              "person_id": "HH006-P1",
+              "name": "Taylor Mock",
+              "role": "joint",
+              "method": "name_match"
+            },
+            {
+              "person_id": "HH006-P2",
+              "name": "Sam Mock",
+              "role": "joint",
+              "method": "name_match"
+            }
+          ],
+          "attribution_status": "assigned",
+          "status": "accepted",
+          "review_reasons": [],
+          "notes": [
+            "tag_uncertain:tax",
+            "tag_uncertain:income"
+          ]
         },
         {
           "name": "taylor_w2_2025.pdf",
@@ -517,8 +550,9 @@
             }
           ],
           "attribution_status": "assigned",
-          "status": "needs_review",
-          "review_reasons": [
+          "status": "accepted",
+          "review_reasons": [],
+          "notes": [
             "tag_uncertain:tax"
           ]
         }
@@ -592,12 +626,12 @@
     },
     "suggestions": []
   },
-  "GET /api/households/HH006/rag-chunks (4 of 18 chunks)": {
+  "GET /api/households/HH006/rag-chunks (4 of 19 chunks)": {
     "household_id": "HH006",
     "chunks": [
       {
         "id": "HH006:household_summary:HH006",
-        "text": "Household HH006, tax year 2025, filing status married filing jointly; dependents 1 (not checked); AGI $152,000 (not checked); cash $210,000 (not checked), 16.6 months of income; mortgage interest: none on file. Status: findings, highest priority high. Flag for review, not advice.",
+        "text": "Household HH006, tax year 2025, filing status married filing jointly; dependents 1 (verified against hh006_1040_2025.pdf); AGI $152,000 (verified against hh006_1040_2025.pdf); cash $210,000 (verified against hh006_bank_statement_2025.pdf), 16.6 months of income; mortgage interest: none on file. Status: findings, highest priority high. Flag for review, not advice.",
         "metadata": {
           "household_id": "HH006",
           "person_ids": [
@@ -609,7 +643,8 @@
           "topics": [
             "income",
             "retirement",
-            "tax"
+            "tax",
+            "banking_cash"
           ],
           "fields_present": [
             "dependents",
@@ -619,7 +654,7 @@
           "tax_year": 2025,
           "source_document": null,
           "page": null,
-          "textract_confidence_min": 0.99,
+          "textract_confidence_min": 0.983,
           "attribution_status": null,
           "synthetic": true,
           "chunk_type": "household_summary",
@@ -631,12 +666,39 @@
           },
           "rule": null,
           "checks": {
-            "dependents": "not_checked",
-            "adjusted_gross_income": "not_checked",
-            "cash_balance": "not_checked",
+            "dependents": "verified",
+            "adjusted_gross_income": "verified",
+            "cash_balance": "verified",
             "mortgage_interest": "not_checked"
           },
-          "ruleset_version": "2025.1"
+          "notes": [],
+          "ruleset_version": "2025.2",
+          "model_scores": {
+            "household.dependents": [
+              {
+                "document": "hh006_1040_2025.pdf",
+                "relation": "supports",
+                "supports": 0.9836,
+                "contradicts": 0.0033
+              }
+            ],
+            "household.adjusted_gross_income": [
+              {
+                "document": "hh006_1040_2025.pdf",
+                "relation": "supports",
+                "supports": 0.9656,
+                "contradicts": 0.0067
+              }
+            ],
+            "household.cash_balance": [
+              {
+                "document": "hh006_bank_statement_2025.pdf",
+                "relation": "supports",
+                "supports": 0.9759,
+                "contradicts": 0.0016
+              }
+            ]
+          }
         }
       },
       {
@@ -657,7 +719,8 @@
           "topics": [
             "income",
             "retirement",
-            "tax"
+            "tax",
+            "banking_cash"
           ],
           "fields_present": [
             "wages",
@@ -680,22 +743,23 @@
             "wages": "verified",
             "employee_401k_contribution": "verified"
           },
-          "ruleset_version": "2025.1",
+          "notes": [],
+          "ruleset_version": "2025.2",
           "model_scores": {
             "HH006-P1.wages": [
               {
                 "document": "taylor_w2_2025.pdf",
                 "relation": "supports",
                 "supports": 0.9607,
-                "contradicts": 0.019
+                "contradicts": 0.0178
               }
             ],
             "HH006-P1.employee_401k_contribution": [
               {
                 "document": "taylor_w2_2025.pdf",
                 "relation": "supports",
-                "supports": 0.9777,
-                "contradicts": 0.0038
+                "supports": 0.9784,
+                "contradicts": 0.0039
               }
             ]
           }
@@ -747,14 +811,15 @@
             "HH006-P1.employee_401k_contribution": "verified",
             "HH006-P1.wages": "verified"
           },
-          "ruleset_version": "2025.1",
+          "notes": [],
+          "ruleset_version": "2025.2",
           "model_scores": {
             "HH006-P1.employee_401k_contribution": [
               {
                 "document": "taylor_w2_2025.pdf",
                 "relation": "supports",
-                "supports": 0.9777,
-                "contradicts": 0.0038
+                "supports": 0.9784,
+                "contradicts": 0.0039
               }
             ],
             "HH006-P1.wages": [
@@ -762,7 +827,7 @@
                 "document": "taylor_w2_2025.pdf",
                 "relation": "supports",
                 "supports": 0.9607,
-                "contradicts": 0.019
+                "contradicts": 0.0178
               }
             ]
           }
@@ -808,7 +873,8 @@
             "HH006-P1.employee_401k_contribution": "verified",
             "HH006-P1.wages": "verified"
           },
-          "ruleset_version": "2025.1",
+          "notes": [],
+          "ruleset_version": "2025.2",
           "finding_type": "retirement_contribution_review",
           "category": "retirement",
           "model_scores": {
@@ -816,8 +882,8 @@
               {
                 "document": "taylor_w2_2025.pdf",
                 "relation": "supports",
-                "supports": 0.9777,
-                "contradicts": 0.0038
+                "supports": 0.9784,
+                "contradicts": 0.0039
               }
             ],
             "HH006-P1.wages": [
@@ -825,7 +891,7 @@
                 "document": "taylor_w2_2025.pdf",
                 "relation": "supports",
                 "supports": 0.9607,
-                "contradicts": 0.019
+                "contradicts": 0.0178
               }
             ]
           }

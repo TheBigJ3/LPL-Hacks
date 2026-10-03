@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "ruleset_version": "2025.1",
+  "ruleset_version": "2025.2",
   "household_id": "HH006",
   "tax_year": 2025,
   "status": "findings",
@@ -9,16 +9,17 @@
   "summary": {
     "filing_status": "married_filing_jointly",
     "dependents": 1,
-    "dependents_check": "not_checked",
+    "dependents_check": "verified",
+    "dependents_source_document": "hh006_1040_2025.pdf",
     "agi": {
       "value": 152000,
-      "check": "not_checked",
-      "source_document": null,
-      "page": null
+      "check": "verified",
+      "source_document": "hh006_1040_2025.pdf",
+      "page": 1
     },
     "cash": {
       "value": 210000,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh006_bank_statement_2025.pdf",
       "page": 1,
       "months_of_income": 16.6
@@ -157,7 +158,7 @@
         "hsa_without_plan": 0,
         "mismatches": 0
       },
-      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value its document contradicts means more documentation is needed"
+      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value contradicted by the document it came from means more documentation is needed"
     },
     {
       "id": "major_changes",
@@ -172,7 +173,10 @@
         "flag_change_pct": 25,
         "high_at_events": 3,
         "prior_tax_year": 2024,
-        "events": 1
+        "events": [
+          "life_event_new_dependent"
+        ],
+        "event_count": 1
       },
       "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
@@ -267,7 +271,7 @@
       "member": null,
       "person_id": null,
       "action_label": "Discuss cash",
-      "check": "not_checked",
+      "check": "verified",
       "metrics": {
         "cash": 210000,
         "agi": 152000,
@@ -291,7 +295,7 @@
       "member": null,
       "person_id": null,
       "action_label": "Schedule review",
-      "check": "not_checked",
+      "check": "verified",
       "metrics": {
         "before": 0,
         "after": 1
@@ -303,17 +307,10 @@
     "documents": 3,
     "conflicts": [],
     "low_confidence_fields": [],
-    "unchecked_values": 3,
+    "unchecked_values": 0,
     "missing_documents": [],
     "unassigned_documents": [],
-    "documents_needing_review": [
-      {
-        "name": "taylor_w2_2025.pdf",
-        "review_reasons": [
-          "tag_uncertain:tax"
-        ]
-      }
-    ]
+    "documents_needing_review": []
   },
   "errors": [],
   "prior_year": {
@@ -371,7 +368,8 @@
       "topics": [
         "income",
         "retirement",
-        "tax"
+        "tax",
+        "banking_cash"
       ],
       "categories_flagged": [
         "retirement",
@@ -393,9 +391,7 @@
       "life_events": [
         "life_event_new_dependent"
       ],
-      "data_quality": [
-        "unchecked_value"
-      ]
+      "data_quality": []
     },
     "members": [
       {
@@ -404,7 +400,8 @@
         "topics": [
           "income",
           "retirement",
-          "tax"
+          "tax",
+          "banking_cash"
         ],
         "fields_present": [
           "wages",
@@ -413,6 +410,7 @@
         ],
         "documents": [
           "hh006_1040_2025.pdf",
+          "hh006_bank_statement_2025.pdf",
           "taylor_w2_2025.pdf"
         ],
         "findings": [
@@ -432,13 +430,15 @@
         "topics": [
           "income",
           "tax",
-          "self_employment"
+          "self_employment",
+          "banking_cash"
         ],
         "fields_present": [
           "self_employment_income"
         ],
         "documents": [
-          "hh006_1040_2025.pdf"
+          "hh006_1040_2025.pdf",
+          "hh006_bank_statement_2025.pdf"
         ],
         "findings": [
           "F2"
@@ -483,7 +483,40 @@
         ],
         "attribution_status": "assigned",
         "status": "accepted",
-        "review_reasons": []
+        "review_reasons": [],
+        "notes": []
+      },
+      {
+        "name": "hh006_bank_statement_2025.pdf",
+        "doc_type": "account_statement",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "banking_cash"
+        ],
+        "model_tags": [],
+        "members": [
+          {
+            "person_id": "HH006-P1",
+            "name": "Taylor Mock",
+            "role": "joint",
+            "method": "name_match"
+          },
+          {
+            "person_id": "HH006-P2",
+            "name": "Sam Mock",
+            "role": "joint",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
       },
       {
         "name": "taylor_w2_2025.pdf",
@@ -508,8 +541,9 @@
           }
         ],
         "attribution_status": "assigned",
-        "status": "needs_review",
-        "review_reasons": [
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
           "tag_uncertain:tax"
         ]
       }

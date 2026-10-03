@@ -23,9 +23,9 @@ def by_type(result):
 
 
 def test_ruleset_version_and_limit_table():
-    assert RULESET_VERSION == "2025.1"
+    assert RULESET_VERSION == "2025.2"
     assert LIMIT_401K == {2025: 23500.0, 2026: 24500.0}
-    assert fixture("HH001").ruleset_version == "2025.1"
+    assert fixture("HH001").ruleset_version == "2025.2"
 
 
 @pytest.mark.parametrize("household_id,status,priority", [

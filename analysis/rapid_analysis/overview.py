@@ -292,6 +292,7 @@ def overview_build_household(household: Household, documents: Mapping[str, Evide
         filing_status=household.filing_status,
         dependents=_display(dependents),
         dependents_check=checks.get("household.dependents", "not_checked"),
+        dependents_source_document=dependents.source_document if dependents and not dependents.conflict else None,
         agi=_checked(agi, checks.get("household.adjusted_gross_income", "not_checked")),
         cash=contract.CashValue(**cash_out.model_dump(), months_of_income=months),
         mortgage_interest=_checked(household.get("mortgage_interest"), checks.get("household.mortgage_interest", "not_checked")),

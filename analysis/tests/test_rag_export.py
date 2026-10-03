@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from rapid_analysis import RULESET_VERSION
 from rapid_analysis import api as api_module
 from rapid_analysis.fixtures import FIXTURE_IDS, fixture_household_documents, fixture_household_raw
 from rapid_analysis.overview import overview_build
@@ -20,6 +21,9 @@ SCORE_WORDS = re.compile(r"\b0\.\d+|confidence|score|probabilit", re.I)
 MONEY = re.compile(r"\$([\d,]+(?:\.\d+)?)")
 PERCENT = re.compile(r"(\d+(?:\.\d+)?)%")
 MONTHS = re.compile(r"(\d+(?:\.\d+)?) months")
+ONE_PLURAL = re.compile(r"(?<![\d.,])1 (values|contributions|HSA contributions|documents|months)\b")
+VERIFIED = re.compile(r"verified(?! against [\w.-]+\.pdf)")
+REVIEW_REASONS = {"doc_type_unknown", "member_ambiguous", "member_unassigned", "member_model_disagrees"}
 _builds: dict[str, object] = {}
 
 
@@ -68,6 +72,17 @@ def check_chunks(household_id, chunks, model_on):
         assert "{" not in text and "}" not in text
         assert not SCORE_WORDS.search(text), (c["id"], SCORE_WORDS.search(text).group(0))
         assert "model_scores" not in text
+        assert "? ." not in text and " . " not in text and ".." not in text, c["id"]
+        assert "its document" not in text, c["id"]
+        assert not VERIFIED.search(text), (c["id"], "verified without naming its document")
+        assert not ONE_PLURAL.search(text), (c["id"], ONE_PLURAL.search(text).group(0))
+        assert "tag_uncertain" not in text and "member_model_only" not in text, c["id"]
+        assert isinstance(md["member_roles"], dict)
+        assert all(isinstance(v, list) for v in md["member_roles"].values()), c["id"]
+        if "events" in md["metrics"]:
+            assert isinstance(md["metrics"]["events"], list), c["id"]
+        if md["checklist_id"] == "major_changes" or md["chunk_type"] == "changes":
+            assert isinstance(md["metrics"].get("events"), list), c["id"]
         for amount in MONEY.findall(text):
             assert float(amount.replace(",", "")) in known, (c["id"], amount)
         for value in PERCENT.findall(text) + MONTHS.findall(text):
@@ -85,9 +100,20 @@ def check_chunks(household_id, chunks, model_on):
         roles = [r for v in md["member_roles"].values() for r in (v if isinstance(v, list) else [v])]
         assert set(roles) <= set(tag_ids("member_roles"))
         assert set(md["checks"].values()) <= set(tag_ids("check_status"))
-        assert md["ruleset_version"] == "2025.1"
+        assert md["ruleset_version"] == RULESET_VERSION == "2025.2"
         if md["chunk_type"] == "member":
             assert len(md["person_ids"]) == 1 and c["id"].endswith(md["person_ids"][0])
+        if md["chunk_type"] == "checklist":
+            # every checklist chunk states its reason: a real sentence between the question and the rule
+            before_rule = text.split(" Rule:")[0] if "Rule:" in text else text.split(" Result:")[0]
+            question = next(i for i in overview["checklist"] if i["id"] == md["checklist_id"])["question"]
+            reason = before_rule[len(question):].strip() if before_rule.startswith(question) else before_rule
+            assert len(reason) > 10 and reason.endswith("."), (c["id"], reason)
+        if md["chunk_type"] == "document":
+            doc = next(d for d in overview["tags"]["documents"] if d["name"] == md["source_document"])
+            assert set(doc["review_reasons"]) <= REVIEW_REASONS
+            assert ("needs review" in text) == (doc["status"] == "needs_review"), c["id"]
+            assert md["notes"] == doc["notes"]
         if md["chunk_type"] in ("checklist", "finding"):
             assert md["rule"] and ("Rule:" in text or "not been assessed" in text)
             assert "Result:" in text
@@ -136,6 +162,38 @@ def test_checklist_chunk_has_metrics_rule_answer(backend_none):
     assert insurance["text"].startswith("Insurance has not been assessed: no data or rules yet.")
 
 
+def test_checklist_reasons_for_no_needs_data_and_not_assessed(backend_none):
+    texts = {h: {c["metadata"]["checklist_id"]: c["text"] for c in chunks_for(h) if c["metadata"]["chunk_type"] == "checklist"}
+             for h in ("HH001", "HH004", "HH009", "HH010")}
+    assert texts["HH001"]["tax_savings_possible"].startswith(
+        "Can tax savings be made? No self-employment income or 1099-R on file. Rule: ")
+    assert texts["HH004"]["retirement_can_improve"].startswith(
+        "Can retirement savings be improved? Jordan's wages conflict ($120,000 vs $165,000), so this can't be assessed. Rule: ")
+    assert texts["HH009"]["retirement_can_improve"].startswith(
+        "Can retirement savings be improved? No wage earners in this household. Rule: ")
+    assert "Missing cash balance and adjusted gross income, so this can't be assessed. Rule: " in texts["HH010"]["excess_cash"]
+    assert "No prior year on file, so changes can't be assessed. Rule: " in texts["HH001"]["major_changes"]
+    assert "0 values where documents disagree, 0 HSA contributions without plan proof" in texts["HH001"]["needs_documents"]
+    hh003 = next(c for c in chunks_for("HH003") if c["id"] == "HH003:checklist:needs_documents")
+    assert "1 HSA contribution without plan proof" in hh003["text"]
+
+
+def test_major_changes_events_is_a_list(backend_none):
+    hh005 = {c["id"]: c for c in chunks_for("HH005")}
+    for key in ("HH005:checklist:major_changes", "HH005:changes:HH005"):
+        metrics = hh005[key]["metadata"]["metrics"]
+        assert metrics["events"] == ["life_event_new_dependent", "life_event_new_employer", "life_event_new_mortgage",
+                                     "life_event_large_income_increase"]
+        assert metrics["event_count"] == 4
+    assert {c["id"]: c for c in chunks_for("HH001")}["HH001:changes:HH001"]["metadata"]["metrics"]["events"] == []
+
+
+def test_document_chunk_uncertain_tag_is_a_note_not_review(backend_none):
+    w2 = next(c for c in chunks_for("HH006") if c["id"] == "HH006:document:taylor_w2_2025.pdf")
+    assert w2["text"].endswith("Status: accepted.")
+    assert w2["metadata"]["member_roles"] == {"HH006-P1": ["owner"]}
+
+
 def test_conflict_is_labeled(backend_none):
     member = next(c for c in chunks_for("HH004") if c["id"] == "HH004:member:HH004-P1")
     assert "documents disagree: $120,000 (jordan_w2_2025.pdf) vs $165,000 (hh004_1040_2025.pdf)" in member["text"]
@@ -150,6 +208,28 @@ def test_chunks_model_on(loaded_engine, household_id):
         for entries in c["metadata"]["model_scores"].values():
             for e in entries:
                 assert set(e) <= {"document", "relation", "supports", "contradicts"}
+
+
+@pytest.mark.model
+def test_household_values_are_checked_against_documents(loaded_engine):
+    for h in ("HH003", "HH006"):
+        summary = next(c for c in chunks_for(h) if c["metadata"]["chunk_type"] == "household_summary")
+        checks = summary["metadata"]["checks"]
+        assert {checks[k] for k in ("dependents", "adjusted_gross_income", "cash_balance")} == {"verified"}, (h, checks)
+    f3 = next(c for c in chunks_for("HH006") if c["id"] == "HH006:finding:F3")
+    assert "$134,000" in f3["text"]
+    assert ("Values: cash balance $210,000 (verified against hh006_bank_statement_2025.pdf); "
+            "adjusted gross income $152,000 (verified against hh006_1040_2025.pdf).") in f3["text"]
+    assert set(f3["metadata"]["checks"].values()) == {"verified"}
+
+
+@pytest.mark.model
+def test_model_on_uncertain_tags_never_need_review(loaded_engine):
+    for h in FIXTURE_IDS:
+        for doc in build(h).overview["tags"]["documents"]:
+            if doc["status"] == "accepted":
+                assert not doc["review_reasons"]
+            assert not any(r.startswith("tag_uncertain") or r == "member_model_only" for r in doc["review_reasons"]), (h, doc)
 
 
 @pytest.mark.model

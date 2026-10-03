@@ -232,7 +232,7 @@ def _summary_number(overview: dict, field_id: str) -> dict | None:
         return {"field": field_id, **{k: s[key].get(k) for k in ("value", "check", "source_document", "page")}}
     if field_id == "dependents":
         return {"field": field_id, "value": s.get("dependents"), "check": s.get("dependents_check", "not_checked"),
-                "source_document": None, "page": None}
+                "source_document": s.get("dependents_source_document"), "page": None}
     if field_id == "filing_status":
         return {"field": field_id, "value": s.get("filing_status"), "check": "not_checked", "source_document": None, "page": None}
     return None

@@ -61,6 +61,8 @@ def write_api_samples() -> None:
         for name, (household_id, question) in ASK_SAMPLES.items():
             body = client.post(f"/api/households/{household_id}/ask", json={"question": question}).json()
             (SAMPLES / name).write_text(sample_dumps(body), encoding="utf-8")
+        raw = client.get("/api/households/HH006/documents/taylor_w2_2025.pdf/decision").json()
+        (SAMPLES / "raw_decision_HH006_taylor_w2.json").write_text(sample_dumps(raw), encoding="utf-8")
         evidence = client.get("/api/households/HH006/findings/F1/evidence").json()
         (SAMPLES / "evidence_HH006_F1.json").write_text(sample_dumps(evidence), encoding="utf-8")
     api_module.STORE.clear()

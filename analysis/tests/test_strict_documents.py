@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from rapid_analysis.documents import (
+    REVIEW_REASONS,
     MemberRef,
     decision_request,
     document_classify,
@@ -156,11 +157,12 @@ def test_model_yes_never_assigns_and_tentative_never_vetoes():
 def test_model_disagreement_keeps_pattern_type():
     response = {"answers": {"docType": {"type": "choice", "choice": "1040", "probabilities": {"1040": 0.93}}}}
     r = classify(DOCS[0], response).result
-    assert r["doc_type"] == "w2" and "doc_type_model_disagrees" in r["review_reasons"]
+    assert r["doc_type"] == "w2" and "doc_type_model_disagrees" in r["notes"]
+    assert "doc_type_model_disagrees" not in r["review_reasons"]
     low = {"answers": {"docType": {"choice": "1040", "probabilities": {"1040": 0.6}}}}
-    assert "doc_type_model_disagrees" not in classify(DOCS[0], low).result["review_reasons"]
+    assert "doc_type_model_disagrees" not in classify(DOCS[0], low).result["notes"]
     agrees = {"answers": {"docType": {"choice": "1099", "probabilities": {"1099": 0.99}}}}
-    assert "doc_type_model_disagrees" not in classify(DOCS[5], agrees).result["review_reasons"]
+    assert "doc_type_model_disagrees" not in classify(DOCS[5], agrees).result["notes"]
 
 
 def test_tags_only_when_confirmed():
@@ -168,8 +170,32 @@ def test_tags_only_when_confirmed():
                             "tag_earnings": {"status": "confirmed", "answer": False}}}
     r = classify(DOCS[0], response).result
     assert r["model_tags"] == []
-    assert "tag_uncertain:tax" in r["review_reasons"] and "tag_uncertain:income" not in r["review_reasons"]
+    assert "tag_uncertain:tax" in r["notes"] and "tag_uncertain:income" not in r["notes"]
+    assert not any(reason.startswith("tag_uncertain") for reason in r["review_reasons"])
     assert r["topics"] == ["income", "retirement", "tax"]
+
+
+def test_uncertain_tag_on_certain_w2_is_accepted():
+    """A W-2 with a certain type and owner but an uncertain tag is accepted; the tag is only a note."""
+    response = {"answers": {"docType": {"choice": "w2", "probabilities": {"w2": 0.99}},
+                            "tag_tax": {"status": "tentative", "answer": True},
+                            "tag_earnings": {"status": "confirmed", "answer": True},
+                            "member_sarah_johnson": {"status": "confirmed", "answer": True},
+                            "member_john_johnson": {"status": "tentative", "answer": True}}}
+    r = classify(DOCS[0], response).result
+    assert r["doc_type"] == "w2" and r["attribution_status"] == "assigned"
+    assert [m["person_id"] for m in r["members"]] == ["HHJ-P2"]
+    assert r["status"] == "accepted" and r["review_reasons"] == []
+    assert r["notes"] == ["tag_uncertain:tax", "member_model_only"]
+
+
+def test_only_listed_reasons_set_needs_review():
+    for doc in DOCS:
+        for response in (recorded(doc["id"]), None):
+            r = classify(doc, response).result
+            assert set(r["review_reasons"]) <= set(REVIEW_REASONS)
+            assert not set(r["notes"]) & set(REVIEW_REASONS)
+            assert (r["status"] == "needs_review") == bool(r["review_reasons"])
 
 
 @pytest.mark.parametrize("response", [{}, {"answers": None}, {"answers": {"docType": "x", "tag_tax": [], "member_john_johnson": {"status": 3}}},

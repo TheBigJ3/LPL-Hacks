@@ -96,7 +96,8 @@ def test_hh006_matches_spec_shape(backend_none):
     assert (o["household_id"], o["tax_year"], o["status"], o["priority"]) == ("HH006", 2025, "findings", "high")
     assert o["summary"]["filing_status"] == "married_filing_jointly"
     assert o["summary"]["dependents"] == 1
-    assert o["summary"]["agi"] == {"value": 152000, "check": "not_checked", "source_document": None, "page": None}
+    assert o["summary"]["agi"] == {"value": 152000, "check": "not_checked", "source_document": "hh006_1040_2025.pdf", "page": 1}
+    assert o["summary"]["dependents_source_document"] == "hh006_1040_2025.pdf"
     assert o["summary"]["cash"]["value"] == 210000 and o["summary"]["cash"]["months_of_income"] == 16.6
     taylor = o["members"][0]
     assert (taylor["person_id"], taylor["name"], taylor["employer"]) == ("HH006-P1", "Taylor Mock", "Adventure Works Sample")

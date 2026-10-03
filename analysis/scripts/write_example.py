@@ -31,7 +31,7 @@ def main() -> int:
         rag = client.get("/api/households/HH006/rag-chunks").json()["chunks"]
         example = {
             "_about": ("SYNTHETIC TEST DATA. Real responses from the rapid analysis service for household HH006 "
-                       "(schema 1.1, ruleset 2025.1, model on). Full samples for all households are in docs/samples/."),
+                       "(schema 1.1, ruleset 2025.2, model on). Full samples for all households are in docs/samples/."),
             "GET /health": client.get("/health").json(),
             "GET /api/households/HH006/overview": client.get("/api/households/HH006/overview").json(),
             "GET /api/households/HH006/findings/F1/evidence": client.get("/api/households/HH006/findings/F1/evidence").json(),

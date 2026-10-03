@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "ruleset_version": "2025.1",
+  "ruleset_version": "2025.2",
   "household_id": "HH003",
   "tax_year": 2025,
   "status": "findings",
@@ -9,16 +9,17 @@
   "summary": {
     "filing_status": "single",
     "dependents": 0,
-    "dependents_check": "not_checked",
+    "dependents_check": "verified",
+    "dependents_source_document": "hh003_1040_2025.pdf",
     "agi": {
       "value": 81000,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh003_1040_2025.pdf",
       "page": 1
     },
     "cash": {
       "value": 19000,
-      "check": "not_checked",
+      "check": "verified",
       "source_document": "hh003_bank_statement_2025.pdf",
       "page": 1,
       "months_of_income": 2.8
@@ -140,7 +141,7 @@
         "hsa_without_plan": 1,
         "mismatches": 0
       },
-      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value its document contradicts means more documentation is needed"
+      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value contradicted by the document it came from means more documentation is needed"
     },
     {
       "id": "major_changes",
@@ -151,7 +152,8 @@
       "finding_ids": [],
       "metrics": {
         "flag_change_pct": 25,
-        "high_at_events": 3
+        "high_at_events": 3,
+        "events": []
       },
       "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
@@ -204,14 +206,14 @@
         "hsa_contribution": 4300,
         "eligible_plan_documented": false
       },
-      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value its document contradicts means more documentation is needed"
+      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value contradicted by the document it came from means more documentation is needed"
     }
   ],
   "data_quality": {
     "documents": 3,
     "conflicts": [],
     "low_confidence_fields": [],
-    "unchecked_values": 3,
+    "unchecked_values": 0,
     "missing_documents": [
       {
         "type": "1095",
@@ -221,14 +223,7 @@
       }
     ],
     "unassigned_documents": [],
-    "documents_needing_review": [
-      {
-        "name": "morgan_w2_2025.pdf",
-        "review_reasons": [
-          "tag_uncertain:tax"
-        ]
-      }
-    ]
+    "documents_needing_review": []
   },
   "errors": [],
   "prior_year": null,
@@ -237,7 +232,8 @@
       "topics": [
         "income",
         "retirement",
-        "tax"
+        "tax",
+        "banking_cash"
       ],
       "categories_flagged": [
         "hsa"
@@ -253,8 +249,7 @@
       ],
       "life_events": [],
       "data_quality": [
-        "missing_document",
-        "unchecked_value"
+        "missing_document"
       ]
     },
     "members": [
@@ -265,7 +260,8 @@
           "income",
           "retirement",
           "tax",
-          "health_savings"
+          "health_savings",
+          "banking_cash"
         ],
         "fields_present": [
           "wages",
@@ -274,6 +270,8 @@
           "hsa_contribution"
         ],
         "documents": [
+          "hh003_1040_2025.pdf",
+          "hh003_bank_statement_2025.pdf",
           "morgan_w2_2025.pdf"
         ],
         "findings": [
@@ -289,6 +287,59 @@
       }
     ],
     "documents": [
+      {
+        "name": "hh003_1040_2025.pdf",
+        "doc_type": "1040",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "tax"
+        ],
+        "model_tags": [
+          "tax",
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH003-P1",
+            "name": "Morgan Lee",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": []
+      },
+      {
+        "name": "hh003_bank_statement_2025.pdf",
+        "doc_type": "account_statement",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "banking_cash"
+        ],
+        "model_tags": [],
+        "members": [
+          {
+            "person_id": "HH003-P1",
+            "name": "Morgan Lee",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      },
       {
         "name": "morgan_w2_2025.pdf",
         "doc_type": "w2",
@@ -312,8 +363,9 @@
           }
         ],
         "attribution_status": "assigned",
-        "status": "needs_review",
-        "review_reasons": [
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
           "tag_uncertain:tax"
         ]
       }

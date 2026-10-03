@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1",
-  "ruleset_version": "2025.1",
+  "ruleset_version": "2025.2",
   "household_id": "HH001",
   "tax_year": 2025,
   "status": "findings",
@@ -10,6 +10,7 @@
     "filing_status": "married_filing_jointly",
     "dependents": 2,
     "dependents_check": "verified",
+    "dependents_source_document": "hh001_1040_2025.pdf",
     "agi": {
       "value": 185000,
       "check": "verified",
@@ -165,7 +166,7 @@
         "hsa_without_plan": 0,
         "mismatches": 0
       },
-      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value its document contradicts means more documentation is needed"
+      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value contradicted by the document it came from means more documentation is needed"
     },
     {
       "id": "major_changes",
@@ -176,7 +177,8 @@
       "finding_ids": [],
       "metrics": {
         "flag_change_pct": 25,
-        "high_at_events": 3
+        "high_at_events": 3,
+        "events": []
       },
       "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
     },
@@ -269,15 +271,7 @@
     "unchecked_values": 0,
     "missing_documents": [],
     "unassigned_documents": [],
-    "documents_needing_review": [
-      {
-        "name": "hh001_bank_statement_2025.pdf",
-        "review_reasons": [
-          "tag_uncertain:tax",
-          "tag_uncertain:income"
-        ]
-      }
-    ]
+    "documents_needing_review": []
   },
   "errors": [],
   "prior_year": null,
@@ -397,7 +391,8 @@
         ],
         "attribution_status": "assigned",
         "status": "accepted",
-        "review_reasons": []
+        "review_reasons": [],
+        "notes": []
       },
       {
         "name": "hh001_bank_statement_2025.pdf",
@@ -424,8 +419,9 @@
           }
         ],
         "attribution_status": "assigned",
-        "status": "needs_review",
-        "review_reasons": [
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
           "tag_uncertain:tax",
           "tag_uncertain:income"
         ]
@@ -455,7 +451,8 @@
         ],
         "attribution_status": "assigned",
         "status": "accepted",
-        "review_reasons": []
+        "review_reasons": [],
+        "notes": []
       },
       {
         "name": "sarah_w2_2025.pdf",
@@ -482,7 +479,8 @@
         ],
         "attribution_status": "assigned",
         "status": "accepted",
-        "review_reasons": []
+        "review_reasons": [],
+        "notes": []
       }
     ]
   }

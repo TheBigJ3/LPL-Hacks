@@ -1,7 +1,8 @@
 """STRICT document type, tags and member relevance (amendment §3).
 
-A document type, tag or member assignment is set only when certain; anything uncertain is
-needs_review with a reason. Decisions:
+A document type, tag or member assignment is set only when certain. Only an unknown type or an
+unsettled owner makes a document needs_review (REVIEW_REASONS); an uncertain tag, a model-only member
+yes or a model doc-type disagreement is a note and leaves status alone. Decisions:
 - doc_type: form-number patterns on the text. The model's docType is only ever a suggestion.
 - tags: tags.json doc_types[].topics apply deterministically; a model tag counts only when its
   status is "confirmed".
@@ -9,7 +10,8 @@ needs_review with a reason. Decisions:
   (confirmed + answer false). A model-only YES never assigns anyone.
 
 The model is called in-process through OpenDecision's DocumentDecisionService, one call per document,
-with the redacted label: value text. Raw responses are logged, never returned to the frontend.
+with the redacted label: value text. The raw response is kept on the decision and served only by the raw
+decision endpoint (GET .../documents/{name}/decision); the overview and frontend never carry it.
 """
 
 from __future__ import annotations
@@ -56,6 +58,8 @@ TAG_QUESTIONS = {
     "tag_tax": ("tax", "This document is tax-related."),
     "tag_earnings": ("income", "This document reports employment earnings or wages."),
 }
+# The only reasons that make a document needs_review. Everything else the classifier records is a note.
+REVIEW_REASONS = ("doc_type_unknown", "member_ambiguous", "member_unassigned", "member_model_disagrees")
 FINANCIAL_VALUE = re.compile(r"\$\s?\d|\b\d{1,3}(?:,\d{3})+(?:\.\d{2})?\b")
 
 
@@ -72,6 +76,7 @@ class DocumentDecision:
     result: dict[str, Any]
     logged: list[str] = field(default_factory=list)
     model_failed: bool = False
+    response: dict[str, Any] | None = None  # the raw OpenDecision response this decision was made from
 
 
 # ---------------------------------------------------------------- the model call (§3.1)
@@ -249,6 +254,8 @@ def document_classify(name: str, text: str, members: Sequence[MemberRef], respon
     role = "joint" if len(assigned) > 1 else "owner"
 
     reasons = list(dict.fromkeys(reasons))
+    notes = [r for r in reasons if r not in REVIEW_REASONS]
+    reasons = [r for r in reasons if r in REVIEW_REASONS]
     result = {
         "name": name,
         "doc_type": doc_type,
@@ -261,6 +268,7 @@ def document_classify(name: str, text: str, members: Sequence[MemberRef], respon
         "attribution_status": attribution,
         "status": "needs_review" if reasons else "accepted",
         "review_reasons": reasons,
+        "notes": notes,
     }
     return DocumentDecision(result=result, logged=logged)
 
@@ -293,6 +301,7 @@ def document_decision(name: str, text: str, members: Sequence[MemberRef], decide
         response, failed = None, True
     decision = document_classify(name, text, members, response)
     decision.model_failed = failed
+    decision.response = response
     if not failed:
         with _memo_lock:
             _memo[key] = decision

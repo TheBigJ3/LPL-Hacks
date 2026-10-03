@@ -10,7 +10,13 @@
     "textract_confidence": 0.984,
     "verified": false
   },
-  "dependents": 0,
+  "dependents": {
+    "value": 0,
+    "source_document": "hh003_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
   "cash_balance": {
     "value": 19000,
     "source_document": "hh003_bank_statement_2025.pdf",

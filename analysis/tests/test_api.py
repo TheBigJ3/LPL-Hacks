@@ -37,7 +37,7 @@ def client_off(backend_none):
 
 def test_health(client_off):
     body = client_off.get("/health").json()
-    assert body == {"status": "ok", "model_loaded": False, "device": "none", "ruleset_version": "2025.1", "schema_version": "1.1"}
+    assert body == {"status": "ok", "model_loaded": False, "device": "none", "ruleset_version": "2025.2", "schema_version": "1.1"}
 
 
 def test_enums(client_off):
@@ -64,7 +64,7 @@ def test_overview_cached_until_refresh_or_new_data(client_off):
     first = client_off.get("/api/households/HH001/overview").json()
     assert len(api_module.STORE.overviews) >= 1
     key = next(k for k in api_module.STORE.overviews if k[0] == "HH001")
-    assert key[1] == "2025.1"
+    assert key[1] == "2025.2"
     assert client_off.get("/api/households/HH001/overview").json() == first
     refreshed = client_off.post("/api/households/HH001/refresh")
     assert refreshed.status_code == 200 and refreshed.json() == first
@@ -341,3 +341,46 @@ def test_stats_rule_counts_model_on(client, loaded_engine):
         values += [n for m in overview["members"] for n in m["numbers"]]
         expected += sum(1 for v in values if v["source_document"] in available or v["check"] == "conflicted")
     assert body["values_checked"] == expected
+
+
+# ---------------------------------------------------------------- raw document decision (RAG team)
+
+RAW_TEAMMATE_SHAPE = {  # the keys the RAG team built against (docs/samples/raw_decision_*.json)
+    "choice": {"type", "choice", "probabilities", "confidence", "evidence"},
+    "noul": {"type", "mode", "answer", "status", "binary", "three_way", "evidence"},
+    "binary": {"answer", "probabilities", "confidence"},
+    "three_way": {"answer", "relation", "scores"},
+    "evidence": {"id", "text", "relevance"},
+}
+
+
+def test_raw_decision_needs_the_model(client_off):
+    response = client_off.get("/api/households/HH006/documents/taylor_w2_2025.pdf/decision")
+    assert response.status_code == 503
+    assert response.json()["errors"][0]["code"] == "validator_unavailable"
+    assert client_off.get("/api/households/NOPE/documents/taylor_w2_2025.pdf/decision").status_code == 404
+    assert client_off.get("/api/households/HH006/documents/nope.pdf/decision").status_code == 404
+
+
+@pytest.mark.model
+def test_raw_decision_shape_and_consistency(client, loaded_engine):
+    body = client.get("/api/households/HH006/documents/taylor_w2_2025.pdf/decision").json()
+    answers = body["answers"]
+    assert set(body) == {"answers"}
+    assert set(answers) == {"docType", "tag_tax", "tag_earnings", "member_taylor_mock", "member_sam_mock"}
+    assert set(answers["docType"]) >= RAW_TEAMMATE_SHAPE["choice"] and answers["docType"]["type"] == "choice"
+    assert answers["docType"]["choice"] == "w2"
+    for key in ("tag_tax", "tag_earnings", "member_taylor_mock", "member_sam_mock"):
+        a = answers[key]
+        assert a["type"] == "document_noul" and a["mode"] == "both"
+        assert set(a) >= RAW_TEAMMATE_SHAPE["noul"]
+        assert set(a["binary"]) >= RAW_TEAMMATE_SHAPE["binary"] and set(a["three_way"]) >= RAW_TEAMMATE_SHAPE["three_way"]
+        assert all(set(e) >= RAW_TEAMMATE_SHAPE["evidence"] for e in a["evidence"])
+    # the raw answers are the ones the strict decision used
+    overview = client.get("/api/households/HH006/overview").json()
+    doc = next(d for d in overview["tags"]["documents"] if d["name"] == "taylor_w2_2025.pdf")
+    confirmed = {"tag_tax": "tax", "tag_earnings": "income"}
+    assert doc["model_tags"] == [t for k, t in confirmed.items()
+                                 if answers[k]["status"] == "confirmed" and answers[k]["answer"] is True]
+    # raw scores stay out of the advisor-facing overview
+    assert "probabilit" not in json.dumps(overview).lower()

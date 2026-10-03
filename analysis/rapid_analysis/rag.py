@@ -19,10 +19,20 @@ MAX_TEXT = 700
 ANSWER_WORDS = {"yes": "flagged (yes)", "no": "not flagged (no)", "needs_data": "needs data", "not_assessed": "not assessed"}
 CHECKLIST_SUBJECTS = {"insurance_review": "Insurance", "estate_review": "Estate planning", "education_review": "Education savings"}
 TAIL = "Flag for review, not advice."
+REVIEW_WORDS = {"doc_type_unknown": "document type not recognized", "member_ambiguous": "owner ambiguous",
+                "member_unassigned": "no owner found", "member_model_disagrees": "the checker disputes the name match"}
 
 
 def _money(value: Any) -> str:
     return money_format(float(value)) if isinstance(value, (int, float)) and not isinstance(value, bool) else str(value)
+
+
+def _plural(count: int, singular: str, plural: str) -> str:
+    return f"{count} {singular if count == 1 else plural}"
+
+
+def _first(name: str) -> str:
+    return name.split()[0]
 
 
 def _value_text(field_id: str, value: Any) -> str:
@@ -36,13 +46,13 @@ def _value_text(field_id: str, value: Any) -> str:
 
 def _check_text(number: dict, field_id: str) -> str:
     check = number.get("check", "not_checked")
-    doc = number.get("source_document") or "its document"
+    doc = number.get("source_document")
     if check == "verified":
-        return f"verified against {doc}"
+        return f"verified against {doc}" if doc else "verified"
     if check == "mismatch":
-        return f"mismatch: {doc} says otherwise"
+        return f"mismatch: {doc} says otherwise" if doc else "mismatch: its source says otherwise"
     if check == "unconfirmed":
-        return f"unconfirmed: not found in {doc}"
+        return f"unconfirmed: not found in {doc}" if doc else "unconfirmed"
     if check == "conflicted":
         parts = [f"{_value_text(field_id, c['value'])} ({c['source_document']})" for c in number.get("candidates") or []]
         return "documents disagree: " + " vs ".join(parts) if parts else "documents disagree"
@@ -63,6 +73,9 @@ def _member_names(overview: dict) -> dict[str, str]:
 def _number(overview: dict, person_id: str | None, field_id: str) -> dict | None:
     if person_id is None:
         s = overview.get("summary") or {}
+        if field_id == "dependents":
+            return {"value": s.get("dependents"), "check": s.get("dependents_check", "not_checked"),
+                    "source_document": s.get("dependents_source_document")}
         key = {"adjusted_gross_income": "agi", "cash_balance": "cash", "mortgage_interest": "mortgage_interest"}.get(field_id)
         return s.get(key) if key else None
     card = next((m for m in overview["members"] if m["person_id"] == person_id), None)
@@ -75,7 +88,7 @@ def _base_metadata(overview: dict, chunk_type: str) -> dict[str, Any]:
         "topics": [], "fields_present": [], "tax_year": overview["tax_year"], "source_document": None, "page": None,
         "textract_confidence_min": None, "attribution_status": None, "synthetic": True,
         "chunk_type": chunk_type, "checklist_id": None, "answer": None, "dollar_impact": None,
-        "metrics": {}, "rule": None, "checks": {}, "ruleset_version": RULESET_VERSION,
+        "metrics": {}, "rule": None, "checks": {}, "notes": [], "ruleset_version": RULESET_VERSION,
     }
 
 
@@ -105,7 +118,7 @@ def _summary_chunk(overview: dict, vc: dict, conf: dict) -> dict:
     hid = overview["household_id"]
     deps = s["dependents"]
     parts = [f"Household {hid}, tax year {overview['tax_year']}, filing status {(s['filing_status'] or 'unknown').replace('_', ' ')}",
-             f"dependents {deps if deps is not None else 'none on file'} ({_check_text({'check': s['dependents_check']}, 'dependents')})",
+             f"dependents {deps if deps is not None else 'none on file'} ({_check_text(_number(overview, None, 'dependents'), 'dependents')})",
              _number_sentence("AGI", "adjusted_gross_income", s["agi"]),
              _number_sentence("cash", "cash_balance", s["cash"])
              + (f", {s['cash']['months_of_income']} months of income" if s["cash"]["months_of_income"] is not None else ""),
@@ -144,7 +157,22 @@ def _member_chunk(overview: dict, card: dict, vc: dict, conf: dict) -> dict:
     return _chunk(f"{hid}:member:{pid}", text, md, vc, keys)
 
 
+def _cannot_assess(overview: dict, item: dict, fields: tuple[str, ...]) -> list[str]:
+    """Why a needs_data item can't be assessed, naming any conflicting values."""
+    out = []
+    for card in overview["members"]:
+        for n in card["numbers"]:
+            if n["field"] in fields and n["check"] == "conflicted":
+                values = " vs ".join(_value_text(n["field"], c["value"]) for c in n.get("candidates") or [])
+                out.append(f"{_first(card['name'] or card['person_id'])}'s {n['label'].lower()} conflict ({values}), so this can't be assessed")
+    return out or [f"{item['reason']}, so this can't be assessed"]
+
+
 def _retirement_sentences(overview: dict, item: dict) -> list[str]:
+    if item["answer"] == "not_assessed":
+        return ["No wage earners in this household"]
+    if item["answer"] == "needs_data":
+        return _cannot_assess(overview, item, ("wages", "employee_401k_contribution"))
     names = _member_names(overview)
     limit = item["metrics"].get("limit")
     out = []
@@ -174,13 +202,15 @@ def _tax_sentences(overview: dict, item: dict) -> list[str]:
             if f.get("estimated_additional_tax") is not None:
                 s += f", estimated additional tax {_money(f['estimated_additional_tax'])} at {f['additional_tax_rate_pct']}%"
             out.append(s)
-    return out
+    if item["answer"] == "needs_data":
+        out += _cannot_assess(overview, item, ("self_employment_income", "retirement_distribution_taxable", "federal_tax_withheld"))
+    return out or ["No self-employment income or 1099-R on file"]
 
 
 def _cash_sentences(overview: dict, item: dict) -> list[str]:
     m = item["metrics"]
     if "cash" not in m:
-        return [item["reason"]]
+        return _cannot_assess(overview, item, ())
     s = overview["summary"]
     out = (f"Cash {_money(m['cash'])} ({_check_text(s['cash'], 'cash_balance')}) against AGI {_money(m['agi'])} "
            f"({_check_text(s['agi'], 'adjusted_gross_income')}): {m['months_of_income']} months of income vs a "
@@ -192,14 +222,15 @@ def _cash_sentences(overview: dict, item: dict) -> list[str]:
 
 def _documents_sentences(overview: dict, item: dict) -> list[str]:
     m = item["metrics"]
-    return [f"{m.get('conflicts', 0)} values where documents disagree, {m.get('hsa_without_plan', 0)} HSA contributions "
-            f"without plan proof, {m.get('mismatches', 0)} values their document contradicts",
+    return [f"{_plural(m.get('conflicts', 0), 'value', 'values')} where documents disagree, "
+            f"{_plural(m.get('hsa_without_plan', 0), 'HSA contribution', 'HSA contributions')} without plan proof, "
+            f"{_plural(m.get('mismatches', 0), 'value', 'values')} that a document contradicts",
             *([item["reason"]] if item["answer"] == "yes" else [])]
 
 
 def _changes_sentences(overview: dict, item: dict) -> list[str]:
     if item["answer"] == "not_assessed":
-        return ["No prior year on file"]
+        return ["No prior year on file, so changes can't be assessed"]
     texts = [c["text"] for c in overview["changes_since_last_year"]]
     return [f"Compared with {item['metrics'].get('prior_tax_year')}: " + ("; ".join(texts) if texts else "no major changes")]
 
@@ -280,10 +311,11 @@ def _document_chunk(overview: dict, doc: dict) -> dict:
     text = (f"Document {doc['name']}: {doc_label} ({method}). Belongs to {who}. "
             f"Topics: {', '.join(topic_labels) or 'none'}. "
             f"Confirmed content tags: {', '.join(doc['model_tags']) or 'none'}. "
-            f"Status: {doc['status'].replace('_', ' ')}" + (f" ({', '.join(doc['review_reasons'])})" if doc["review_reasons"] else "") + ".")
+            + ("Status: accepted." if doc["status"] == "accepted"
+               else f"Status: needs review ({', '.join(REVIEW_WORDS.get(r, r) for r in doc['review_reasons'])})."))
     md = _base_metadata(overview, "document")
     md.update({"person_ids": [m["person_id"] for m in doc["members"]],
-               "member_roles": {m["person_id"]: m["role"] for m in doc["members"]},
+               "member_roles": {m["person_id"]: [m["role"]] for m in doc["members"]}, "notes": doc.get("notes", []),
                "doc_type": doc["doc_type"], "topics": doc["topics"], "source_document": doc["name"], "page": 1,
                "attribution_status": doc["attribution_status"],
                "fields_present": [f for f in tag_by_id("doc_types")[doc["doc_type"]]["fields"] if f in tag_ids("fields")]})
@@ -300,8 +332,7 @@ def _changes_chunk(overview: dict) -> dict:
         text = (f"Changes since {item['metrics'].get('prior_tax_year')}: " + ("; ".join(c["text"] for c in changes) if changes else "none")
                 + f". Rule: {item['rule']}.")
     md = _base_metadata(overview, "changes")
-    md.update({"answer": item["answer"], "metrics": {"events": [c["type"] for c in overview["changes_since_last_year"]], **item["metrics"]},
-               "topics": ["life_event"]})
+    md.update({"answer": item["answer"], "metrics": item["metrics"], "rule": item["rule"], "topics": ["life_event"]})
     return {"id": f"{hid}:changes:{hid}", "text": text, "metadata": md}
 
 
