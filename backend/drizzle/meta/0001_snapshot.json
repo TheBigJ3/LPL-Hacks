@@ -1,5 +1,5 @@
 {
-  "id": "e2f9936c-a7d0-411d-954d-7451c6be23f9",
+  "id": "1a5e9b8b-747e-4a79-aa70-8ba3adeb6332",
   "prevId": "c04f72b7-2bbc-44c1-bc89-9619c5620ac9",
   "version": "7",
   "dialect": "postgresql",
@@ -27,9 +27,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "content": {
-          "name": "content",
-          "type": "bytea",
+        "s3_key": {
+          "name": "s3_key",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },

@@ -1,11 +1,11 @@
 import { Readable } from "stream";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AppError } from "../../../modules/AppError.js";
-import { GENERAL_ERRORS } from "../../../types/native/errors.js";
 import { DOCUMENT_ERRORS } from "../../../types/native/documents/errors.js";
 import { EXTRACTION_ERRORS } from "../../../types/native/extraction/errors.js";
 
-const { db, rows, analyze, notifyRooms } = vi.hoisted(() => {
+const { db, rows, s3Send, analyze, notifyRooms } = vi.hoisted(() => {
   const rows = { selected: [] as unknown[], updated: [] as unknown[], sets: [] as unknown[], inserted: [] as unknown[] };
 
   const db = {
@@ -19,15 +19,16 @@ const { db, rows, analyze, notifyRooms } = vi.hoisted(() => {
     insert: vi.fn(() => ({
       values: (values: Record<string, unknown>) => {
         rows.inserted.push(values);
-        return { returning: async () => [{ id: "new-document-id", ...values, status: "uploaded", pageCount: null, failureMessage: null }] };
+        return { returning: async () => [{ ...values, status: "uploaded", pageCount: null, failureMessage: null }] };
       },
     })),
   };
 
-  return { db, rows, analyze: vi.fn(), notifyRooms: vi.fn() };
+  return { db, rows, s3Send: vi.fn(), analyze: vi.fn(), notifyRooms: vi.fn() };
 });
 
 vi.mock("../../../loaders/postgresLoader.js", () => ({ db }));
+vi.mock("../../../loaders/s3Loader.js", () => ({ S3_DOCUMENTS_BUCKET: "documents-bucket", s3_client: { send: s3Send } }));
 vi.mock("../../../services/extraction/extractedFieldMethods.js", () => ({
   extractedFieldAnalyze: analyze,
 }));
@@ -41,14 +42,14 @@ const {
 } = await import("../../../services/documents/documentMethods.js");
 
 const DOCUMENT_ID = "2f1c8f0e-5d1a-4c47-9a3e-8f0a2b6c9d11";
-const CONTENT = Buffer.from("%PDF");
+const CONTENT = new Uint8Array(Buffer.from("%PDF"));
 const ANALYSIS = { fields: [], tables: [], lines: [{ text: "Page one", confidence: 99, confidenceLevel: "high", page: 1, box: null }] };
 
 const record = (overrides: Record<string, unknown> = {}) => ({
   id: DOCUMENT_ID,
   fileName: "statement.pdf",
   contentType: "application/pdf",
-  content: CONTENT,
+  s3Key: `documents/${DOCUMENT_ID}`,
   status: "uploaded",
   pageCount: null,
   extraction: null,
@@ -68,22 +69,32 @@ beforeEach(() => {
   rows.updated = [];
   rows.sets = [];
   rows.inserted = [];
+  s3Send.mockResolvedValue({ Body: { transformToByteArray: async () => CONTENT } });
 });
 
 describe("documentCreate", () => {
-  it("stores the whole upload on the new document and returns it without the file", async () => {
-    const document = await documentCreate({ fileName: "statement.pdf", contentType: "application/pdf", contentLength: 8, body: Readable.from(["%PDF", "-1.7"]) });
+  it("streams the upload to S3 under the new document's id before recording it as uploaded", async () => {
+    const body = Readable.from(["%PDF"]);
 
-    expect(rows.inserted).toEqual([{ fileName: "statement.pdf", contentType: "application/pdf", content: Buffer.from("%PDF-1.7") }]);
-    expect(document).toEqual({ id: "new-document-id", fileName: "statement.pdf", status: "uploaded", pageCount: null, failureMessage: null });
+    const document = await documentCreate({ fileName: "statement.pdf", contentType: "application/pdf", contentLength: 4, body });
+
+    const command = s3Send.mock.calls[0][0];
+    expect(command).toBeInstanceOf(PutObjectCommand);
+    expect(command.input).toEqual({
+      Bucket: "documents-bucket",
+      Key: `documents/${document.id}`,
+      Body: body,
+      ContentType: "application/pdf",
+      ContentLength: 4,
+    });
+    expect(rows.inserted).toEqual([{ id: document.id, fileName: "statement.pdf", contentType: "application/pdf", s3Key: `documents/${document.id}` }]);
+    expect(document).toEqual({ id: document.id, fileName: "statement.pdf", status: "uploaded", pageCount: null, failureMessage: null });
   });
 
-  it.each([
-    ["longer", "%PDF-1.7", GENERAL_ERRORS.UPLOAD_TOO_LARGE],
-    ["shorter", "%P", GENERAL_ERRORS.BAD_REQUEST],
-  ])("records nothing when the body is %s than declared", async (_case, body, expected) => {
-    await expect(documentCreate({ fileName: "a.pdf", contentType: "application/pdf", contentLength: 4, body: Readable.from([body]) }))
-      .rejects.toMatchObject({ _status: expected.STATUS });
+  it("records nothing when S3 rejects the upload", async () => {
+    s3Send.mockRejectedValue(new Error("AccessDenied"));
+
+    await expect(documentCreate({ fileName: "a.pdf", contentType: "application/pdf", contentLength: 4, body: Readable.from(["%PDF"]) })).rejects.toThrow("AccessDenied");
     expect(db.insert).not.toHaveBeenCalled();
   });
 });
@@ -110,17 +121,21 @@ describe("documentExtract", () => {
       rows.selected = selected;
 
       expect(await documentExtract(DOCUMENT_ID)).toBe("skipped");
+      expect(s3Send).not.toHaveBeenCalled();
       expect(analyze).not.toHaveBeenCalled();
       expect(db.update).not.toHaveBeenCalled();
     },
   );
 
-  it("analyzes the stored file, then saves the analysis and page count and signals the document's room", async () => {
+  it("analyzes the file downloaded from S3, then saves the analysis and page count and signals the document's room", async () => {
     rows.selected = [record()];
     rows.updated = [{ id: DOCUMENT_ID }];
     analyze.mockResolvedValue({ pageCount: 3, analysis: ANALYSIS });
 
     expect(await documentExtract(DOCUMENT_ID)).toBe("extracted");
+    const command = s3Send.mock.calls[0][0];
+    expect(command).toBeInstanceOf(GetObjectCommand);
+    expect(command.input).toEqual({ Bucket: "documents-bucket", Key: `documents/${DOCUMENT_ID}` });
     expect(analyze).toHaveBeenCalledWith(CONTENT, "application/pdf");
     expect(rows.sets).toEqual([{ status: "extracting" }, { status: "extracted", pageCount: 3, extraction: ANALYSIS }]);
     expectSettledSignal();
@@ -140,6 +155,15 @@ describe("documentExtract", () => {
     analyze.mockResolvedValue({ pageCount: 3, analysis: ANALYSIS });
 
     expect(await documentExtract(DOCUMENT_ID)).toBe("extracted");
+    expect(notifyRooms).not.toHaveBeenCalled();
+  });
+
+  it("rethrows a failed download so the job retries, without analyzing or settling the document", async () => {
+    rows.selected = [record()];
+    s3Send.mockRejectedValue(new Error("SlowDown"));
+
+    await expect(documentExtract(DOCUMENT_ID)).rejects.toThrow("SlowDown");
+    expect(analyze).not.toHaveBeenCalled();
     expect(notifyRooms).not.toHaveBeenCalled();
   });
 

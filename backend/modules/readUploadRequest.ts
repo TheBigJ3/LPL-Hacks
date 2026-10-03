@@ -31,18 +31,3 @@ export function readUploadRequest(req: Request, rules: UploadRequestRules): Uplo
 
     return { body: req, contentType, contentLength: declaredLength };
 }
-
-export async function readUploadBody(upload: UploadRequest): Promise<Buffer> {
-    const chunks: Buffer[] = [];
-    let received = 0;
-
-    for await (const chunk of upload.body) {
-        const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-        received += buffer.length;
-        if (received > upload.contentLength) throw new AppError(GENERAL_ERRORS.UPLOAD_TOO_LARGE);
-        chunks.push(buffer);
-    }
-
-    if (received !== upload.contentLength) throw new AppError(GENERAL_ERRORS.BAD_REQUEST);
-    return Buffer.concat(chunks);
-}
