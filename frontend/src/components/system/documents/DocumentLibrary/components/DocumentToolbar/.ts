@@ -27,6 +27,11 @@ export function useDocumentToolbar(query: string) {
     apply(draft.trim())
   }
 
+  // Leaving the field searches whatever is in it, same as pressing Enter.
+  const blur = () => {
+    if (draft.trim() !== query) apply(draft.trim())
+  }
+
   const clear = () => {
     setDraft('')
     apply('')
@@ -37,6 +42,7 @@ export function useDocumentToolbar(query: string) {
     setDraft,
     showClear: !!query && draft.trim() === query,
     submit,
+    blur,
     clear,
   }
 }

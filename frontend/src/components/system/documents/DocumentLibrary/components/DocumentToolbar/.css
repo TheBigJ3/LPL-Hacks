@@ -3,7 +3,7 @@
 }
 
 .document-toolbar__search {
-  max-width: 351px;
+  max-width: 420px;
   height: 44px;
   padding: 6px 6px 6px 12px;
   border: 1px solid var(--color-border);
@@ -46,6 +46,12 @@
 
 .document-toolbar__action:hover {
   background: var(--color-surface-hover);
+}
+
+.document-toolbar__divider {
+  width: 1px;
+  height: 20px;
+  background: var(--color-border);
 }
 
 .document-toolbar__upload {

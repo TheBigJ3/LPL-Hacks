@@ -2,7 +2,6 @@ import './.css'
 import { AnimatePresence, motion } from 'motion/react'
 import { DOCUMENT_LIBRARY_VIEW_VARIANTS, useDocumentLibrary } from './.ts'
 import DocumentToolbar from './components/DocumentToolbar/DocumentToolbar'
-import DocumentTagFilter from './components/DocumentTagFilter/DocumentTagFilter'
 import DocumentSection from './components/DocumentSection/DocumentSection'
 import DocumentEmptyState from './components/DocumentEmptyState/DocumentEmptyState'
 
@@ -16,8 +15,7 @@ const DocumentLibrary = () => {
 
   return <div className="document-library flex flex-col items-center">
     <h1 className="sr-only">Documents</h1>
-    <DocumentToolbar query={library.query} uploadHref={library.uploadHref} />
-    <DocumentTagFilter options={library.tagOptions} />
+    <DocumentToolbar query={library.query} uploadHref={library.uploadHref} tagOptions={library.tagOptions} />
 
     <div ref={measureRef} className="document-library__content w-full">
       <AnimatePresence mode="wait">
