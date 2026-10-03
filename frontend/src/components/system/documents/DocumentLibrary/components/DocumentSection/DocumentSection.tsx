@@ -21,7 +21,7 @@ const DocumentSection = ({ section, mode, columns, wide }: DocumentSectionProps)
         <div className="flex min-w-0 items-center gap-3">
           <h2 className="document-section__title">{section.title}</h2>
           {view.showCount &&
-            <span className="document-section__count flex h-6 flex-none items-center rounded-full px-2">
+            <span className="document-section__count flex h-6 flex-none items-center">
               {section.total}
               <span className="sr-only"> {view.countLabel}</span>
             </span>}

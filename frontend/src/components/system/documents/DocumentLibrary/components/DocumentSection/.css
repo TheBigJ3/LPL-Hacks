@@ -4,13 +4,13 @@
 
 .document-section__title {
   color: var(--color-heading);
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
+  font-weight: 600;
   font-size: 20px;
   line-height: normal;
 }
 
 .document-section__count {
-  border: 1px solid var(--color-border);
   color: var(--color-dark-gray);
   font-size: 13px;
   line-height: 1;
