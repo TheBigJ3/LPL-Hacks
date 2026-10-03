@@ -13,8 +13,9 @@
   border: 1px solid rgba(0, 0, 0, .2);
   border-radius: var(--radius-md);
   background: #FFFFFF;
+  box-shadow: var(--shadow-200);
   transform-origin: center;
-  transition: transform var(--duration-panel) var(--ease-out-expo), box-shadow var(--duration-panel) var(--ease-out-expo);
+  transition: transform var(--duration-panel) var(--ease-out-expo);
 }
 
 .document-card__page img {
@@ -74,7 +75,6 @@
 .document-card:hover .document-card__page-front,
 .document-card:focus-visible .document-card__page-front {
   transform: rotate(-1deg);
-  box-shadow: var(--shadow-200);
 }
 
 .document-card__name {
