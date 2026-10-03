@@ -1,13 +1,16 @@
 import {
-  AnalyzeDocumentCommand,
   BadDocumentException,
   DocumentTooLargeException,
+  GetDocumentAnalysisCommand,
+  LimitExceededException,
   ProvisionedThroughputExceededException,
+  StartDocumentAnalysisCommand,
   ThrottlingException,
   UnsupportedDocumentException,
   type Block,
   type BoundingBox,
 } from "@aws-sdk/client-textract";
+import type { ExtractedAnalysis } from "@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis.js";
 import type { ExtractedBox } from "@lpl-hacks/shared/src/types/native/extraction/extractedBox.js";
 import type { ExtractedField, ExtractedLine } from "@lpl-hacks/shared/src/types/native/extraction/extractedField.js";
 import type { ExtractedTable, ExtractedTableCell, ExtractedTableCellRole } from "@lpl-hacks/shared/src/types/native/extraction/extractedTable.js";
@@ -25,24 +28,52 @@ import {
 const CELL_FIELD_OVERLAP = 0.3;
 const CELL_LABEL_OVERLAP = 0.25;
 
-type ExtractedFieldAnalysis = {
-  fields: ExtractedField[];
-  tables: ExtractedTable[];
-  lines: ExtractedLine[];
+type ExtractedFieldDocumentLocation = {
+  bucket: string;
+  key: string;
 };
 
-export async function extractedFieldAnalyze(document: Uint8Array): Promise<ExtractedFieldAnalysis> {
-  let blocks: Block[];
+export type ExtractedFieldCollectResult =
+  | { status: "pending" }
+  | { status: "failed"; message: string }
+  | { status: "succeeded"; pageCount: number; analysis: ExtractedAnalysis };
+
+export async function extractedFieldAnalyzeStart(documentId: string, location: ExtractedFieldDocumentLocation): Promise<string> {
   try {
-    const result = await textract_client.send(new AnalyzeDocumentCommand({
-      Document: { Bytes: document },
+    const result = await textract_client.send(new StartDocumentAnalysisCommand({
+      DocumentLocation: { S3Object: { Bucket: location.bucket, Name: location.key } },
       FeatureTypes: ["FORMS", "TABLES"],
+      // Textract returns the same JobId for a repeated token, so a replayed job never starts a second analysis.
+      ClientRequestToken: documentId,
     }));
-    blocks = result.Blocks ?? [];
+    return result.JobId!;
+  } catch (err) {
+    throw extractedFieldTranslateError(err);
+  }
+}
+
+export async function extractedFieldAnalyzeCollect(textractJobId: string): Promise<ExtractedFieldCollectResult> {
+  const blocks: Block[] = [];
+  let nextToken: string | undefined;
+  let pageCount = 0;
+
+  try {
+    do {
+      const result = await textract_client.send(new GetDocumentAnalysisCommand({ JobId: textractJobId, NextToken: nextToken }));
+      if (result.JobStatus === "IN_PROGRESS") return { status: "pending" };
+      if (result.JobStatus === "FAILED") return { status: "failed", message: EXTRACTION_ERRORS.DOCUMENT_UNREADABLE.MESSAGE };
+      blocks.push(...(result.Blocks ?? []));
+      pageCount = result.DocumentMetadata?.Pages ?? pageCount;
+      nextToken = result.NextToken;
+    } while (nextToken);
   } catch (err) {
     throw extractedFieldTranslateError(err);
   }
 
+  return { status: "succeeded", pageCount: Math.max(pageCount, 1), analysis: extractedFieldParse(blocks) };
+}
+
+function extractedFieldParse(blocks: Block[]): ExtractedAnalysis {
   const blocksById = new Map(blocks.map((block) => [block.Id!, block]));
 
   const fields = blocks
@@ -186,7 +217,7 @@ function extractedFieldTranslateError(err: unknown): unknown {
   if (err instanceof DocumentTooLargeException) {
     return new AppError(EXTRACTION_ERRORS.DOCUMENT_TOO_LARGE);
   }
-  if (err instanceof ThrottlingException || err instanceof ProvisionedThroughputExceededException) {
+  if (err instanceof ThrottlingException || err instanceof ProvisionedThroughputExceededException || err instanceof LimitExceededException) {
     return new AppError(EXTRACTION_ERRORS.EXTRACTION_BUSY);
   }
   return err;

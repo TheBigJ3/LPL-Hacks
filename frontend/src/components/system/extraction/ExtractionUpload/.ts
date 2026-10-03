@@ -1,21 +1,38 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type CSSProperties } from 'react'
-import type { Response as ExtractionAnalyzeResponse } from '@lpl-hacks/shared/src/types/native/api/v1/extraction/analyze'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type CSSProperties } from 'react'
+import type { ExtractedAnalysis } from '@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis'
 import type { ExtractedBox } from '@lpl-hacks/shared/src/types/native/extraction/extractedBox'
 import type { ExtractedLine } from '@lpl-hacks/shared/src/types/native/extraction/extractedField'
 import type { ExtractedConfidenceLevel, ExtractedValue } from '@lpl-hacks/shared/src/types/native/extraction/extractedValue'
-import analyzeApi from '@api/extraction/analyzeApi'
-import { apiUploadRequest } from '@features/apiLayer'
+import documentsExtractionSettled from '@lpl-hacks/shared/src/types/native/sockets/documents/extractionSettled'
+import documentsWatch from '@lpl-hacks/shared/src/types/native/sockets/documents/watch'
+import getDocumentApi from '@api/documents/getDocumentApi'
+import uploadDocumentApi from '@api/documents/uploadDocumentApi'
+import { apiGetRequest, apiUploadRequest } from '@features/apiLayer'
 import { documentPreviewRelease, documentPreviewRender, type DocumentPreviewPage } from '@features/documentPreview'
+import { socketAwait, socketLayer, socketWatch } from '@stores/socketStore'
 import { EXTRACTION_ERRORS } from '@typings/native/extraction/errors'
 
 export const EXTRACTION_UPLOAD_MIME_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/tiff']
-export const EXTRACTION_UPLOAD_MAX_BYTES = 10 * 1024 * 1024
+export const EXTRACTION_UPLOAD_MAX_BYTES = 50 * 1024 * 1024
+export const EXTRACTION_UPLOAD_IMAGE_MAX_BYTES = 10 * 1024 * 1024
+const EXTRACTION_UPLOAD_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg']
 export const EXTRACTION_EMPTY_VALUE_LABEL = '—'
 export const EXTRACTION_EDITOR_DOM_ID = 'extraction-review-editor'
 
 const EXTRACTION_FALLBACK_PAGE_ASPECT = 11 / 8.5
 const EXTRACTION_CROP_PADDING = { x: 0.05, y: 0.025 }
 const EXTRACTION_FALLBACK_TEXT_HEIGHT = 0.014
+const EXTRACTION_WAIT_MAX_MS = 20 * 60 * 1000
+const EXTRACTION_CHECK_CONNECTED_MS = 10_000
+const EXTRACTION_CHECK_DISCONNECTED_MS = 3_000
+
+export type ExtractionPhase = 'idle' | 'uploading' | 'extracting'
+
+const EXTRACTION_PHASE_LABELS: Record<ExtractionPhase, string> = {
+  idle: 'Choose a PDF or image',
+  uploading: 'Uploading…',
+  extracting: 'Extracting…',
+}
 
 export type ExtractionLayout = 'scan' | 'rebuilt'
 
@@ -135,8 +152,13 @@ export type ExtractionReviewView = {
 
 type ExtractionAnalysis = {
   fileName: string
-  data: ExtractionAnalyzeResponse
+  pageCount: number
+  data: ExtractedAnalysis
 }
+
+type ExtractionWaitResult =
+  | { success: true, pageCount: number, data: ExtractedAnalysis }
+  | { success: false, message: string }
 
 function extractionFormatPercent(confidence: number | null): string {
   return confidence === null ? EXTRACTION_EMPTY_VALUE_LABEL : `${confidence.toFixed(1)}%`
@@ -181,7 +203,7 @@ function extractionBuildItem(
   return { ...base, kind, text, checked, edited, status }
 }
 
-function extractionBuildItems(data: ExtractionAnalyzeResponse, edits: Record<string, ExtractionEditValue>, confirmed: Record<string, boolean>): ExtractionItem[] {
+function extractionBuildItems(data: ExtractedAnalysis, edits: Record<string, ExtractionEditValue>, confirmed: Record<string, boolean>): ExtractionItem[] {
   const fieldItems = data.fields.map((field) => extractionBuildItem(
     { id: field.id, origin: 'field', label: field.label, page: field.page, box: field.valueBox, labelBox: field.labelBox, source: field },
     edits,
@@ -276,7 +298,7 @@ function extractionMedianLineHeight(lines: ExtractedLine[]): number {
 }
 
 function extractionBuildPages(
-  data: ExtractionAnalyzeResponse,
+  data: ExtractedAnalysis,
   items: ExtractionItem[],
   previews: DocumentPreviewPage[] | null,
   layout: ExtractionLayout,
@@ -385,8 +407,42 @@ function extractionBuildReview(items: ExtractionItem[], previews: DocumentPrevie
   }
 }
 
+async function extractionWaitForDocument(documentId: string, signal: AbortSignal): Promise<ExtractionWaitResult | null> {
+  const unwatch = socketWatch(documentsWatch, { documentId })
+  const deadline = Date.now() + EXTRACTION_WAIT_MAX_MS
+
+  try {
+    while (Date.now() < deadline) {
+      const timeoutMs = socketLayer.getSnapshot() === 'connected' ? EXTRACTION_CHECK_CONNECTED_MS : EXTRACTION_CHECK_DISCONNECTED_MS
+      const settled = socketAwait(documentsExtractionSettled, (payload) => payload.documentId === documentId, { timeoutMs, signal })
+      const res = await apiGetRequest(getDocumentApi, { documentId })
+      if (signal.aborted) return null
+      if (!res.success) return { success: false, message: res.error.message }
+
+      const { document, extraction } = res.data
+      if (document.status === 'extracted' && extraction) return { success: true, pageCount: document.pageCount ?? 1, data: extraction }
+      if (document.status === 'failed') return { success: false, message: document.failureMessage ?? EXTRACTION_ERRORS.WAIT_TIMED_OUT.MESSAGE }
+
+      await settled
+      if (signal.aborted) return null
+    }
+    return { success: false, message: EXTRACTION_ERRORS.WAIT_TIMED_OUT.MESSAGE }
+  } finally {
+    unwatch()
+  }
+}
+
+async function extractionUploadAndWait(file: File, signal: AbortSignal, onUploaded: () => void): Promise<ExtractionWaitResult | null> {
+  const res = await apiUploadRequest(uploadDocumentApi, { fileName: file.name }, file)
+  if (signal.aborted) return null
+  if (!res.success) return { success: false, message: res.error.message }
+
+  onUploaded()
+  return extractionWaitForDocument(res.data.document.id, signal)
+}
+
 export function useExtractionUpload() {
-  const [uploading, setUploading] = useState(false)
+  const [phase, setPhase] = useState<ExtractionPhase>('idle')
   const [error, setError] = useState<string | null>(null)
   const [analysis, setAnalysis] = useState<ExtractionAnalysis | null>(null)
   const [previews, setPreviews] = useState<DocumentPreviewPage[] | null>(null)
@@ -395,10 +451,13 @@ export function useExtractionUpload() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [layout, setLayout] = useState<ExtractionLayout>('scan')
   const [showValues, setShowValues] = useState(true)
+  const uploadAbort = useRef<AbortController | null>(null)
 
   useEffect(() => () => {
     if (previews) documentPreviewRelease(previews)
   }, [previews])
+
+  useEffect(() => () => uploadAbort.current?.abort(), [])
 
   const result = useMemo(() => {
     if (!analysis) return null
@@ -409,7 +468,7 @@ export function useExtractionUpload() {
     return {
       items,
       review,
-      summary: `${analysis.fileName} · ${review.unresolved} of ${review.total} left to review`,
+      summary: `${analysis.fileName} · ${analysis.pageCount} ${analysis.pageCount === 1 ? 'page' : 'pages'} · ${review.unresolved} of ${review.total} left to review`,
       document: {
         pages: extractionBuildPages(data, items, previews, effectiveLayout, selectedId),
         layoutOptions: (['scan', 'rebuilt'] as const).map((value): ExtractionLayoutOption => ({
@@ -437,26 +496,39 @@ export function useExtractionUpload() {
       setError(EXTRACTION_ERRORS.FILE_TOO_LARGE.MESSAGE)
       return
     }
+    if (EXTRACTION_UPLOAD_IMAGE_MIME_TYPES.includes(file.type) && file.size > EXTRACTION_UPLOAD_IMAGE_MAX_BYTES) {
+      setError(EXTRACTION_ERRORS.IMAGE_TOO_LARGE.MESSAGE)
+      return
+    }
+
+    uploadAbort.current?.abort()
+    const abort = new AbortController()
+    uploadAbort.current = abort
 
     setError(null)
     setAnalysis(null)
     setPreviews(null)
-    setUploading(true)
-    const [res, pages] = await Promise.all([apiUploadRequest(analyzeApi, undefined, file), documentPreviewRender(file)])
-    setUploading(false)
+    setPhase('uploading')
+    const [result, pages] = await Promise.all([
+      extractionUploadAndWait(file, abort.signal, () => setPhase('extracting')),
+      documentPreviewRender(file),
+    ])
 
-    if (!res.success) {
+    if (!result || !result.success) {
       if (pages) documentPreviewRelease(pages)
-      setError(res.error.message)
+      if (!result) return
+      setPhase('idle')
+      setError(result.message)
       return
     }
+    setPhase('idle')
     setEdits({})
     setConfirmed({})
     setSelectedId(null)
     setLayout('scan')
     setShowValues(true)
     setPreviews(pages)
-    setAnalysis({ fileName: file.name, data: res.data })
+    setAnalysis({ fileName: file.name, pageCount: result.pageCount, data: result.data })
   }
 
   function edit(id: string, value: ExtractionEditValue) {
@@ -492,7 +564,8 @@ export function useExtractionUpload() {
   }
 
   return {
-    uploading,
+    busy: phase !== 'idle',
+    statusLabel: EXTRACTION_PHASE_LABELS[phase],
     error,
     result,
     upload,
