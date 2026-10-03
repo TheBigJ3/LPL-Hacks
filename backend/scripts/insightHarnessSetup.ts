@@ -12,6 +12,7 @@ import { CreateRoleCommand, GetRoleCommand, NoSuchEntityException, PutRolePolicy
 import { GetCallerIdentityCommand } from "@aws-sdk/client-sts";
 import { agentcore_control_client, iam_client, sts_client } from "../loaders/agentCoreControlLoader.js";
 import requireEnv from "../modules/requireEnv.js";
+import requireSettings from "../modules/requireSettings.js";
 import {
   INSIGHT_ALLOWED_TOOLS,
   INSIGHT_SEARCH_TOOL_DESCRIPTION,
@@ -21,7 +22,7 @@ import {
 } from "../services/insight/insightAnswerChecks.js";
 
 const AWS_REGION = requireEnv("AWS_REGION");
-const HARNESS_NAME = "lpl_insight";
+const HARNESS_NAME = requireSettings("INSIGHT").HARNESS_NAME;
 const ROLE_NAME = "LplInsightHarnessRole";
 const MEMORY_NAME = "lpl_insight_memory";
 const MODEL_ID = process.env.INSIGHT_MODEL_ID ?? "global.anthropic.claude-sonnet-4-6";

@@ -2,6 +2,7 @@ import { and, asc, desc, eq, inArray, lt, sql } from "drizzle-orm";
 import type { InsightConversation, InsightMessage } from "@lpl-hacks/shared/src/types/native/insight/insightMessage.js";
 import { db } from "../../loaders/postgresLoader.js";
 import { AppError } from "../../modules/AppError.js";
+import { isUniqueViolation } from "../../modules/pgError.js";
 import requireSettings from "../../modules/requireSettings.js";
 import { clients } from "../../schemas/clients.js";
 import { insightConversations, insightMessages } from "../../schemas/insight.js";
@@ -16,13 +17,6 @@ export type InsightAskResult = {
   conversationId: string;
   messages: InsightMessage[];
 };
-
-const INSIGHT_OPEN_ANSWER_INDEX = "insight_messages_one_open_answer_idx";
-
-function insightCheckOpenAnswerConflict(err: unknown): boolean {
-  const cause = (err as { cause?: { code?: string; constraint?: string } })?.cause ?? (err as { code?: string; constraint?: string });
-  return cause?.code === "23505" && cause.constraint === INSIGHT_OPEN_ANSWER_INDEX;
-}
 
 export function insightMessageToView(record: InsightMessageRecord): InsightMessage {
   return {
@@ -74,7 +68,8 @@ export async function insightConversationAsk(advisorId: string, clientId: string
   try {
     return await insightConversationInsertTurn(advisorId, clientId, owner.conversationId, message);
   } catch (err) {
-    if (insightCheckOpenAnswerConflict(err)) throw new AppError(INSIGHT_ERRORS.CONVERSATION_BUSY);
+    // The only unique index this insert can hit is the one allowing a single open answer per conversation.
+    if (isUniqueViolation(err)) throw new AppError(INSIGHT_ERRORS.CONVERSATION_BUSY);
     throw err;
   }
 }
