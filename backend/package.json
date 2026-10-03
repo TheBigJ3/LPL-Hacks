@@ -16,10 +16,11 @@
     "db:studio": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts studio"
   },
   "dependencies": {
-    "@lpl-hacks/shared": "*",
     "@aws-sdk/client-s3": "^3.1137.0",
+    "@aws-sdk/client-textract": "^3.1146.0",
     "@aws-sdk/rds-signer": "3.1146.0",
     "@aws-sdk/s3-request-presigner": "^3.1137.0",
+    "@lpl-hacks/shared": "*",
     "@socket.io/redis-adapter": "^8.3.0",
     "bullmq": "^6.3.8",
     "cookie-parser": "^1.4.7",

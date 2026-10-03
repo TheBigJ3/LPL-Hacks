@@ -7,4 +7,8 @@ export default  {
     AUTH_REFILL_PER_SEC: 5,
     IPV6_PREFIX: 64
   },
+  EXTRACTION: {
+    CONFIDENCE_HIGH: 95,
+    CONFIDENCE_MEDIUM: 85,
+  },
 }

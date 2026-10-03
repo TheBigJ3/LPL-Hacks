@@ -1,0 +1,18 @@
+# Local stand-in for the ElastiCache cluster (Valkey 9.1, no AUTH, no TLS), which is only reachable from inside the VPC.
+services:
+  redis:
+    image: valkey/valkey:9.1
+    command: ["valkey-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  redis-data:
