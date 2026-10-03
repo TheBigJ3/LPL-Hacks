@@ -13,13 +13,13 @@ type SplashScreenTimeline = {
 }
 
 const SPLASH_SCREEN_TIMELINE: SplashScreenTimeline = {
-  squareMs: 650,
-  innerDelayMs: 260,
-  innerMs: 770,
-  outerDelayMs: 440,
-  outerMs: 820,
-  holdMs: 300,
-  exitMs: 520,
+  squareMs: 400,
+  innerDelayMs: 150,
+  innerMs: 460,
+  outerDelayMs: 260,
+  outerMs: 500,
+  holdMs: 180,
+  exitMs: 320,
 }
 
 const SPLASH_SCREEN_REDUCED_TIMELINE: SplashScreenTimeline = {
