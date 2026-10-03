@@ -4,7 +4,7 @@ import { NOTE_VIEW_OPTIONS, NOTE_VIEW_TOGGLE_LABEL_VARIANTS } from './.ts'
 import type { NoteView } from '../../.ts'
 
 const NoteViewToggle = ({ view, onChange }: { view: NoteView; onChange: (view: NoteView) => void }) =>
-  <div className="note-view-toggle flex items-center gap-1.5" role="group" aria-label="Note layout">
+  <div data-onboarding="note-view" className="note-view-toggle flex items-center gap-1.5" role="group" aria-label="Note layout">
     {NOTE_VIEW_OPTIONS.map((option) =>
       <button
         key={option.view}

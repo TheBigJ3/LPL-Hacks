@@ -6,7 +6,7 @@ const InsightComposer = ({ busy, error, onSend }: { busy: boolean; error: string
 
   return <div className="insight-composer sticky bottom-0 z-10 mt-auto flex flex-none flex-col items-center justify-end gap-2">
     {error && <p className="insight-composer__error w-full rounded-lg px-4 py-2" role="alert">{error}</p>}
-    <form onSubmit={(event) => void composer.submit(event)} className="insight-composer__field flex w-full items-end justify-between gap-2 rounded-lg py-3 pl-6 pr-3">
+    <form data-onboarding="insight-composer" onSubmit={(event) => void composer.submit(event)} className="insight-composer__field flex w-full items-end justify-between gap-2 rounded-lg py-3 pl-6 pr-3">
       <textarea
         rows={1}
         value={composer.draft}

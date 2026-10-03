@@ -13,7 +13,7 @@ type SidebarClientMembersProps = {
 const SidebarClientMembers = ({ members, selectedId, open }: SidebarClientMembersProps) => {
   const scope = useSidebarClientMembers(members, selectedId)
 
-  return <motion.section className="sidebar-client-members flex flex-col gap-2" data-open={open} aria-label="Household members" variants={SIDEBAR_TAB_VARIANTS}>
+  return <motion.section data-onboarding="sidebar-members" className="sidebar-client-members flex flex-col gap-2" data-open={open} aria-label="Household members" variants={SIDEBAR_TAB_VARIANTS}>
     <h2 className="sidebar-client-members__label">Viewing</h2>
     <div className="flex flex-wrap gap-1.5 px-1" role="radiogroup" aria-label="Household member">
       {scope.options.map((option) =>

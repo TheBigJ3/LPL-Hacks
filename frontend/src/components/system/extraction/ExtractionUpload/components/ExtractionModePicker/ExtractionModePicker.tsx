@@ -10,7 +10,7 @@ type ExtractionModePickerProps = {
 const ExtractionModePicker = ({ options, onSelect }: ExtractionModePickerProps) => {
   const picker = useExtractionModePicker(options, onSelect)
 
-  return <div role="radiogroup" aria-label="How to add documents" className="extraction-mode-picker grid w-full" onKeyDown={picker.moveOnArrow}>
+  return <div data-onboarding="extraction-modes" role="radiogroup" aria-label="How to add documents" className="extraction-mode-picker grid w-full" onKeyDown={picker.moveOnArrow}>
     {options.map((option) =>
       <button
         key={option.mode}

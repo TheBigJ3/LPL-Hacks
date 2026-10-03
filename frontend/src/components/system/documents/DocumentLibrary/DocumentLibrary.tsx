@@ -1,6 +1,7 @@
 import './.css'
+import OnboardingTour from '@components/template/OnboardingTour/OnboardingTour'
 import { AnimatePresence, motion } from 'motion/react'
-import { DOCUMENT_LIBRARY_VIEW_VARIANTS, useDocumentLibrary } from './.ts'
+import { DOCUMENT_LIBRARY_TOUR_STEPS, DOCUMENT_LIBRARY_TOUR_STORAGE_KEY, DOCUMENT_LIBRARY_VIEW_VARIANTS, useDocumentLibrary } from './.ts'
 import DocumentToolbar from './components/DocumentToolbar/DocumentToolbar'
 import DocumentSection from './components/DocumentSection/DocumentSection'
 import DocumentLibrarySkeleton from './components/DocumentLibrarySkeleton/DocumentLibrarySkeleton'
@@ -25,7 +26,7 @@ const DocumentLibrary = () => {
     <div className="document-library flex flex-col items-center">
       <h1 className="sr-only">Documents</h1>
 
-      <div ref={measureRef} className="document-library__content w-full" aria-busy={library.loading}>
+      <div data-onboarding="document-list" ref={measureRef} className="document-library__content w-full" aria-busy={library.loading}>
         <AnimatePresence mode="wait" initial={false}>
           {library.loading
             ? <motion.div key="skeleton" variants={DOCUMENT_LIBRARY_VIEW_VARIANTS} initial="enter" animate="center" exit="exit">
@@ -51,6 +52,7 @@ const DocumentLibrary = () => {
         </AnimatePresence>
       </div>
     </div>
+    <OnboardingTour steps={DOCUMENT_LIBRARY_TOUR_STEPS} storageKey={DOCUMENT_LIBRARY_TOUR_STORAGE_KEY} />
   </>
 }
 

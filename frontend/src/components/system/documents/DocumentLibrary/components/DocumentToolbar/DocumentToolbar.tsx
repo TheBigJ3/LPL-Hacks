@@ -8,7 +8,7 @@ const DocumentToolbar = ({ query, uploadHref, tagOptions }: { query: string; upl
   const toolbar = useDocumentToolbar(query)
 
   return <form className="document-toolbar flex w-full items-center justify-center" role="search" onSubmit={toolbar.submit}>
-    <div className="document-toolbar__search flex min-w-0 flex-1 items-center justify-between gap-2 rounded-lg">
+    <div data-onboarding="document-search" className="document-toolbar__search flex min-w-0 flex-1 items-center justify-between gap-2 rounded-lg">
       <label className="flex min-w-0 flex-1 items-center gap-3">
         <span className="material-symbols-outlined document-toolbar__search-icon flex-none" aria-hidden="true">search</span>
         <input
@@ -29,7 +29,7 @@ const DocumentToolbar = ({ query, uploadHref, tagOptions }: { query: string; upl
       <DocumentTagFilter options={tagOptions} />
     </div>
 
-    <Link to={uploadHref} className="document-toolbar__upload flex h-11 flex-none items-center gap-3 rounded-lg px-3">
+    <Link data-onboarding="document-upload" to={uploadHref} className="document-toolbar__upload flex h-11 flex-none items-center gap-3 rounded-lg px-3">
       Upload
       <span className="material-symbols-outlined document-toolbar__upload-icon" aria-hidden="true">upload</span>
     </Link>

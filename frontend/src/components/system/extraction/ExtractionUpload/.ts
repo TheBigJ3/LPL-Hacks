@@ -19,6 +19,7 @@ import { DOCUMENT_UPLOAD_ACCEPT, DOCUMENT_UPLOAD_HINT, documentUploadCheckFile }
 import { documentPreviewRelease, documentPreviewRender, type DocumentPreviewPage } from '@features/documentPreview'
 import { socketAwait, socketLayer, socketWatch } from '@stores/socketStore'
 import { EXTRACTION_ERRORS } from '@typings/native/extraction/errors'
+import type { OnboardingTourStep } from '@components/template/OnboardingTour/.ts'
 
 export const EXTRACTION_EMPTY_VALUE_LABEL = '—'
 export const EXTRACTION_EDITOR_DOM_ID = 'extraction-review-editor'
@@ -1063,3 +1064,20 @@ export function useExtractionUpload() {
     reviewDocument,
   }
 }
+
+export const EXTRACTION_UPLOAD_TOUR_STORAGE_KEY = 'onboarding:extract-seen'
+
+export const EXTRACTION_UPLOAD_TOUR_STEPS: OnboardingTourStep[] = [
+  {
+    target: 'extraction-modes',
+    title: 'Choose how documents come in',
+    body: 'Upload a file yourself, or send the client a secure link to upload their own.',
+    placement: 'bottom',
+  },
+  {
+    target: 'extraction-dropzone',
+    title: 'Drop in a document',
+    body: 'We pull out the text, fields and tables, then you confirm anything low-confidence before it is tagged and searchable.',
+    placement: 'top',
+  },
+]

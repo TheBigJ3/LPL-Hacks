@@ -1,7 +1,8 @@
 import './.css'
+import OnboardingTour from '@components/template/OnboardingTour/OnboardingTour'
 import PageHeader from '@components/template/PageHeader/PageHeader'
 import EmptyState from '@components/template/EmptyState/EmptyState'
-import { useExtractionUpload } from './.ts'
+import { EXTRACTION_UPLOAD_TOUR_STEPS, EXTRACTION_UPLOAD_TOUR_STORAGE_KEY, useExtractionUpload } from './.ts'
 import ExtractionDocument from './components/ExtractionDocument/ExtractionDocument'
 import ExtractionModePicker from './components/ExtractionModePicker/ExtractionModePicker'
 import ExtractionProgress from './components/ExtractionProgress/ExtractionProgress'
@@ -54,7 +55,7 @@ const ExtractionUpload = () => {
           : <>
             {extraction.progress
               ? <ExtractionProgress progress={extraction.progress} onCancel={extraction.startOver} />
-              : <label className="extraction-upload__dropzone flex w-full flex-col items-center gap-1 rounded-lg text-center">
+              : <label data-onboarding="extraction-dropzone" className="extraction-upload__dropzone flex w-full flex-col items-center gap-1 rounded-lg text-center">
                 <span className="material-symbols-outlined extraction-upload__dropzone-icon" aria-hidden="true">document_scanner</span>
                 <span className="extraction-upload__dropzone-title">Choose a PDF or image</span>
                 <span className="extraction-upload__dropzone-hint">{extraction.hint}</span>
@@ -64,6 +65,7 @@ const ExtractionUpload = () => {
             {extraction.error && <p className="extraction-upload__error w-full rounded-lg" role="alert">{extraction.error}</p>}
           </>}
       </div>}
+    {!extraction.result && <OnboardingTour steps={EXTRACTION_UPLOAD_TOUR_STEPS} storageKey={EXTRACTION_UPLOAD_TOUR_STORAGE_KEY} />}
   </>
 }
 

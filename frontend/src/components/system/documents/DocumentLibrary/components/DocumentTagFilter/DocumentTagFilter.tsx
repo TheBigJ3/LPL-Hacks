@@ -8,7 +8,7 @@ import type { DocumentTagOption } from '../../.ts'
 const DocumentTagFilter = ({ options }: { options: DocumentTagOption[] }) => {
   const { rootRef, buttonRef, ...filter } = useDocumentTagFilter(options)
 
-  return <div ref={rootRef} className="document-tag-filter relative flex flex-none items-center rounded-md" data-active={!!filter.selected} onKeyDown={filter.closeOnEscape}>
+  return <div data-onboarding="document-tags" ref={rootRef} className="document-tag-filter relative flex flex-none items-center rounded-md" data-active={!!filter.selected} onKeyDown={filter.closeOnEscape}>
     <button
       ref={buttonRef}
       type="button"

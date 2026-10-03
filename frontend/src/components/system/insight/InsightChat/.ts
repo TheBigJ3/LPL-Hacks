@@ -18,6 +18,7 @@ import { apiPostRequest, useApiGetQuery } from '@features/apiLayer'
 import { queryClient } from '@features/queryClient'
 import { socketWatch, useSocketEvent } from '@stores/socketStore'
 import { INSIGHT_ERRORS } from '@typings/native/insight/errors'
+import type { OnboardingTourStep } from '@components/template/OnboardingTour/.ts'
 
 const INSIGHT_CHAT_PARAM = 'chat'
 const INSIGHT_OPEN_POLL_MS = 4_000
@@ -209,3 +210,44 @@ export function useInsightChat() {
     send,
   }
 }
+
+export const INSIGHT_CHAT_TOUR_STORAGE_KEY = 'onboarding:insight-seen'
+
+export const INSIGHT_CHAT_TOUR_STEPS: OnboardingTourStep[] = [
+  {
+    target: 'sidebar-client',
+    title: 'Everything about this client',
+    body: 'Insight, Documents and Notes for the selected client live here. Switching clients keeps you on the same tab.',
+    placement: 'right',
+  },
+  {
+    target: 'sidebar-members',
+    title: 'Focus on one member',
+    body: 'Narrow every tab to a single household member, or view the whole household at once.',
+    placement: 'right',
+  },
+  {
+    target: 'insight-composer',
+    title: 'Ask about this client',
+    body: 'Ask in plain English. Answers cite the source document and page, so every number can be checked.',
+    placement: 'top',
+  },
+  {
+    target: 'insight-history',
+    title: 'Pick up past chats',
+    body: 'Conversations are saved here. Pin, rename or delete them from the menu on each chat.',
+    placement: 'left',
+  },
+  {
+    target: 'insight-new',
+    title: 'Start a new chat',
+    body: 'Begin a fresh conversation whenever you switch topics.',
+    placement: 'bottom',
+  },
+  {
+    target: 'sidebar-tools',
+    title: 'Bring in new documents',
+    body: 'Extract reads a PDF or image, lets you review what it found, then tags it and adds it to search.',
+    placement: 'right',
+  },
+]

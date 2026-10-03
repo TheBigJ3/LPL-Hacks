@@ -4,7 +4,7 @@ import type { InsightChatActions, InsightChatListItem as InsightChatListItemData
 import InsightChatListItem from './components/InsightChatListItem/InsightChatListItem'
 
 const InsightChatList = ({ chats, actions, newChatHref, newChatSelected }: { chats: InsightChatListItemData[]; actions: InsightChatActions; newChatHref: string; newChatSelected: boolean }) =>
-  <aside className="insight-chat-list flex flex-none flex-col gap-4" aria-label="Chats">
+  <aside data-onboarding="insight-history" className="insight-chat-list flex flex-none flex-col gap-4" aria-label="Chats">
     <Link to={newChatHref} className="insight-chat-list__new flex items-center gap-2 rounded-lg px-3 py-2" aria-current={newChatSelected ? 'page' : undefined}>
       <span className="material-symbols-outlined text-xl leading-none" aria-hidden="true">add</span>
       New chat

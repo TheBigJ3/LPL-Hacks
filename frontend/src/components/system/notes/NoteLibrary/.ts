@@ -12,6 +12,7 @@ import updateNoteApi from '@api/notes/updateNoteApi'
 import { apiPostRequest, useApiGetQuery } from '@features/apiLayer'
 import { queryClient } from '@features/queryClient'
 import { NOTE_ERRORS } from '@typings/native/notes/errors'
+import type { OnboardingTourStep } from '@components/template/OnboardingTour/.ts'
 
 export type { NoteColor }
 
@@ -261,3 +262,32 @@ export function useNoteLibrary() {
       : { title: 'No notes yet', subtitle: 'Create one to get started' },
   }
 }
+
+export const NOTE_LIBRARY_TOUR_STORAGE_KEY = 'onboarding:notes-seen'
+
+export const NOTE_LIBRARY_TOUR_STEPS: OnboardingTourStep[] = [
+  {
+    target: 'note-search',
+    title: 'Search your notes',
+    body: 'Find any meeting note or reminder for this client in seconds.',
+    placement: 'bottom',
+  },
+  {
+    target: 'note-create',
+    title: 'Write a note',
+    body: 'Capture meeting notes and tag the household members they relate to.',
+    placement: 'bottom',
+  },
+  {
+    target: 'note-view',
+    title: 'Switch layouts',
+    body: 'Flip between cards and a compact list.',
+    placement: 'bottom',
+  },
+  {
+    target: 'note-list',
+    title: 'All notes',
+    body: 'Open a note to read it, or use its menu to edit or delete it.',
+    placement: 'top',
+  },
+]

@@ -1,8 +1,9 @@
 import './.css'
+import OnboardingTour from '@components/template/OnboardingTour/OnboardingTour'
 import { Link } from 'react-router'
 import PageHeader from '@components/template/PageHeader/PageHeader'
 import EmptyState from '@components/template/EmptyState/EmptyState'
-import { useInsightChat } from './.ts'
+import { INSIGHT_CHAT_TOUR_STEPS, INSIGHT_CHAT_TOUR_STORAGE_KEY, useInsightChat } from './.ts'
 import InsightMessage from './components/InsightMessage/InsightMessage'
 import InsightComposer from './components/InsightComposer/InsightComposer'
 import InsightChatList from './components/InsightChatList/InsightChatList'
@@ -20,7 +21,7 @@ const InsightChat = () => {
 
   return <>
     <PageHeader title="Insight">
-      <Link to={chat.newChatHref} className="insight-chat__new flex items-center gap-1.5 rounded-lg px-3 py-1.5">
+      <Link data-onboarding="insight-new" to={chat.newChatHref} className="insight-chat__new flex items-center gap-1.5 rounded-lg px-3 py-1.5">
         <span className="material-symbols-outlined text-xl leading-none" aria-hidden="true">add</span>
         New chat
       </Link>
@@ -44,6 +45,7 @@ const InsightChat = () => {
       </div>
       <InsightChatList chats={chat.chats} actions={chat.chatActions} newChatHref={chat.newChatHref} newChatSelected={chat.newChatSelected} />
     </div>
+    <OnboardingTour steps={INSIGHT_CHAT_TOUR_STEPS} storageKey={INSIGHT_CHAT_TOUR_STORAGE_KEY} />
   </>
 }
 

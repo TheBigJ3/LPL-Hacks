@@ -1,8 +1,9 @@
 import './.css'
+import OnboardingTour from '@components/template/OnboardingTour/OnboardingTour'
 import { AnimatePresence, motion } from 'motion/react'
 import PageHeader from '@components/template/PageHeader/PageHeader'
 import EmptyState from '@components/template/EmptyState/EmptyState'
-import { useNoteLibrary } from './.ts'
+import { NOTE_LIBRARY_TOUR_STEPS, NOTE_LIBRARY_TOUR_STORAGE_KEY, useNoteLibrary } from './.ts'
 import NoteToolbar from './components/NoteToolbar/NoteToolbar'
 import NoteViewToggle from './components/NoteViewToggle/NoteViewToggle'
 import NoteEditor from './popup/NoteEditor/NoteEditor'
@@ -27,7 +28,7 @@ const NoteLibrary = () => {
 
     <div className="note-library flex flex-col items-center">
       <h1 className="sr-only">Notes</h1>
-      <section className="note-library__content flex w-full flex-col" aria-labelledby="note-library-title">
+      <section data-onboarding="note-list" className="note-library__content flex w-full flex-col" aria-labelledby="note-library-title">
         <header className="flex items-center justify-between gap-4">
           <h2 id="note-library-title" className="note-library__title">All notes</h2>
           <NoteViewToggle view={library.view} onChange={library.setView} />
@@ -53,6 +54,8 @@ const NoteLibrary = () => {
         </AnimatePresence>
       </section>
     </div>
+
+    <OnboardingTour steps={NOTE_LIBRARY_TOUR_STEPS} storageKey={NOTE_LIBRARY_TOUR_STORAGE_KEY} />
 
     <AnimatePresence>
       {library.editor.open &&

@@ -8,6 +8,7 @@ import listClientsApi from '@api/clients/listClientsApi'
 import listDocumentsApi from '@api/documents/listDocumentsApi'
 import { useApiGetQuery } from '@features/apiLayer'
 import { DOCUMENT_LIBRARY_ERRORS } from '@typings/native/documents/errors'
+import type { OnboardingTourStep } from '@components/template/OnboardingTour/.ts'
 
 export type DocumentCardView = {
   id: string
@@ -248,3 +249,32 @@ export function useDocumentLibrary() {
     uploadHref: `/clients/${clientSlug}/extract${memberSearch}`,
   }
 }
+
+export const DOCUMENT_LIBRARY_TOUR_STORAGE_KEY = 'onboarding:documents-seen'
+
+export const DOCUMENT_LIBRARY_TOUR_STEPS: OnboardingTourStep[] = [
+  {
+    target: 'document-search',
+    title: 'Search inside documents',
+    body: 'Search the contents of every document for this client, not just file names.',
+    placement: 'bottom',
+  },
+  {
+    target: 'document-tags',
+    title: 'Filter by tag',
+    body: 'Narrow the library to a single tag, like a document type or tax year.',
+    placement: 'bottom',
+  },
+  {
+    target: 'document-upload',
+    title: 'Upload a document',
+    body: 'Add a new file. It is extracted, reviewed and tagged before it joins the library.',
+    placement: 'bottom',
+  },
+  {
+    target: 'document-list',
+    title: 'Your filing cabinet',
+    body: 'Every document for this client, grouped and tagged. Open one to see its extracted fields.',
+    placement: 'top',
+  },
+]

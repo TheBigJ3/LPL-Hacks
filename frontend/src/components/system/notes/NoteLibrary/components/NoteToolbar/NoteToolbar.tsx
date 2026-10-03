@@ -3,7 +3,7 @@ import type { NoteSearch } from '../../.ts'
 
 const NoteToolbar = ({ search, onCreate }: { search: NoteSearch; onCreate: () => void }) =>
   <form className="note-toolbar flex w-full items-center" role="search" onSubmit={search.submit}>
-    <label className="note-toolbar__search flex h-11 min-w-0 flex-1 items-center gap-3 rounded-lg">
+    <label data-onboarding="note-search" className="note-toolbar__search flex h-11 min-w-0 flex-1 items-center gap-3 rounded-lg">
       <span className="material-symbols-outlined note-toolbar__icon flex-none" aria-hidden="true">search</span>
       <input
         type="search"
@@ -20,7 +20,7 @@ const NoteToolbar = ({ search, onCreate }: { search: NoteSearch; onCreate: () =>
         </button>}
     </label>
 
-    <button type="button" className="note-toolbar__create flex h-11 flex-none items-center gap-3 rounded-lg px-3" onClick={onCreate}>
+    <button data-onboarding="note-create" type="button" className="note-toolbar__create flex h-11 flex-none items-center gap-3 rounded-lg px-3" onClick={onCreate}>
       New note
       <span className="material-symbols-outlined note-toolbar__icon" aria-hidden="true">add</span>
     </button>
