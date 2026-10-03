@@ -37,7 +37,7 @@ export function answerCheckFilters(clientId: string, toolInput: unknown): Retrie
 }
 
 export function answerCheckFiltersNarrowed(filters: RetrievalFilter): boolean {
-  return filters.taxYear !== undefined || filters.tags !== undefined || filters.familyMembers !== undefined || filters.docType !== undefined;
+  return filters.taxYear !== undefined || filters.tags !== undefined || filters.familyMembers !== undefined || filters.docType !== undefined || filters.sourceType !== undefined;
 }
 
 function answerCheckQuote(chunkText: string): string {

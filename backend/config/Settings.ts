@@ -14,4 +14,17 @@ export default  {
   ANSWER: {
     MAX_SOURCES: 8,
   },
+  KNOWLEDGE_BASE: {
+    DEV_NAME: "knowledge-base-quick-start-rdfyx",
+  },
+  INSIGHT: {
+    HARNESS_NAME: "lpl_insight",
+    MAX_SOURCES: 8,
+    MAX_TOOL_ROUNDS: 6,
+    PROGRESS_INTERVAL_MS: 150,
+    QUOTE_MAX_CHARS: 600,
+    STALE_ANSWER_MS: 5 * 60 * 1000,
+    LIST_LIMIT: 50,
+    TITLE_MAX_CHARS: 80,
+  },
 }

@@ -3,15 +3,79 @@
   color: var(--color-main-black);
   font-size: 16px;
   line-height: 1.4;
+  white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
 .insight-message__body {
+  --insight-message-font-size: 17px;
   color: #000;
-  font-size: 20px;
+  font-size: var(--insight-message-font-size);
   line-height: 1.6;
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .insight-message__body {
+    --insight-message-font-size: 20px;
+  }
+}
+
+.insight-message__body p {
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.insight-message__body strong {
+  font-weight: 700;
+}
+
+.insight-message__list {
+  padding-left: 30px;
+  list-style: disc;
+}
+
+.insight-message__body[data-streaming="true"] > :last-child::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.12em;
+  background: var(--color-main-gray);
+  animation: insight-message-caret 1s steps(2, start) infinite;
+}
+
+@keyframes insight-message-caret {
+  to { visibility: hidden; }
+}
+
+.insight-message__thinking {
+  color: var(--color-dark-gray);
+  font-size: 16px;
+}
+
+.insight-message__dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-main-gray);
+  animation: insight-message-dot 1.2s ease-in-out infinite;
+}
+
+.insight-message__dots span:nth-child(2) { animation-delay: 0.15s; }
+.insight-message__dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes insight-message-dot {
+  0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
+}
+
+.insight-message__failed {
+  border: 1px solid color-mix(in srgb, var(--color-error) 40%, transparent);
+  background: color-mix(in srgb, var(--color-error) 6%, transparent);
+  color: var(--color-error);
+  font-size: 15px;
 }
 
 .insight-message__action {
@@ -31,4 +95,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .insight-message__action { transition: none; }
+  .insight-message__dots span, .insight-message__body[data-streaming="true"] > :last-child::after { animation: none; }
 }

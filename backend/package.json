@@ -5,7 +5,8 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "dotenv -e .env.development -v NODE_ENV=development -- tsx watch index.ts",
+    "dev": "tsx scripts/devEnv.ts && dotenv -e .env.development -v NODE_ENV=development -- tsx watch index.ts",
+    "env:fill": "tsx scripts/devEnv.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
@@ -15,14 +16,19 @@
     "db:migrate": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts migrate",
     "db:studio": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts studio",
     "kb:ingest": "dotenv -e .env.development -- tsx scripts/knowledgeBaseIngest.ts",
-    "kb:reindex": "dotenv -e .env.development -- tsx scripts/knowledgeBaseReindex.ts"
+    "kb:reindex": "dotenv -e .env.development -- tsx scripts/knowledgeBaseReindex.ts",
+    "insight:harness": "dotenv -e .env.development -- tsx scripts/insightHarnessSetup.ts"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-agent": "3.1146.0",
     "@aws-sdk/client-bedrock-agent-runtime": "3.1146.0",
+    "@aws-sdk/client-bedrock-agentcore": "^3.1146.0",
+    "@aws-sdk/client-bedrock-agentcore-control": "^3.1146.0",
     "@aws-sdk/client-bedrock-runtime": "3.1146.0",
+    "@aws-sdk/client-iam": "^3.1146.0",
     "@aws-sdk/client-s3": "^3.1146.0",
     "@aws-sdk/client-sagemaker-runtime": "^3.1146.0",
+    "@aws-sdk/client-sts": "^3.1146.0",
     "@aws-sdk/client-textract": "^3.1146.0",
     "@aws-sdk/rds-signer": "3.1146.0",
     "@lpl-hacks/shared": "*",

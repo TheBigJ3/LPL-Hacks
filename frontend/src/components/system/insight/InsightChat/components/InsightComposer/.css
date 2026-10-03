@@ -57,3 +57,11 @@
 @media (prefers-reduced-motion: reduce) {
   .insight-composer__send { transition: none; }
 }
+
+.insight-composer__error {
+  max-width: var(--container-content);
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-error) 40%, transparent);
+  color: var(--color-error);
+  font-size: 14px;
+}

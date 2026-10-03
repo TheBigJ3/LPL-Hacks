@@ -16,3 +16,32 @@
   gap: var(--insight-chat-gap);
   padding-bottom: 132px;
 }
+
+.insight-chat__error {
+  max-width: 738px;
+  border: 1px solid color-mix(in srgb, var(--color-error) 40%, transparent);
+  color: var(--color-error);
+  font-size: 15px;
+}
+
+.insight-chat__new {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-main-black);
+  font-size: 14px;
+}
+
+.insight-chat__new:hover {
+  background: var(--color-surface-hover);
+}
+
+.insight-chat__new:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (min-width: 1024px) {
+  .insight-chat__new {
+    display: none;
+  }
+}

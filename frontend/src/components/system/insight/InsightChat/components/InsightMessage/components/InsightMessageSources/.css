@@ -1,0 +1,86 @@
+.insight-message-sources {
+  padding-top: 4px;
+}
+
+.insight-message-sources__title {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.insight-message-sources__item {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.insight-message-sources__item summary {
+  list-style: none;
+}
+
+.insight-message-sources__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.insight-message-sources__item summary:hover {
+  background: var(--color-surface-hover);
+}
+
+.insight-message-sources__item summary:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.insight-message-sources__number {
+  width: 22px;
+  height: 22px;
+  background: var(--color-accent-blue-light);
+  color: var(--color-accent-blue);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.insight-message-sources__icon {
+  color: var(--color-dark-gray);
+  font-size: 20px;
+}
+
+.insight-message-sources__name {
+  color: var(--color-main-black);
+  font-size: 14px;
+}
+
+.insight-message-sources__detail {
+  color: var(--color-dark-gray);
+  font-size: 12px;
+}
+
+.insight-message-sources__badge {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.insight-message-sources__badge[data-badge="verified"] {
+  background: color-mix(in srgb, var(--color-success) 14%, transparent);
+  color: var(--color-success);
+}
+
+.insight-message-sources__badge[data-badge="unverified"] {
+  background: var(--color-review-soft);
+  color: var(--color-review-text);
+}
+
+.insight-message-sources__badge[data-badge="note"] {
+  background: rgba(9, 9, 11, 0.07);
+  color: var(--color-dark-gray);
+}
+
+.insight-message-sources__quote {
+  background: var(--color-main-white);
+  color: var(--color-text-default);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
