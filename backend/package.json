@@ -13,13 +13,17 @@
     "db:push": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts push",
     "db:generate": "dotenv -e .env.development -- drizzle-kit generate",
     "db:migrate": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts migrate",
-    "db:studio": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts studio"
+    "db:studio": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts studio",
+    "kb:seed": "dotenv -e .env.development -- tsx scripts/knowledgeBaseSeed.ts",
+    "kb:unseed": "dotenv -e .env.development -- tsx scripts/knowledgeBaseSeed.ts --remove"
   },
   "dependencies": {
-    "@lpl-hacks/shared": "*",
+    "@aws-sdk/client-bedrock-agent": "3.1146.0",
+    "@aws-sdk/client-bedrock-agent-runtime": "3.1146.0",
     "@aws-sdk/client-s3": "^3.1137.0",
     "@aws-sdk/rds-signer": "3.1146.0",
     "@aws-sdk/s3-request-presigner": "^3.1137.0",
+    "@lpl-hacks/shared": "*",
     "@socket.io/redis-adapter": "^8.3.0",
     "bullmq": "^6.3.8",
     "cookie-parser": "^1.4.7",
