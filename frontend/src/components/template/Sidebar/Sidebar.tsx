@@ -5,7 +5,6 @@ import SidebarHeader from './components/SidebarHeader/SidebarHeader'
 import SidebarClientSwitcher from './components/SidebarClientSwitcher/SidebarClientSwitcher'
 import SidebarClientMembers from './components/SidebarClientMembers/SidebarClientMembers'
 import SidebarGroup from './components/SidebarGroup/SidebarGroup'
-import SidebarThemeSwitcher from './components/SidebarThemeSwitcher/SidebarThemeSwitcher'
 
 const Sidebar = () => {
   const sidebar = useSidebar()
@@ -43,7 +42,6 @@ const Sidebar = () => {
             </motion.div>
           </AnimatePresence>
         </div>
-        <SidebarThemeSwitcher open={sidebar.open} />
       </nav>
     </div>
   </MotionConfig>
