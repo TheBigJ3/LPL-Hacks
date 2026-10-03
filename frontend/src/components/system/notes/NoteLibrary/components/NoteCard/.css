@@ -1,0 +1,84 @@
+.note-card {
+  --note-card-background: var(--color-note-yellow);
+  aspect-ratio: 1;
+  padding: 16px;
+  border-radius: var(--radius-xl);
+  background: var(--note-card-background);
+  box-shadow: 0 1px 2px #0C0C0D1A, 0 1px 2px #0C0C0D0D;
+  translate: 0 0;
+  transition: translate 200ms var(--ease-out-expo), box-shadow 200ms var(--ease-out-expo);
+}
+
+.note-card:hover,
+.note-card:has(.note-card__open:focus-visible) {
+  translate: 0 -3px;
+  box-shadow: 0 8px 20px #0C0C0D1F, 0 2px 4px #0C0C0D0F;
+}
+
+.note-card[data-color="pink"] { --note-card-background: var(--color-note-pink); }
+.note-card[data-color="mint"] { --note-card-background: var(--color-note-mint); }
+.note-card[data-color="blue"] { --note-card-background: var(--color-note-blue); }
+.note-card[data-color="mauve"] { --note-card-background: var(--color-note-mauve); }
+.note-card[data-color="gray"] { --note-card-background: var(--color-note-gray); }
+
+.note-card .note-menu {
+  --note-menu-button-color: #49454F;
+  z-index: 2;
+}
+
+.note-card__open {
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.note-card__open:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.note-card__member {
+  max-width: 100%;
+  padding: 2px 10px 2px 2px;
+  border: 1px solid rgba(0, 0, 0, .07);
+  background: #FFFFFF;
+  color: #000000;
+  font-size: 14px;
+  line-height: normal;
+}
+
+.note-card__avatar {
+  width: 24px;
+  height: 24px;
+  background: var(--color-navy);
+  color: var(--color-accent-blue-light);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.note-card__title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #09090B;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.note-card__date {
+  color: rgba(102, 102, 136, .8);
+  font-size: 14px;
+  line-height: normal;
+}
+
+.note-card__body {
+  color: rgba(102, 102, 136, .5);
+  font-size: 16px;
+  line-height: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-card { transition: none; }
+}

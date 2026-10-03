@@ -41,6 +41,35 @@
   transition: width 300ms var(--ease-out-expo);
 }
 
+.extraction-review-panel__legend {
+  color: var(--color-dark-gray);
+  font-size: 12px;
+}
+
+.extraction-review-panel__swatch[data-status="review"] {
+  background: color-mix(in srgb, var(--color-review) 70%, transparent);
+}
+
+.extraction-review-panel__swatch[data-status="confirmed"] {
+  background: color-mix(in srgb, var(--color-review) 25%, transparent);
+}
+
+.extraction-review-panel__swatch[data-status="edited"] {
+  background: color-mix(in srgb, var(--color-accent-blue-light) 60%, transparent);
+  box-shadow: inset 0 0 0 1px var(--color-accent-blue);
+}
+
+.extraction-review-panel__empty {
+  border: 1px dashed var(--color-border);
+  color: var(--color-dark-gray);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.extraction-review-panel__empty .material-symbols-outlined {
+  font-size: 20px;
+}
+
 .extraction-review-panel__next {
   background: var(--color-accent-blue);
   color: #FFFFFF;

@@ -1,18 +1,15 @@
 import { useEffect, useState, type KeyboardEvent } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import type { Variants } from 'motion/react'
-import {
-  SIDEBAR_DEMO_CLIENTS,
-  SIDEBAR_SWAP_TRANSITION,
-  type SidebarClient,
-  type SidebarClientKind,
-  type SidebarClientMember,
-} from '../../.ts'
+import type { Client, ClientKind, ClientMember } from '@lpl-hacks/shared/src/types/native/clients/client'
+import listClientsApi from '@api/clients/listClientsApi'
+import { useApiGetQuery } from '@features/apiLayer'
+import { SIDEBAR_SWAP_TRANSITION } from '../../.ts'
 
 export type SidebarClientOption = {
   id: string
   name: string
-  kind: SidebarClientKind
+  kind: ClientKind
   initial: string
   detail: string
   active: boolean
@@ -32,26 +29,30 @@ export const SIDEBAR_CLIENT_PICKER_VARIANTS: Variants = {
   open: { height: 'auto', opacity: 1, transition: SIDEBAR_SWAP_TRANSITION },
 }
 
-const SIDEBAR_CLIENT_KIND_LABELS: Record<SidebarClientKind, string> = {
+const SIDEBAR_CLIENT_KIND_LABELS: Record<ClientKind, string> = {
   household: 'Household',
   individual: 'Individual',
 }
 
 const SIDEBAR_CLIENT_RECENT_STORAGE_KEY = 'sidebar:recent-clients'
 const SIDEBAR_CLIENT_RECENT_LIMIT = 4
-const SIDEBAR_CLIENT_DEFAULT_RECENT = SIDEBAR_DEMO_CLIENTS.slice(0, 3).map((client) => client.id)
+const SIDEBAR_CLIENT_DEFAULT_RECENT_COUNT = 3
 
-const sidebarClientReadRecent = (): string[] => {
+const sidebarClientReadRecent = (): string[] | null => {
   try {
     const stored: unknown = JSON.parse(localStorage.getItem(SIDEBAR_CLIENT_RECENT_STORAGE_KEY) ?? 'null')
-    if (!Array.isArray(stored)) return SIDEBAR_CLIENT_DEFAULT_RECENT
+    if (!Array.isArray(stored)) return null
     return stored.filter((id): id is string => typeof id === 'string')
   } catch {
-    return SIDEBAR_CLIENT_DEFAULT_RECENT
+    return null
   }
 }
 
-const sidebarClientWriteRecent = (ids: string[]) => {
+const sidebarClientGetDefaultRecent = (clients: Client[]) =>
+  clients.slice(0, SIDEBAR_CLIENT_DEFAULT_RECENT_COUNT).map((client) => client.slug)
+
+const sidebarClientWriteRecent = (ids: string[] | null) => {
+  if (!ids) return
   try {
     localStorage.setItem(SIDEBAR_CLIENT_RECENT_STORAGE_KEY, JSON.stringify(ids))
   } catch {
@@ -59,45 +60,55 @@ const sidebarClientWriteRecent = (ids: string[]) => {
   }
 }
 
-const sidebarClientGetDetail = (client: SidebarClient) => {
+const sidebarClientGetDetail = (client: Client) => {
   const kind = SIDEBAR_CLIENT_KIND_LABELS[client.kind]
   if (client.kind === 'individual') return kind
   return `${kind} · ${client.members.length} ${client.members.length === 1 ? 'member' : 'members'}`
 }
 
-const sidebarClientToOption = (client: SidebarClient, activeId: string | undefined): SidebarClientOption => ({
-  id: client.id,
+const sidebarClientToOption = (client: Client, activeId: string | undefined): SidebarClientOption => ({
+  id: client.slug,
   name: client.name,
   kind: client.kind,
   initial: client.name.charAt(0).toUpperCase(),
   detail: sidebarClientGetDetail(client),
-  active: client.id === activeId,
+  active: client.slug === activeId,
 })
 
-const sidebarClientSearch = (query: string, recentIds: string[]) => {
+const sidebarClientSearch = (clients: Client[], query: string, recentIds: string[]) => {
   const needle = query.trim().toLowerCase()
-  if (!needle) return recentIds.flatMap((id) => SIDEBAR_DEMO_CLIENTS.find((client) => client.id === id) ?? [])
-  return SIDEBAR_DEMO_CLIENTS.filter((client) =>
+  if (!needle) return recentIds.flatMap((id) => clients.find((client) => client.slug === id) ?? [])
+  return clients.filter((client) =>
     client.name.toLowerCase().includes(needle)
     || client.members.some((member) => member.name.toLowerCase().includes(needle))
   )
 }
 
-export function useSidebarClientSwitcher(client: SidebarClient | null, member: SidebarClientMember | null, open: boolean, onExpand: () => void) {
+const sidebarClientGetSection = (pathname: string) => {
+  const segments = pathname.split('/').filter(Boolean)
+  return segments[0] === 'clients' ? segments.slice(2).join('/') : segments.join('/')
+}
+
+export function useSidebarClientSwitcher(client: Client | null, member: ClientMember | null, open: boolean, onExpand: () => void) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [pickerOpen, setPickerOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [recentIds, setRecentIds] = useState(sidebarClientReadRecent)
+  const [storedRecentIds, setRecentIds] = useState(sidebarClientReadRecent)
+  const clientsQuery = useApiGetQuery(listClientsApi)
 
-  const clientId = client?.id
-  const results = sidebarClientSearch(query, recentIds).map((item) => sidebarClientToOption(item, clientId))
+  const clients = clientsQuery.data?.clients
+  const defaultRecentIds = sidebarClientGetDefaultRecent(clients ?? [])
+  const recentIds = storedRecentIds ?? defaultRecentIds
+  const clientId = client?.slug
+  const results = sidebarClientSearch(clients ?? [], query, recentIds).map((item) => sidebarClientToOption(item, clientId))
 
   useEffect(() => {
-    if (!clientId) return
-    setRecentIds((ids) => [clientId, ...ids.filter((id) => id !== clientId)].slice(0, SIDEBAR_CLIENT_RECENT_LIMIT))
-  }, [clientId])
+    if (!clientId || !clients) return
+    setRecentIds((ids) => [clientId, ...(ids ?? sidebarClientGetDefaultRecent(clients)).filter((id) => id !== clientId)].slice(0, SIDEBAR_CLIENT_RECENT_LIMIT))
+  }, [clientId, clients])
 
-  useEffect(() => sidebarClientWriteRecent(recentIds), [recentIds])
+  useEffect(() => sidebarClientWriteRecent(storedRecentIds), [storedRecentIds])
 
   const closePicker = () => {
     setPickerOpen(false)
@@ -115,7 +126,9 @@ export function useSidebarClientSwitcher(client: SidebarClient | null, member: S
 
   const select = (id: string) => {
     closePicker()
-    if (id !== clientId) navigate(`/clients/${id}`)
+    if (id === clientId) return
+    const section = sidebarClientGetSection(pathname)
+    navigate(section ? `/clients/${id}/${section}` : `/clients/${id}`)
   }
 
   const closeOnEscape = (event: KeyboardEvent) => {

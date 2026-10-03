@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { flushSync } from 'react-dom'
 import type { Theme } from '@typings/native/theme'
 
 type ThemeListener = () => void
@@ -67,15 +68,16 @@ class ThemeLayer {
 
   private update(theme: Theme, animate: boolean): void {
     const changed = document.documentElement.dataset.theme !== theme
-
-    if (this.theme !== theme) {
-      this.theme = theme
-      this.listeners.forEach((listener) => listener())
+    const commit = () => {
+      if (this.theme !== theme) {
+        this.theme = theme
+        this.listeners.forEach((listener) => listener())
+      }
+      if (changed) themeApply(theme)
     }
 
-    if (!changed) return
-    if (!animate || !document.startViewTransition || window.matchMedia(THEME_REDUCED_MOTION_QUERY).matches) return themeApply(theme)
-    document.startViewTransition(() => themeApply(theme))
+    if (!changed || !animate || !document.startViewTransition || window.matchMedia(THEME_REDUCED_MOTION_QUERY).matches) return commit()
+    document.startViewTransition(() => flushSync(commit))
   }
 }
 

@@ -1,0 +1,101 @@
+{
+  "version": "1.0",
+  "description": "Taxonomy: topics, fields, checklist, findings and the other enums. Document types are in doc_types.json, model-checked document tags in document_tags.json. All ids are stable machine keys; labels are display text; descriptions are the exact text used as OpenDecision choice criteria.",
+
+  "topics": [
+    {"id": "income", "label": "Income", "description": "Wages, salary, or other money earned"},
+    {"id": "retirement", "label": "Retirement", "description": "401(k), IRA, pension contributions or distributions"},
+    {"id": "tax", "label": "Tax", "description": "Income tax, withholding, or tax planning"},
+    {"id": "self_employment", "label": "Self-employment", "description": "Business, freelance, or contract income"},
+    {"id": "health_savings", "label": "Health savings", "description": "HSA contributions and health plan eligibility"},
+    {"id": "banking_cash", "label": "Cash and banking", "description": "Bank balances, savings accounts, and interest"},
+    {"id": "investments", "label": "Investments", "description": "Brokerage accounts, dividends, and capital gains"},
+    {"id": "mortgage_housing", "label": "Mortgage and housing", "description": "Home loans and mortgage interest"},
+    {"id": "insurance", "label": "Insurance", "description": "Life, disability, health, or property coverage"},
+    {"id": "estate", "label": "Estate", "description": "Wills, trusts, and beneficiaries"},
+    {"id": "education", "label": "Education", "description": "529 plans and education savings"},
+    {"id": "life_event", "label": "Life event", "description": "New child, new job, new home, marriage, or large income change"}
+  ],
+
+  "fields": [
+    {"id": "wages", "label": "Wages", "scope": "member", "unit": "usd", "topic": "income", "doc_sources": ["w2", "1040"]},
+    {"id": "adjusted_gross_income", "label": "Adjusted gross income", "scope": "household", "unit": "usd", "topic": "income", "doc_sources": ["1040"]},
+    {"id": "employer", "label": "Employer", "scope": "member", "unit": "text", "topic": "income", "doc_sources": ["w2"]},
+    {"id": "employee_401k_contribution", "label": "401(k) contribution", "scope": "member", "unit": "usd", "topic": "retirement", "doc_sources": ["w2"]},
+    {"id": "hsa_contribution", "label": "HSA contribution", "scope": "member", "unit": "usd", "topic": "health_savings", "doc_sources": ["w2", "5498_sa"]},
+    {"id": "hsa_eligible_health_plan", "label": "HSA-eligible health plan", "scope": "member", "unit": "bool", "topic": "health_savings", "doc_sources": ["1095"]},
+    {"id": "self_employment_income", "label": "Self-employment income", "scope": "member", "unit": "usd", "topic": "self_employment", "doc_sources": ["1099_nec", "1040"]},
+    {"id": "interest_income", "label": "Interest income", "scope": "member", "unit": "usd", "topic": "banking_cash", "doc_sources": ["1099_int", "account_statement", "1040"]},
+    {"id": "dividend_income", "label": "Dividend income", "scope": "member", "unit": "usd", "topic": "investments", "doc_sources": ["1099_div", "1040"]},
+    {"id": "cash_balance", "label": "Cash balance", "scope": "household", "unit": "usd", "topic": "banking_cash", "doc_sources": ["account_statement"]},
+    {"id": "mortgage_interest", "label": "Mortgage interest", "scope": "household", "unit": "usd", "topic": "mortgage_housing", "doc_sources": ["1098"]},
+    {"id": "dependents", "label": "Dependents", "scope": "household", "unit": "count", "topic": "life_event", "doc_sources": ["1040"]},
+    {"id": "filing_status", "label": "Filing status", "scope": "household", "unit": "enum", "topic": "tax", "doc_sources": ["1040"]},
+    {"id": "retirement_distribution", "label": "Retirement distribution", "scope": "member", "unit": "usd", "topic": "retirement", "doc_sources": ["1099_r"]},
+    {"id": "retirement_distribution_taxable", "label": "Taxable distribution", "scope": "member", "unit": "usd", "topic": "tax", "doc_sources": ["1099_r"]},
+    {"id": "federal_tax_withheld", "label": "Federal tax withheld", "scope": "member", "unit": "usd", "topic": "tax", "doc_sources": ["w2", "1099_r"]},
+    {"id": "state_tax_withheld", "label": "State tax withheld", "scope": "member", "unit": "usd", "topic": "tax", "doc_sources": ["w2", "1099_r"]},
+    {"id": "distribution_code", "label": "Distribution code", "scope": "member", "unit": "enum", "topic": "retirement", "doc_sources": ["1099_r"]}
+  ],
+
+  "distribution_codes": [
+    {"id": "1", "label": "Early distribution, no known exception"},
+    {"id": "2", "label": "Early distribution, exception applies"},
+    {"id": "4", "label": "Death"},
+    {"id": "7", "label": "Normal distribution"},
+    {"id": "G", "label": "Direct rollover"}
+  ],
+
+  "checklist": [
+    {"id": "retirement_can_improve", "question": "Can retirement savings be improved?", "topic": "retirement", "assessed": true},
+    {"id": "tax_savings_possible", "question": "Can tax savings be made?", "topic": "tax", "assessed": true},
+    {"id": "excess_cash", "question": "Is there excess cash to put to work?", "topic": "banking_cash", "assessed": true},
+    {"id": "needs_documents", "question": "Is more documentation needed?", "topic": "data_quality", "assessed": true},
+    {"id": "major_changes", "question": "Anything major changed since last year?", "topic": "life_event", "assessed": true},
+    {"id": "insurance_review", "question": "Insurance coverage reviewed?", "topic": "insurance", "assessed": false},
+    {"id": "estate_review", "question": "Estate plan reviewed?", "topic": "estate", "assessed": false},
+    {"id": "education_review", "question": "Education savings reviewed?", "topic": "education", "assessed": false}
+  ],
+  "checklist_answers": ["yes", "no", "needs_data", "not_assessed"],
+
+  "member_roles": [
+    {"id": "owner", "label": "Owner", "description": "The document is issued to this person alone"},
+    {"id": "joint", "label": "Joint", "description": "The document covers this person together with another household member"},
+    {"id": "mentioned", "label": "Mentioned", "description": "This person appears on the document but it is not theirs (e.g. a dependent)"}
+  ],
+  "attribution_methods": ["name_match", "model", "manual"],
+  "attribution_status": ["assigned", "ambiguous", "unassigned"],
+
+  "check_status": [
+    {"id": "verified", "label": "Matches document", "icon": "check"},
+    {"id": "mismatch", "label": "Document says otherwise", "icon": "x"},
+    {"id": "unconfirmed", "label": "Not found in document", "icon": "question"},
+    {"id": "conflicted", "label": "Documents disagree", "icon": "alert"},
+    {"id": "not_checked", "label": "Not checked", "icon": "minus"}
+  ],
+
+  "categories": ["retirement", "tax", "hsa", "cash_management", "life_event", "data_quality"],
+  "priorities": ["informational", "low", "medium", "high"],
+  "household_status": ["findings", "no_findings", "needs_review"],
+
+  "finding_types": [
+    {"id": "retirement_contribution_review", "category": "retirement", "headline": "{member} could save more for retirement", "action_label": "Discuss savings"},
+    {"id": "self_employment_tax_review", "category": "tax", "headline": "{member} has self-employment income to plan for", "action_label": "Review tax plan"},
+    {"id": "excess_cash_review", "category": "cash_management", "headline": "Cash above a 6-month cushion", "action_label": "Discuss cash"},
+    {"id": "retirement_distribution_review", "category": "tax", "headline": "{member} took a retirement distribution", "action_label": "Plan for tax bill"},
+    {"id": "hsa_eligibility_unverified", "category": "hsa", "headline": "HSA contribution without plan proof", "action_label": "Request document"},
+    {"id": "source_data_conflict", "category": "data_quality", "headline": "Documents disagree on {field}", "action_label": "Confirm value"},
+    {"id": "life_event_new_dependent", "category": "life_event", "headline": "New dependent", "action_label": "Schedule review"},
+    {"id": "life_event_new_employer", "category": "life_event", "headline": "{member} changed jobs", "action_label": "Schedule review"},
+    {"id": "life_event_new_mortgage", "category": "life_event", "headline": "New mortgage", "action_label": "Schedule review"},
+    {"id": "life_event_large_income_increase", "category": "life_event", "headline": "Large income change", "action_label": "Schedule review"}
+  ],
+
+  "data_quality": [
+    {"id": "conflict", "label": "Documents disagree"},
+    {"id": "low_confidence", "label": "Low read confidence (< 0.90)"},
+    {"id": "missing_document", "label": "Supporting document missing"},
+    {"id": "unassigned_document", "label": "Document not matched to a member"},
+    {"id": "unchecked_value", "label": "Value not checked against a document"}
+  ]
+}

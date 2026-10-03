@@ -1,0 +1,167 @@
+{
+ "_synthetic": "SYNTHETIC TEST DATA - recorded OpenDecision 0.1.2 response",
+ "chunks": 1,
+ "answers": {
+  "docType": {
+   "type": "choice",
+   "choice": "account_statement",
+   "probabilities": {
+    "w2": 0.0006420146964956075,
+    "1099_int": 0.0055163828656077385,
+    "1099_r": 0.002396141062490642,
+    "1099_div": 0.0015356391086243093,
+    "1099_nec": 0.0021464952151291072,
+    "1040": 0.0006813734653405845,
+    "1098": 0.002363186387810856,
+    "5498_sa": 0.0011622704332694411,
+    "1095": 0.0008615206752438098,
+    "account_statement": 0.9755628705024719,
+    "unknown": 0.007132142782211304
+   },
+   "confidence": 0.9317798732691752,
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Harbor Example Bank - Monthly Account Statement\nStatement period: December 1-31, 2024\nAccount holders: John R. Johnson and Sarah A. Johnson\nBeginning balance: $31,120.44\nEnding balance: $32,216.56",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "tag_tax": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": false,
+   "status": "tentative",
+   "binary": {
+    "answer": false,
+    "probabilities": {
+     "true": 0.2309197634458542,
+     "false": 0.7690802365541458
+    },
+    "confidence": 0.7690802365541458
+   },
+   "three_way": {
+    "answer": null,
+    "relation": "unknown",
+    "scores": {
+     "supports": 0.0020507436711341143,
+     "contradicts": 0.0333368256688118
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document is tax-related.\" is yes.",
+    "contradiction": "The answer to the question \"This document is tax-related.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Harbor Example Bank - Monthly Account Statement\nStatement period: December 1-31, 2024\nAccount holders: John R. Johnson and Sarah A. Johnson\nBeginning balance: $31,120.44\nEnding balance: $32,216.56",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "tag_income": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": false,
+   "status": "tentative",
+   "binary": {
+    "answer": false,
+    "probabilities": {
+     "true": 0.35220178961753845,
+     "false": 0.6477982103824615
+    },
+    "confidence": 0.6477982103824615
+   },
+   "three_way": {
+    "answer": null,
+    "relation": "unknown",
+    "scores": {
+     "supports": 0.001304506789892912,
+     "contradicts": 0.007011795416474342
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document reports employment earnings or wages.\" is yes.",
+    "contradiction": "The answer to the question \"This document reports employment earnings or wages.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Harbor Example Bank - Monthly Account Statement\nStatement period: December 1-31, 2024\nAccount holders: John R. Johnson and Sarah A. Johnson\nBeginning balance: $31,120.44\nEnding balance: $32,216.56",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "member_john_johnson": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.9697853922843933,
+     "false": 0.03021460771560669
+    },
+    "confidence": 0.9697853922843933
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.9099069833755493,
+     "contradicts": 0.011508150026202202
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document concerns John Johnson.\" is yes.",
+    "contradiction": "The answer to the question \"This document concerns John Johnson.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Harbor Example Bank - Monthly Account Statement\nStatement period: December 1-31, 2024\nAccount holders: John R. Johnson and Sarah A. Johnson\nBeginning balance: $31,120.44\nEnding balance: $32,216.56",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "member_sarah_johnson": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.9049869179725647,
+     "false": 0.0950130820274353
+    },
+    "confidence": 0.9049869179725647
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.5910742878913879,
+     "contradicts": 0.01971912756562233
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document concerns Sarah Johnson.\" is yes.",
+    "contradiction": "The answer to the question \"This document concerns Sarah Johnson.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Harbor Example Bank - Monthly Account Statement\nStatement period: December 1-31, 2024\nAccount holders: John R. Johnson and Sarah A. Johnson\nBeginning balance: $31,120.44\nEnding balance: $32,216.56",
+     "relevance": 1.0
+    }
+   ]
+  }
+ }
+}

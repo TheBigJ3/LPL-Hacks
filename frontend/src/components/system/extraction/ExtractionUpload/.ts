@@ -1,39 +1,54 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type CSSProperties } from 'react'
+import { useParams, useSearchParams } from 'react-router'
 import type { ExtractedAnalysis } from '@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis'
 import type { ExtractedBox } from '@lpl-hacks/shared/src/types/native/extraction/extractedBox'
 import type { ExtractedTable } from '@lpl-hacks/shared/src/types/native/extraction/extractedTable'
 import type { ExtractedConfidenceLevel, ExtractedValue } from '@lpl-hacks/shared/src/types/native/extraction/extractedValue'
 import documentsExtractionSettled from '@lpl-hacks/shared/src/types/native/sockets/documents/extractionSettled'
 import documentsWatch from '@lpl-hacks/shared/src/types/native/sockets/documents/watch'
+import listClientsApi from '@api/clients/listClientsApi'
 import getDocumentApi from '@api/documents/getDocumentApi'
+import getDocumentContentApi from '@api/documents/getDocumentContentApi'
 import uploadDocumentApi from '@api/documents/uploadDocumentApi'
-import { apiGetRequest, apiUploadRequest } from '@features/apiLayer'
+import { apiGetRequest, apiUploadRequest, useApiGetQuery } from '@features/apiLayer'
+import { DOCUMENT_UPLOAD_ACCEPT, DOCUMENT_UPLOAD_HINT, documentUploadCheckFile } from '@features/documentUploadCheck'
 import { documentPreviewRelease, documentPreviewRender, type DocumentPreviewPage } from '@features/documentPreview'
 import { fileDownloadJson } from '@features/fileDownload'
 import { socketAwait, socketLayer, socketWatch } from '@stores/socketStore'
 import { EXTRACTION_ERRORS } from '@typings/native/extraction/errors'
 
-export const EXTRACTION_UPLOAD_MIME_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/tiff']
-export const EXTRACTION_UPLOAD_MAX_BYTES = 50 * 1024 * 1024
-export const EXTRACTION_UPLOAD_IMAGE_MAX_BYTES = 10 * 1024 * 1024
-const EXTRACTION_UPLOAD_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg']
 export const EXTRACTION_EMPTY_VALUE_LABEL = '—'
 export const EXTRACTION_EDITOR_DOM_ID = 'extraction-review-editor'
 export const EXTRACTION_PANEL_DOM_ID = 'extraction-review-panel'
 
-const EXTRACTION_CROP_PADDING = { x: 0.05, y: 0.025 }
+const EXTRACTION_CROP_MARGIN = { x: 0.02, y: 0.012 }
+const EXTRACTION_CROP_MIN_WIDTH = 0.16
+const EXTRACTION_CROP_FRAME_RATIO = { min: 0.3, max: 0.9 }
+const EXTRACTION_CROP_LABEL_REACH = { width: 0.45, height: 0.08 }
+const EXTRACTION_BOX_MIN = { width: 0.02, height: 0.01 }
 const EXTRACTION_HIGHLIGHT_PADDING = 0.003
 const EXTRACTION_WAIT_MAX_MS = 20 * 60 * 1000
 const EXTRACTION_CHECK_CONNECTED_MS = 10_000
 const EXTRACTION_CHECK_DISCONNECTED_MS = 3_000
 
-export type ExtractionPhase = 'idle' | 'uploading' | 'extracting'
+export type ExtractionPhase = 'idle' | 'uploading' | 'opening' | 'extracting'
 
 const EXTRACTION_PHASE_LABELS: Record<ExtractionPhase, string> = {
   idle: 'Choose a PDF or image',
   uploading: 'Uploading…',
+  opening: 'Opening document…',
   extracting: 'Extracting…',
 }
+
+export type ExtractionMode = 'self' | 'request'
+
+const EXTRACTION_MODE_PARAM = 'mode'
+const EXTRACTION_DOCUMENT_PARAM = 'document'
+
+export const EXTRACTION_MODE_OPTIONS: { mode: ExtractionMode, icon: string, title: string, hint: string }[] = [
+  { mode: 'self', icon: 'upload_file', title: 'Upload files myself', hint: 'Extract and review a document now' },
+  { mode: 'request', icon: 'add_link', title: 'Request from client', hint: 'Send a link they can upload one set of files with' },
+]
 
 export type ExtractionEditValue = string | boolean
 
@@ -56,10 +71,37 @@ type ExtractionItem = {
 
 const EXTRACTION_STATUS_LABELS: Record<ExtractionItemStatus, string> = {
   review: 'Needs review',
-  edited: 'Edited',
+  edited: 'Corrected',
   confirmed: 'Approved',
   plain: 'Looks fine',
 }
+
+const EXTRACTION_STATUS_ICONS: Record<ExtractionItemStatus, string> = {
+  review: 'error',
+  edited: 'edit',
+  confirmed: 'check_circle',
+  plain: 'check',
+}
+
+const EXTRACTION_GUIDANCE: Record<ExtractionItemStatus, string> = {
+  review: 'Compare what we read with the document. Approve it if it matches, or type the correct value.',
+  edited: 'Your correction will be used instead of what we read.',
+  confirmed: 'You approved this value as it was read.',
+  plain: "This value wasn't flagged. You can still correct it if something looks off.",
+}
+
+const EXTRACTION_CONFIDENCE_LABELS: Record<ExtractedConfidenceLevel, string> = {
+  high: 'High certainty',
+  medium: 'Medium certainty',
+  low: 'Low certainty',
+  unknown: 'Certainty unknown',
+}
+
+export const EXTRACTION_HIGHLIGHT_LEGEND: { status: ExtractionItemStatus, label: string }[] = [
+  { status: 'review', label: 'Needs review' },
+  { status: 'confirmed', label: 'Approved' },
+  { status: 'edited', label: 'Corrected' },
+]
 
 export type ExtractionHighlightView = {
   id: string
@@ -101,18 +143,28 @@ export type ExtractionCropView = {
 export type ExtractionSelectedView = {
   id: string
   label: string
+  context: string
+  guidance: string
   kind: 'text' | 'checkbox'
   text: string
   checked: boolean
   readAs: string
+  readAsMissing: boolean
   normalizedLabel: string | null
+  changedFrom: string | null
+  confidenceLabel: string
   confidencePercent: string
   confidenceLevel: ExtractedConfidenceLevel
   issues: string[]
   status: ExtractionItemStatus
   statusLabel: string
+  statusIcon: string
   canConfirm: boolean
+  canUnconfirm: boolean
   canRevert: boolean
+  canGoNext: boolean
+  pageLabel: string
+  locationNote: string | null
   crop: ExtractionCropView | null
 }
 
@@ -150,7 +202,7 @@ function extractionFormatRatio(ratio: number): string {
 
 function extractionFormatNormalized(value: ExtractedValue): string | null {
   if (value.value === null || typeof value.value === 'boolean') return null
-  return String(value.value) === value.rawValue ? null : `→ ${value.value}`
+  return String(value.value) === value.rawValue ? null : String(value.value)
 }
 
 function extractionFormatItemValue(item: ExtractionItem): string {
@@ -198,7 +250,20 @@ function extractionBuildItems(data: ExtractedAnalysis, edits: Record<string, Ext
   return [...fieldItems, ...cellItems]
 }
 
-function extractionBuildHighlight(item: ExtractionItem, box: ExtractedBox, aspect: number, selectedId: string | null): ExtractionHighlightView {
+function extractionUnionBox(a: ExtractedBox, b: ExtractedBox): ExtractedBox {
+  const left = Math.min(a.left, b.left)
+  const top = Math.min(a.top, b.top)
+  return { left, top, width: Math.max(a.left + a.width, b.left + b.width) - left, height: Math.max(a.top + a.height, b.top + b.height) - top }
+}
+
+function extractionExpandBox(box: ExtractedBox): ExtractedBox {
+  const width = Math.max(box.width, EXTRACTION_BOX_MIN.width)
+  const height = Math.max(box.height, EXTRACTION_BOX_MIN.height)
+  return { left: box.left + (box.width - width) / 2, top: box.top + (box.height - height) / 2, width, height }
+}
+
+function extractionBuildHighlight(item: ExtractionItem, rawBox: ExtractedBox, aspect: number, selectedId: string | null): ExtractionHighlightView {
+  const box = extractionExpandBox(rawBox)
   const padX = EXTRACTION_HIGHLIGHT_PADDING
   const padY = EXTRACTION_HIGHLIGHT_PADDING / aspect
   return {
@@ -228,11 +293,20 @@ function extractionBuildPages(items: ExtractionItem[], previews: DocumentPreview
   })
 }
 
-function extractionBuildCrop(box: ExtractedBox, preview: DocumentPreviewPage): ExtractionCropView {
-  const left = Math.max(0, box.left - EXTRACTION_CROP_PADDING.x)
-  const top = Math.max(0, box.top - EXTRACTION_CROP_PADDING.y)
-  const width = Math.min(1, box.left + box.width + EXTRACTION_CROP_PADDING.x) - left
-  const height = Math.min(1, box.top + box.height + EXTRACTION_CROP_PADDING.y) - top
+function extractionCenterCropSpan(start: number, size: number, span: number): number {
+  return Math.min(Math.max(start + size / 2 - span / 2, 0), 1 - span)
+}
+
+function extractionBuildCrop(valueBox: ExtractedBox, labelBox: ExtractedBox | null, preview: DocumentPreviewPage): ExtractionCropView {
+  const box = extractionExpandBox(valueBox)
+  const withLabel = labelBox && extractionUnionBox(box, labelBox)
+  const focus = withLabel && withLabel.width <= EXTRACTION_CROP_LABEL_REACH.width && withLabel.height <= EXTRACTION_CROP_LABEL_REACH.height ? withLabel : box
+  const fitWidth = Math.max(focus.width + EXTRACTION_CROP_MARGIN.x * 2, EXTRACTION_CROP_MIN_WIDTH)
+  const fitHeight = focus.height + EXTRACTION_CROP_MARGIN.y * 2
+  const width = Math.min(1, Math.max(fitWidth, fitHeight * preview.aspect / EXTRACTION_CROP_FRAME_RATIO.max))
+  const height = Math.min(1, Math.max(fitHeight, width * EXTRACTION_CROP_FRAME_RATIO.min / preview.aspect))
+  const left = extractionCenterCropSpan(focus.left, focus.width, width)
+  const top = extractionCenterCropSpan(focus.top, focus.height, height)
   return {
     imageUrl: preview.url,
     frameStyle: { aspectRatio: `${width} / ${height * preview.aspect}` },
@@ -246,24 +320,41 @@ function extractionBuildCrop(box: ExtractedBox, preview: DocumentPreviewPage): E
   }
 }
 
-function extractionBuildSelected(item: ExtractionItem, previews: DocumentPreviewPage[] | null): ExtractionSelectedView {
+function extractionFormatReadAs(item: ExtractionItem): string {
+  if (item.kind === 'checkbox') return item.source.value === null ? 'Nothing detected' : item.source.value ? 'Checked' : 'Unchecked'
+  return item.source.rawValue === null ? 'Nothing detected' : item.source.rawValue === '' ? 'Empty' : item.source.rawValue
+}
+
+function extractionBuildSelected(item: ExtractionItem, flagged: ExtractionItem[], unresolved: number, previews: DocumentPreviewPage[] | null): ExtractionSelectedView {
   const preview = previews?.[item.page - 1]
+  const flaggedIndex = flagged.indexOf(item)
+  const readAs = extractionFormatReadAs(item)
   return {
     id: item.id,
     label: item.label,
+    context: flaggedIndex === -1 ? 'Extracted field' : `Flagged field ${flaggedIndex + 1} of ${flagged.length}`,
+    guidance: EXTRACTION_GUIDANCE[item.status],
     kind: item.kind,
     text: item.text,
     checked: item.checked,
-    readAs: item.source.rawValue === null ? 'Nothing detected' : item.source.rawValue === '' ? 'Empty' : item.source.rawValue,
+    readAs,
+    readAsMissing: item.kind === 'checkbox' ? item.source.value === null : !item.source.rawValue,
     normalizedLabel: extractionFormatNormalized(item.source),
+    changedFrom: item.edited ? readAs : null,
+    confidenceLabel: EXTRACTION_CONFIDENCE_LABELS[item.source.confidenceLevel],
     confidencePercent: extractionFormatPercent(item.source.confidence),
     confidenceLevel: item.source.confidenceLevel,
     issues: item.source.issues,
     status: item.status,
     statusLabel: EXTRACTION_STATUS_LABELS[item.status],
+    statusIcon: EXTRACTION_STATUS_ICONS[item.status],
     canConfirm: item.status === 'review',
+    canUnconfirm: item.status === 'confirmed',
     canRevert: item.edited,
-    crop: item.box && preview ? extractionBuildCrop(item.box, preview) : null,
+    canGoNext: item.status !== 'review' && unresolved > 0,
+    pageLabel: `Page ${item.page}`,
+    locationNote: item.box ? null : "We couldn't find this field on the page. Enter the value if you know it.",
+    crop: item.box && preview ? extractionBuildCrop(item.box, item.labelBox, preview) : null,
   }
 }
 
@@ -301,7 +392,7 @@ function extractionBuildReview(items: ExtractionItem[], previews: DocumentPrevie
     missing: items
       .filter((item) => item.box === null && !item.source.requiresReview)
       .map((item) => extractionBuildReviewListItem(item, selectedId, item.edited ? `Filled in: ${item.text}` : 'Not found on the page')),
-    selected: selected ? extractionBuildSelected(selected, previews) : null,
+    selected: selected ? extractionBuildSelected(selected, flagged, flagged.length - resolved, previews) : null,
   }
 }
 
@@ -397,8 +488,8 @@ async function extractionWaitForDocument(documentId: string, signal: AbortSignal
   }
 }
 
-async function extractionUploadAndWait(file: File, signal: AbortSignal, onUploaded: () => void): Promise<ExtractionWaitResult | null> {
-  const res = await apiUploadRequest(uploadDocumentApi, { fileName: file.name }, file)
+async function extractionUploadAndWait(file: File, clientId: string | undefined, signal: AbortSignal, onUploaded: () => void): Promise<ExtractionWaitResult | null> {
+  const res = await apiUploadRequest(uploadDocumentApi, { fileName: file.name, clientId }, file)
   if (signal.aborted) return null
   if (!res.success) return { success: false, message: res.error.message }
 
@@ -406,7 +497,25 @@ async function extractionUploadAndWait(file: File, signal: AbortSignal, onUpload
   return extractionWaitForDocument(res.data.document.id, signal)
 }
 
+async function extractionFetchDocumentFile(documentId: string, signal: AbortSignal): Promise<{ success: true, file: File } | { success: false, message: string } | null> {
+  const [content, details] = await Promise.all([
+    apiGetRequest(getDocumentContentApi, { documentId }, { responseType: 'blob', signal }),
+    apiGetRequest(getDocumentApi, { documentId }, { signal }),
+  ])
+  if (signal.aborted) return null
+  if (!content.success) return { success: false, message: content.error.message }
+  if (!details.success) return { success: false, message: details.error.message }
+  return { success: true, file: new File([content.data], details.data.document.fileName, { type: content.data.type }) }
+}
+
 export function useExtractionUpload() {
+  const { clientId: clientSlug } = useParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const clientsQuery = useApiGetQuery(listClientsApi)
+  const client = clientsQuery.data?.clients.find((item) => item.slug === clientSlug) ?? null
+  const mode: ExtractionMode = searchParams.get(EXTRACTION_MODE_PARAM) === 'request' ? 'request' : 'self'
+  const openDocumentId = searchParams.get(EXTRACTION_DOCUMENT_PARAM)
+
   const [phase, setPhase] = useState<ExtractionPhase>('idle')
   const [error, setError] = useState<string | null>(null)
   const [analysis, setAnalysis] = useState<ExtractionAnalysis | null>(null)
@@ -421,6 +530,13 @@ export function useExtractionUpload() {
   }, [previews])
 
   useEffect(() => () => uploadAbort.current?.abort(), [])
+
+  useEffect(() => {
+    if (!openDocumentId) return
+    const abort = extractionStart()
+    setPhase('opening')
+    void extractionOpen(openDocumentId, abort.signal)
+  }, [openDocumentId])
 
   const result = useMemo(() => {
     if (!analysis) return null
@@ -438,37 +554,17 @@ export function useExtractionUpload() {
     }
   }, [analysis, previews, edits, confirmed, selectedId])
 
-  async function upload(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
-    event.target.value = ''
-    if (!file) return
-
-    if (!EXTRACTION_UPLOAD_MIME_TYPES.includes(file.type)) {
-      setError(EXTRACTION_ERRORS.FILE_TYPE_INVALID.MESSAGE)
-      return
-    }
-    if (file.size > EXTRACTION_UPLOAD_MAX_BYTES) {
-      setError(EXTRACTION_ERRORS.FILE_TOO_LARGE.MESSAGE)
-      return
-    }
-    if (EXTRACTION_UPLOAD_IMAGE_MIME_TYPES.includes(file.type) && file.size > EXTRACTION_UPLOAD_IMAGE_MAX_BYTES) {
-      setError(EXTRACTION_ERRORS.IMAGE_TOO_LARGE.MESSAGE)
-      return
-    }
-
+  function extractionStart() {
     uploadAbort.current?.abort()
     const abort = new AbortController()
     uploadAbort.current = abort
-
     setError(null)
     setAnalysis(null)
     setPreviews(null)
-    setPhase('uploading')
-    const [result, pages] = await Promise.all([
-      extractionUploadAndWait(file, abort.signal, () => setPhase('extracting')),
-      documentPreviewRender(file),
-    ])
+    return abort
+  }
 
+  function extractionShow(file: File, result: ExtractionWaitResult | null, pages: DocumentPreviewPage[] | null) {
     if (!result || !result.success) {
       if (pages) documentPreviewRelease(pages)
       if (!result) return
@@ -484,12 +580,79 @@ export function useExtractionUpload() {
     setAnalysis({ documentId: result.documentId, fileName: file.name, pageCount: result.pageCount, data: result.data })
   }
 
+  async function extractionOpen(documentId: string, signal: AbortSignal) {
+    const fetched = await extractionFetchDocumentFile(documentId, signal)
+    if (!fetched) return
+    if (!fetched.success) {
+      setPhase('idle')
+      setError(fetched.message)
+      return
+    }
+    setPhase('extracting')
+    const [result, pages] = await Promise.all([
+      extractionWaitForDocument(documentId, signal),
+      documentPreviewRender(fetched.file),
+    ])
+    extractionShow(fetched.file, result, pages)
+  }
+
+  async function upload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    const invalid = documentUploadCheckFile(file)
+    if (invalid) {
+      setError(invalid.MESSAGE)
+      return
+    }
+
+    if (openDocumentId) extractionClearDocumentParam()
+    const abort = extractionStart()
+    setPhase('uploading')
+    const [result, pages] = await Promise.all([
+      extractionUploadAndWait(file, client?.id, abort.signal, () => setPhase('extracting')),
+      documentPreviewRender(file),
+    ])
+    extractionShow(file, result, pages)
+  }
+
+  function extractionClearDocumentParam() {
+    setSearchParams((params) => {
+      const next = new URLSearchParams(params)
+      next.delete(EXTRACTION_DOCUMENT_PARAM)
+      return next
+    })
+  }
+
+  function selectMode(next: ExtractionMode) {
+    setSearchParams((params) => {
+      const updated = new URLSearchParams(params)
+      if (next === 'request') updated.set(EXTRACTION_MODE_PARAM, next)
+      else updated.delete(EXTRACTION_MODE_PARAM)
+      return updated
+    })
+  }
+
+  function reviewDocument(documentId: string) {
+    setSearchParams((params) => {
+      const next = new URLSearchParams(params)
+      next.delete(EXTRACTION_MODE_PARAM)
+      next.set(EXTRACTION_DOCUMENT_PARAM, documentId)
+      return next
+    })
+  }
+
   function edit(id: string, value: ExtractionEditValue) {
     setEdits((current) => ({ ...current, [id]: value }))
   }
 
   function confirm(id: string) {
     setConfirmed((current) => ({ ...current, [id]: true }))
+  }
+
+  function unconfirm(id: string) {
+    setConfirmed((current) => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)))
   }
 
   function revert(id: string) {
@@ -529,11 +692,18 @@ export function useExtractionUpload() {
     upload,
     edit,
     confirm,
+    unconfirm,
     revert,
     select,
     focusItem,
     focusNext,
     confirmExport,
-    accept: EXTRACTION_UPLOAD_MIME_TYPES.join(','),
+    accept: DOCUMENT_UPLOAD_ACCEPT,
+    hint: DOCUMENT_UPLOAD_HINT,
+    mode,
+    modes: EXTRACTION_MODE_OPTIONS.map((option) => ({ ...option, selected: option.mode === mode })),
+    selectMode,
+    client,
+    reviewDocument,
   }
 }

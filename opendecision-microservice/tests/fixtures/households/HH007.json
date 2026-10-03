@@ -1,0 +1,101 @@
+{
+  "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+  "household_id": "HH007",
+  "tax_year": 2025,
+  "filing_status": "married filing jointly",
+  "adjusted_gross_income": {
+    "value": 139000,
+    "source_document": "hh007_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.985,
+    "verified": false
+  },
+  "dependents": {
+    "value": 0,
+    "source_document": "hh007_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "cash_balance": {
+    "value": 35000,
+    "source_document": "hh007_bank_statement_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "members": [
+    {
+      "person_id": "HH007-P1",
+      "name": "Drew Kim",
+      "employer": {
+        "value": "Litware Sample Inc",
+        "source_document": "drew_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.99,
+        "verified": false
+      },
+      "wages": {
+        "value": 82000,
+        "source_document": "drew_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.98,
+        "verified": false
+      },
+      "employee_401k_contribution": {
+        "value": 23500,
+        "source_document": "drew_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.976,
+        "verified": false
+      }
+    },
+    {
+      "person_id": "HH007-P2",
+      "name": "Avery Kim",
+      "employer": {
+        "value": "Proseware Sample LLC",
+        "source_document": "avery_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.99,
+        "verified": false
+      },
+      "wages": {
+        "value": 80000,
+        "source_document": "avery_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.98,
+        "verified": false
+      },
+      "employee_401k_contribution": {
+        "value": 23500,
+        "source_document": "avery_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.977,
+        "verified": false
+      }
+    }
+  ],
+  "documents": [
+    {
+      "name": "drew_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "avery_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "hh007_1040_2025.pdf",
+      "type": "1040",
+      "date": "2026-04-01"
+    },
+    {
+      "name": "hh007_bank_statement_2025.pdf",
+      "type": "account_statement",
+      "date": "2025-12-31"
+    }
+  ]
+}

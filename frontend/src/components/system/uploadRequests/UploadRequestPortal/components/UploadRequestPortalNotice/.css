@@ -1,0 +1,35 @@
+.upload-request-portal-notice {
+  --upload-request-portal-notice-tone: var(--color-dark-gray);
+  padding: 24px 0 8px;
+}
+
+.upload-request-portal-notice[data-tone="success"] {
+  --upload-request-portal-notice-tone: var(--color-success);
+}
+
+.upload-request-portal-notice[data-tone="error"] {
+  --upload-request-portal-notice-tone: var(--color-error);
+}
+
+.upload-request-portal-notice__icon {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  background: color-mix(in srgb, var(--upload-request-portal-notice-tone) 12%, transparent);
+  color: var(--upload-request-portal-notice-tone);
+  font-size: 28px;
+}
+
+.upload-request-portal-notice__title {
+  color: var(--color-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.upload-request-portal-notice__message {
+  max-width: 380px;
+  color: var(--color-dark-gray);
+  font-size: 15px;
+  line-height: 22px;
+}

@@ -1,6 +1,6 @@
 import './.css'
 import { AnimatePresence, motion } from 'motion/react'
-import type { SidebarClient, SidebarClientMember } from '../../.ts'
+import type { Client, ClientMember } from '@lpl-hacks/shared/src/types/native/clients/client'
 import {
   SIDEBAR_CLIENT_PICKER_ID,
   SIDEBAR_CLIENT_PICKER_VARIANTS,
@@ -11,8 +11,8 @@ import {
 import SidebarClientPicker from './components/SidebarClientPicker/SidebarClientPicker'
 
 type SidebarClientSwitcherProps = {
-  client: SidebarClient | null
-  member: SidebarClientMember | null
+  client: Client | null
+  member: ClientMember | null
   open: boolean
   onExpand: () => void
 }

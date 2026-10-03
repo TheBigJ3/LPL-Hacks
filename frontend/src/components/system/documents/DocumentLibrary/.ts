@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router'
 import type { Variants } from 'motion/react'
 import { useElementWidth } from '@hooks/useElementWidth'
@@ -104,17 +104,19 @@ const DOCUMENT_DEMO_RECORDS: DocumentRecord[] = DOCUMENT_TAGS.flatMap((tag, tagI
 
 const DOCUMENT_DATE_FORMAT = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
 
-const DOCUMENT_CARD_MIN_WIDTH = 168
+const DOCUMENT_CARD_MIN_WIDTH = 200
 const DOCUMENT_WIDE_WIDTH = 900
-const DOCUMENT_GAP_WIDE = 36
-const DOCUMENT_GAP_NARROW = 20
+const DOCUMENT_GAP_WIDE = 24
+const DOCUMENT_GAP_NARROW = 24
 const DOCUMENT_MIN_COLUMNS = 2
-const DOCUMENT_MAX_COLUMNS = 5
+const DOCUMENT_MAX_COLUMNS = 4
+
+let documentPreviewReady = false
 
 export const DOCUMENT_LIBRARY_VIEW_VARIANTS: Variants = {
-  enter: { opacity: 0, y: 12 },
-  center: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1], staggerChildren: 0.05 } },
-  exit: { opacity: 0, y: -8, transition: { duration: 0.16, ease: 'easeIn' } },
+  enter: { opacity: 0 },
+  center: { opacity: 1, transition: { duration: 0.24, ease: 'easeOut' } },
+  exit: { opacity: 0, transition: { duration: 0.12, ease: 'easeIn' } },
 }
 
 const documentGetColumns = (width: number) => {
@@ -144,6 +146,12 @@ const documentFormatCount = (count: number) => `${count} ${count === 1 ? 'docume
 const documentFormatSummary = (shown: number, total: number) =>
   shown === total ? documentFormatCount(total) : `${shown} of ${documentFormatCount(total)}`
 
+const documentPreviewDecode = () => {
+  const image = new Image()
+  image.src = documentPreview
+  return image.decode()
+}
+
 const documentToCard = (record: DocumentRecord, memberSearch: string): DocumentCardView => ({
   id: record.id,
   name: record.name,
@@ -156,6 +164,7 @@ export function useDocumentLibrary() {
   const { clientId } = useParams()
   const [searchParams] = useSearchParams()
   const [measureRef, width] = useElementWidth<HTMLDivElement>()
+  const [previewReady, setPreviewReady] = useState(documentPreviewReady)
 
   const memberId = searchParams.get('member')
   const tag = DOCUMENT_TAGS.find((item) => item.id === searchParams.get('tag')) ?? null
@@ -163,7 +172,20 @@ export function useDocumentLibrary() {
   const memberSearch = memberId ? `?member=${memberId}` : ''
   const viewKey = [clientId, memberId, tag?.id, query].join('|')
 
+  const lastViewKey = useRef(viewKey)
+
   useEffect(() => {
+    if (previewReady) return
+    const markReady = () => {
+      documentPreviewReady = true
+      setPreviewReady(true)
+    }
+    documentPreviewDecode().then(markReady, markReady)
+  }, [previewReady])
+
+  useEffect(() => {
+    if (lastViewKey.current === viewKey) return
+    lastViewKey.current = viewKey
     document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })
   }, [viewKey])
 
@@ -212,6 +234,7 @@ export function useDocumentLibrary() {
 
   return {
     clientSelected: !!clientId,
+    loading: !previewReady,
     measureRef,
     columns: documentGetColumns(width),
     wide: width >= DOCUMENT_WIDE_WIDTH,

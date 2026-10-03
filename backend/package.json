@@ -16,16 +16,17 @@
     "db:studio": "dotenv -e .env.development -- tsx scripts/drizzleKit.ts studio",
     "kb:seed": "dotenv -e .env.development -- tsx scripts/knowledgeBaseSeed.ts",
     "kb:unseed": "dotenv -e .env.development -- tsx scripts/knowledgeBaseSeed.ts --remove",
-    "kb:ingest": "dotenv -e .env.development -- tsx scripts/knowledgeBaseIngest.ts"
+    "kb:ingest": "dotenv -e .env.development -- tsx scripts/knowledgeBaseIngest.ts",
+    "db:seed": "dotenv -e .env.development -- tsx scripts/seedDemo.ts"
   },
   "dependencies": {
     "@aws-sdk/client-bedrock-agent": "3.1146.0",
     "@aws-sdk/client-bedrock-agent-runtime": "3.1146.0",
     "@aws-sdk/client-bedrock-runtime": "3.1146.0",
-    "@aws-sdk/client-s3": "^3.1137.0",
+    "@aws-sdk/client-s3": "^3.1146.0",
+    "@aws-sdk/client-sagemaker-runtime": "^3.1146.0",
     "@aws-sdk/client-textract": "^3.1146.0",
     "@aws-sdk/rds-signer": "3.1146.0",
-    "@aws-sdk/s3-request-presigner": "^3.1137.0",
     "@lpl-hacks/shared": "*",
     "@socket.io/redis-adapter": "^8.3.0",
     "bullmq": "^6.3.8",
@@ -36,6 +37,7 @@
     "drizzle-zod": "^0.8.3",
     "express": "^4.21.2",
     "ioredis": "^6.0.0",
+    "pdf-lib": "^1.17.1",
     "pg": "^8.23.0",
     "socket.io": "^4.8.3"
   },

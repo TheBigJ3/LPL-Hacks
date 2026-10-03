@@ -72,7 +72,7 @@ Add it to the top-level comment, after the findings, in this shape:
 ### 🚀 Demo checklist (release to main)
 **Before merging**
 - [ ] Backend env `KB_ID` — new; from Bedrock → Knowledge bases → the demo KB
-- [ ] Grant the demo IAM role `textract:StartDocumentAnalysis` / `textract:GetDocumentAnalysis`
+- [ ] Grant the demo IAM role `textract:AnalyzeDocument`
 **After deploying**
 - [ ] Re-sync the Knowledge Base data source so the demo household's documents are indexed
 **Nothing needed:** frontend env

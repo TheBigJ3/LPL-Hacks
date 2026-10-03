@@ -1,0 +1,186 @@
+.extraction-request-list__heading {
+  color: var(--color-text-default);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.extraction-request-list__empty {
+  padding: 16px;
+  border: 1px dashed var(--color-border);
+  color: var(--color-dark-gray);
+  font-size: 14px;
+  text-align: center;
+}
+
+.extraction-request-list__item {
+  --extraction-request-list-tone: var(--color-dark-gray);
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: box-shadow 400ms ease, border-color 400ms ease;
+}
+
+.extraction-request-list__item[data-state="open"] {
+  --extraction-request-list-tone: var(--color-heading);
+}
+
+.extraction-request-list__item[data-state="submitted"] {
+  --extraction-request-list-tone: var(--color-success);
+}
+
+.extraction-request-list__item[data-fresh="true"] {
+  border-color: var(--color-accent-blue);
+  box-shadow: var(--shadow-200);
+}
+
+.extraction-request-list__state-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  background: color-mix(in srgb, var(--extraction-request-list-tone) 10%, transparent);
+  color: var(--extraction-request-list-tone);
+  font-size: 18px;
+}
+
+.extraction-request-list__state {
+  color: var(--color-text-default);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.extraction-request-list__item[data-state="expired"] .extraction-request-list__state,
+.extraction-request-list__item[data-state="revoked"] .extraction-request-list__state {
+  color: var(--color-dark-gray);
+}
+
+.extraction-request-list__meta {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.extraction-request-list__note {
+  margin-top: 4px;
+  color: var(--color-text-default);
+  font-size: 14px;
+  line-height: 20px;
+  font-style: italic;
+}
+
+.extraction-request-list__revoke {
+  padding: 6px 10px;
+  color: var(--color-error);
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color 150ms ease;
+}
+
+.extraction-request-list__revoke:hover {
+  background: color-mix(in srgb, var(--color-error) 8%, transparent);
+}
+
+.extraction-request-list__link {
+  padding: 4px 4px 4px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-hover);
+}
+
+.extraction-request-list__link-icon {
+  color: var(--color-dark-gray);
+  font-size: 18px;
+}
+
+.extraction-request-list__link-input {
+  background: transparent;
+  color: var(--color-text-default);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  outline: none;
+}
+
+.extraction-request-list__copy {
+  height: 32px;
+  padding: 0 12px;
+  background: var(--color-navy);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 700;
+  transition: opacity 150ms ease, background-color 150ms ease;
+}
+
+.extraction-request-list__copy .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.extraction-request-list__copy:hover {
+  opacity: 0.9;
+}
+
+.extraction-request-list__copy[data-copied="true"] {
+  background: var(--color-success);
+}
+
+.extraction-request-list__documents {
+  border-top: 1px solid var(--color-border);
+}
+
+.extraction-request-list__document {
+  min-height: 44px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.extraction-request-list__document:last-child {
+  border-bottom: none;
+}
+
+.extraction-request-list__document-icon {
+  color: var(--color-dark-gray);
+  font-size: 18px;
+}
+
+.extraction-request-list__file {
+  color: var(--color-text-default);
+  font-size: 14px;
+}
+
+.extraction-request-list__document-status {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+}
+
+.extraction-request-list__document-status[data-status="failed"] {
+  color: var(--color-error);
+}
+
+.extraction-request-list__review {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-default);
+  font-size: 13px;
+  font-weight: 700;
+  transition: background-color 150ms ease;
+}
+
+.extraction-request-list__review .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.extraction-request-list__review:hover {
+  background: var(--color-surface-hover);
+}
+
+.extraction-request-list__revoke:focus-visible,
+.extraction-request-list__copy:focus-visible,
+.extraction-request-list__review:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .extraction-request-list__item,
+  .extraction-request-list__revoke,
+  .extraction-request-list__copy,
+  .extraction-request-list__review { transition: none; }
+}

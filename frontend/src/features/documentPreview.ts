@@ -3,7 +3,7 @@ import PDF_WORKER_URL from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
 GlobalWorkerOptions.workerSrc = PDF_WORKER_URL
 
-const DOCUMENT_PREVIEW_PDF_WIDTH = 1600
+const DOCUMENT_PREVIEW_PDF_WIDTH = 2400
 
 export type DocumentPreviewPage = {
   url: string

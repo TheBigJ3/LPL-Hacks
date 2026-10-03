@@ -1,0 +1,508 @@
+{
+  "schema_version": "1.1",
+  "ruleset_version": "2025.2",
+  "household_id": "HH005",
+  "tax_year": 2025,
+  "status": "findings",
+  "priority": "high",
+  "checklist_label": "Flags for review, not advice",
+  "summary": {
+    "filing_status": "married_filing_jointly",
+    "dependents": 1,
+    "dependents_check": "verified",
+    "dependents_source_document": "hh005_1040_2025.pdf",
+    "agi": {
+      "value": 171000,
+      "check": "verified",
+      "source_document": "hh005_1040_2025.pdf",
+      "page": 1
+    },
+    "cash": {
+      "value": 22000,
+      "check": "verified",
+      "source_document": "hh005_bank_statement_2025.pdf",
+      "page": 1,
+      "months_of_income": 1.5
+    },
+    "mortgage_interest": {
+      "value": 14200,
+      "check": "verified",
+      "source_document": "hh005_1098_2025.pdf",
+      "page": 1
+    }
+  },
+  "members": [
+    {
+      "person_id": "HH005-P1",
+      "name": "Casey Brooks",
+      "employer": "Bluefin Sample LLC",
+      "numbers": [
+        {
+          "field": "wages",
+          "label": "Wages",
+          "value": 160000,
+          "check": "verified",
+          "source_document": "casey_w2_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "employee_401k_contribution",
+          "label": "401(k) contribution",
+          "value": 16000,
+          "check": "verified",
+          "source_document": "casey_w2_2025.pdf",
+          "page": 1,
+          "context": "10.0% of pay · 68% of limit · $7,500 room left",
+          "candidates": null
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "id": "retirement_can_improve",
+      "question": "Can retirement savings be improved?",
+      "answer": "no",
+      "reason": "Every wage earner contributes at least half of the 401(k) limit",
+      "dollar_impact": null,
+      "finding_ids": [],
+      "metrics": {
+        "flag_below_pct_of_limit": 50,
+        "high_below_pct_of_limit": 15,
+        "limit": 23500,
+        "members": {
+          "HH005-P1": {
+            "contribution": 16000,
+            "wages": 160000,
+            "pct_of_pay": 10.0,
+            "pct_of_limit": 68,
+            "room": 7500
+          }
+        }
+      },
+      "rule": "a 401(k) contribution under 50% of the $23,500 limit flags retirement for review (under 15% is high priority)"
+    },
+    {
+      "id": "tax_savings_possible",
+      "question": "Can tax savings be made?",
+      "answer": "no",
+      "reason": "No self-employment income, early distribution or under-withheld distribution",
+      "dollar_impact": null,
+      "finding_ids": [],
+      "metrics": {
+        "self_employment_above": 0,
+        "early_additional_tax_pct": 10,
+        "flag_below_withholding_pct": 10,
+        "members": {}
+      },
+      "rule": "self-employment income above $0, a 1099-R code 1 early distribution (estimated 10% additional tax), or a code 7 distribution with federal withholding under 10% of the taxable amount flags tax for review"
+    },
+    {
+      "id": "excess_cash",
+      "question": "Is there excess cash to put to work?",
+      "answer": "no",
+      "reason": "Cash covers 1.5 months of income, within 6 months",
+      "dollar_impact": null,
+      "finding_ids": [],
+      "metrics": {
+        "target_months": 6,
+        "high_above_months": 12,
+        "cash": 22000,
+        "agi": 171000,
+        "monthly_income": 14250,
+        "months_of_income": 1.5,
+        "target": 85500
+      },
+      "rule": "cash above 6 months of income (AGI / 12) flags excess cash for review (above 12 months is high priority)"
+    },
+    {
+      "id": "needs_documents",
+      "question": "Is more documentation needed?",
+      "answer": "no",
+      "reason": "No conflicts, missing proof or mismatched values",
+      "dollar_impact": null,
+      "finding_ids": [],
+      "metrics": {
+        "conflicts": 0,
+        "hsa_without_plan": 0,
+        "mismatches": 0
+      },
+      "rule": "documents that disagree, an HSA contribution with no documented eligible plan, or a value contradicted by the document it came from means more documentation is needed"
+    },
+    {
+      "id": "major_changes",
+      "question": "Anything major changed since last year?",
+      "answer": "yes",
+      "reason": "Dependents increased from 0 to 1, Casey changed employer from Acme Sample Corp to Bluefin Sample LLC, Mortgage interest started ($14,200) and AGI rose 94% from $88,000 to $171,000",
+      "dollar_impact": null,
+      "finding_ids": [
+        "F1",
+        "F2",
+        "F3",
+        "F4"
+      ],
+      "metrics": {
+        "flag_change_pct": 25,
+        "high_at_events": 3,
+        "prior_tax_year": 2024,
+        "events": [
+          "life_event_new_dependent",
+          "life_event_new_employer",
+          "life_event_new_mortgage",
+          "life_event_large_income_increase"
+        ],
+        "event_count": 4
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
+    },
+    {
+      "id": "insurance_review",
+      "question": "Insurance coverage reviewed?",
+      "answer": "not_assessed",
+      "reason": "No insurance data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "not assessed: no data or rules yet"
+    },
+    {
+      "id": "estate_review",
+      "question": "Estate plan reviewed?",
+      "answer": "not_assessed",
+      "reason": "No estate planning data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "not assessed: no data or rules yet"
+    },
+    {
+      "id": "education_review",
+      "question": "Education savings reviewed?",
+      "answer": "not_assessed",
+      "reason": "No education savings data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": [],
+      "metrics": {},
+      "rule": "not assessed: no data or rules yet"
+    }
+  ],
+  "changes_since_last_year": [
+    {
+      "type": "life_event_new_dependent",
+      "text": "Dependents increased from 0 to 1"
+    },
+    {
+      "type": "life_event_new_employer",
+      "text": "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC"
+    },
+    {
+      "type": "life_event_new_mortgage",
+      "text": "Mortgage interest started ($14,200)"
+    },
+    {
+      "type": "life_event_large_income_increase",
+      "text": "AGI rose 94% from $88,000 to $171,000"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "type": "life_event_new_dependent",
+      "category": "life_event",
+      "priority": "high",
+      "headline": "New dependent",
+      "explanation": "Dependents increased from 0 to 1 since last year. Several changes happened together.",
+      "dollar_impact": null,
+      "member": null,
+      "person_id": null,
+      "action_label": "Schedule review",
+      "check": "verified",
+      "metrics": {
+        "before": 0,
+        "after": 1
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
+    },
+    {
+      "id": "F2",
+      "type": "life_event_new_employer",
+      "category": "life_event",
+      "priority": "high",
+      "headline": "Casey changed jobs",
+      "explanation": "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC since last year. Several changes happened together.",
+      "dollar_impact": null,
+      "member": "Casey Brooks",
+      "person_id": "HH005-P1",
+      "action_label": "Schedule review",
+      "check": "not_checked",
+      "metrics": {
+        "before": "Acme Sample Corp",
+        "after": "Bluefin Sample LLC"
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
+    },
+    {
+      "id": "F3",
+      "type": "life_event_new_mortgage",
+      "category": "life_event",
+      "priority": "high",
+      "headline": "New mortgage",
+      "explanation": "Mortgage interest started ($14,200) since last year. Several changes happened together.",
+      "dollar_impact": null,
+      "member": null,
+      "person_id": null,
+      "action_label": "Schedule review",
+      "check": "verified",
+      "metrics": {
+        "before": 0,
+        "after": 14200
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
+    },
+    {
+      "id": "F4",
+      "type": "life_event_large_income_increase",
+      "category": "life_event",
+      "priority": "high",
+      "headline": "Large income change",
+      "explanation": "AGI rose 94% from $88,000 to $171,000 since last year. Several changes happened together.",
+      "dollar_impact": null,
+      "member": null,
+      "person_id": null,
+      "action_label": "Schedule review",
+      "check": "verified",
+      "metrics": {
+        "before": 88000,
+        "after": 171000,
+        "change_pct": 94,
+        "flag_change_pct": 25
+      },
+      "rule": "with a prior year on file, a new dependent, a new employer, a new mortgage, or AGI changing 25% or more is a major change (3 or more together is high priority)"
+    }
+  ],
+  "data_quality": {
+    "documents": 4,
+    "conflicts": [],
+    "low_confidence_fields": [],
+    "unchecked_values": 0,
+    "missing_documents": [],
+    "unassigned_documents": [],
+    "documents_needing_review": []
+  },
+  "errors": [],
+  "prior_year": {
+    "tax_year": 2024,
+    "filing_status": "married_filing_jointly",
+    "numbers": [
+      {
+        "field": "adjusted_gross_income",
+        "label": "Adjusted gross income",
+        "value": 88000
+      },
+      {
+        "field": "dependents",
+        "label": "Dependents",
+        "value": 0
+      }
+    ],
+    "members": [
+      {
+        "person_id": "HH005-P1",
+        "name": "Casey Brooks",
+        "numbers": [
+          {
+            "field": "employer",
+            "label": "Employer",
+            "value": "Acme Sample Corp"
+          },
+          {
+            "field": "wages",
+            "label": "Wages",
+            "value": 90000
+          },
+          {
+            "field": "employee_401k_contribution",
+            "label": "401(k) contribution",
+            "value": 9000
+          }
+        ]
+      }
+    ]
+  },
+  "tags": {
+    "household": {
+      "topics": [
+        "income",
+        "retirement",
+        "tax",
+        "banking_cash",
+        "mortgage_housing"
+      ],
+      "categories_flagged": [
+        "life_event"
+      ],
+      "checklist_yes": [
+        "major_changes"
+      ],
+      "checklist_not_assessed": [
+        "insurance_review",
+        "estate_review",
+        "education_review"
+      ],
+      "life_events": [
+        "life_event_new_dependent",
+        "life_event_new_employer",
+        "life_event_new_mortgage",
+        "life_event_large_income_increase"
+      ],
+      "data_quality": []
+    },
+    "members": [
+      {
+        "person_id": "HH005-P1",
+        "name": "Casey Brooks",
+        "topics": [
+          "income",
+          "retirement",
+          "tax",
+          "banking_cash",
+          "mortgage_housing"
+        ],
+        "fields_present": [
+          "wages",
+          "employer",
+          "employee_401k_contribution"
+        ],
+        "documents": [
+          "casey_w2_2025.pdf",
+          "hh005_1040_2025.pdf",
+          "hh005_1098_2025.pdf",
+          "hh005_bank_statement_2025.pdf"
+        ],
+        "findings": [
+          "F2"
+        ],
+        "checks": {
+          "verified": 2,
+          "unconfirmed": 0,
+          "mismatch": 0,
+          "conflicted": 0,
+          "not_checked": 0
+        }
+      }
+    ],
+    "documents": [
+      {
+        "name": "casey_w2_2025.pdf",
+        "doc_type": "w2",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "retirement",
+          "tax"
+        ],
+        "model_tags": [
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH005-P1",
+            "name": "Casey Brooks",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
+          "tag_uncertain:tax"
+        ]
+      },
+      {
+        "name": "hh005_1040_2025.pdf",
+        "doc_type": "1040",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "income",
+          "tax"
+        ],
+        "model_tags": [
+          "tax",
+          "income"
+        ],
+        "members": [
+          {
+            "person_id": "HH005-P1",
+            "name": "Casey Brooks",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": []
+      },
+      {
+        "name": "hh005_1098_2025.pdf",
+        "doc_type": "1098",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "mortgage_housing",
+          "tax"
+        ],
+        "model_tags": [],
+        "members": [
+          {
+            "person_id": "HH005-P1",
+            "name": "Casey Brooks",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      },
+      {
+        "name": "hh005_bank_statement_2025.pdf",
+        "doc_type": "account_statement",
+        "doc_subtype": null,
+        "doc_type_method": "pattern",
+        "suggested_doc_type": null,
+        "topics": [
+          "banking_cash"
+        ],
+        "model_tags": [],
+        "members": [
+          {
+            "person_id": "HH005-P1",
+            "name": "Casey Brooks",
+            "role": "owner",
+            "method": "name_match"
+          }
+        ],
+        "attribution_status": "assigned",
+        "status": "accepted",
+        "review_reasons": [],
+        "notes": [
+          "tag_uncertain:tax",
+          "tag_uncertain:income"
+        ]
+      }
+    ]
+  }
+}

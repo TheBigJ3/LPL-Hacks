@@ -1,7 +1,9 @@
-import { integer, jsonb, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { index, integer, jsonb, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import type { DocumentStatus } from "@lpl-hacks/shared/src/types/native/documents/document.js";
 import type { ExtractedAnalysis } from "@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis.js";
+import { clients } from "./clients.js";
 import { timestamps } from "./general.js";
+import { uploadRequests } from "./uploadRequests.js";
 
 export const documents = pgTable("documents", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -9,9 +11,13 @@ export const documents = pgTable("documents", {
   contentType: text("content_type").notNull(),
   s3Key: text("s3_key").notNull(),
   status: text("status").$type<DocumentStatus>().notNull().default("uploaded"),
-  textractJobId: text("textract_job_id"),
   pageCount: integer("page_count"),
   extraction: jsonb("extraction").$type<ExtractedAnalysis>(),
   failureMessage: text("failure_message"),
+  clientId: uuid("client_id").references(() => clients.id, { onDelete: "set null" }),
+  uploadRequestId: uuid("upload_request_id").references(() => uploadRequests.id, { onDelete: "set null" }),
   ...timestamps,
-});
+}, (table) => [
+  index("documents_client_id_idx").on(table.clientId),
+  index("documents_upload_request_id_idx").on(table.uploadRequestId),
+]);

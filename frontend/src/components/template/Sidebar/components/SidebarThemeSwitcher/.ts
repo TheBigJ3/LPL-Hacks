@@ -7,8 +7,6 @@ type SidebarThemeOption = {
   icon: string
 }
 
-export const SIDEBAR_THEME_HIGHLIGHT_ID = 'sidebar-theme-highlight'
-
 const SIDEBAR_THEME_OPTIONS: SidebarThemeOption[] = [
   { value: 'light', label: 'Light', icon: 'light_mode' },
   { value: 'dark', label: 'Dark', icon: 'dark_mode' },

@@ -1,0 +1,99 @@
+{
+  "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+  "household_id": "HH005",
+  "tax_year": 2025,
+  "filing_status": "MFJ",
+  "adjusted_gross_income": {
+    "value": 171000,
+    "source_document": "hh005_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.984,
+    "verified": false
+  },
+  "dependents": {
+    "value": 1,
+    "source_document": "hh005_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "mortgage_interest": {
+    "value": 14200,
+    "source_document": "hh005_1098_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.978,
+    "verified": false
+  },
+  "cash_balance": {
+    "value": 22000,
+    "source_document": "hh005_bank_statement_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "members": [
+    {
+      "person_id": "HH005-P1",
+      "name": "Casey Brooks",
+      "employer": {
+        "value": "Bluefin Sample LLC",
+        "source_document": "casey_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.99,
+        "verified": false
+      },
+      "wages": {
+        "value": 160000,
+        "source_document": "casey_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.98,
+        "verified": false
+      },
+      "employee_401k_contribution": {
+        "value": 16000,
+        "source_document": "casey_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.975,
+        "verified": false
+      }
+    }
+  ],
+  "documents": [
+    {
+      "name": "casey_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "hh005_1040_2025.pdf",
+      "type": "1040",
+      "date": "2026-04-08"
+    },
+    {
+      "name": "hh005_1098_2025.pdf",
+      "type": "1098",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "hh005_bank_statement_2025.pdf",
+      "type": "account_statement",
+      "date": "2025-12-31"
+    }
+  ],
+  "prior_year": {
+    "tax_year": 2024,
+    "filing_status": "married_filing_jointly",
+    "adjusted_gross_income": 88000,
+    "dependents": 0,
+    "mortgage_interest": null,
+    "members": [
+      {
+        "person_id": "HH005-P1",
+        "name": "Casey Brooks",
+        "employer": "Acme Sample Corp",
+        "wages": 90000,
+        "employee_401k_contribution": 9000
+      }
+    ]
+  }
+}

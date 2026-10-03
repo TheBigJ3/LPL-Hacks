@@ -1,5 +1,5 @@
 .document-library {
-  --document-library-padding-top: 72px;
+  --document-library-padding-top: 24px;
   --document-library-padding-x: 16px;
   --document-library-sections-gap: 48px;
   min-height: 100%;
@@ -9,15 +9,14 @@
 
 @media (min-width: 640px) {
   .document-library {
-    --document-library-padding-top: 24px;
     --document-library-padding-x: var(--spacing-section);
+    --document-library-padding-top: 62px;
     --document-library-sections-gap: 60px;
   }
 }
 
 .document-library__content {
-  max-width: 1237px;
-  margin-top: 24px;
+  max-width: 1040px;
 }
 
 .document-library__view {

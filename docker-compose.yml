@@ -17,5 +17,22 @@ services:
       retries: 5
     restart: unless-stopped
 
+  # OpenDecision microservice (opendecision-microservice/). Not started by a plain `docker compose up`:
+  #   docker compose --profile opendecision up --build
+  # The model is off by default here: on CPU a value check takes ~2.6 s, so run it with
+  # DECISION_BACKEND=opendecision only on a GPU host (and build with the CUDA torch index, see opendecision-microservice/Dockerfile).
+  opendecision:
+    profiles: ["opendecision"]
+    build: ./opendecision-microservice
+    ports:
+      - "8100:8100"
+    environment:
+      DECISION_BACKEND: ${DECISION_BACKEND:-none}
+      ANALYSIS_SERVICE_TOKEN: ${ANALYSIS_SERVICE_TOKEN:-}
+    volumes:
+      - opendecision-models:/models
+    restart: unless-stopped
+
 volumes:
   valkey-data:
+  opendecision-models:

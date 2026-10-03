@@ -36,7 +36,7 @@ const Sidebar = () => {
               animate="center"
               exit="exit"
             >
-              {sidebar.members && <SidebarClientMembers members={sidebar.members} selectedId={sidebar.member?.id ?? null} open={sidebar.open} />}
+              {sidebar.members && <SidebarClientMembers members={sidebar.members} selectedId={sidebar.member?.slug ?? null} open={sidebar.open} />}
               {sidebar.groups.map((group) =>
                 <SidebarGroup key={group.label} group={group} open={sidebar.open} onNavigate={sidebar.closeIfFloating} />
               )}

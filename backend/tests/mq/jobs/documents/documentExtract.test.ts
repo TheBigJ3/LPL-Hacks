@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { EXTRACTION_ERRORS } from "../../../../types/native/extraction/errors.js";
 
-const { bullQueue, extractStart, markFailed } = vi.hoisted(() => ({
+const { bullQueue, extract, markFailed } = vi.hoisted(() => ({
   bullQueue: { add: vi.fn() },
-  extractStart: vi.fn(),
+  extract: vi.fn(),
   markFailed: vi.fn(),
 }));
 
@@ -11,8 +11,7 @@ vi.mock("../../../../mq/queues/extraction.js", () => ({
   default: { name: "extraction", concurrency: 5, jobOptions: { attempts: 5 }, queue: () => bullQueue },
 }));
 vi.mock("../../../../services/documents/documentMethods.js", () => ({
-  documentExtractStart: extractStart,
-  documentExtractCollect: vi.fn(),
+  documentExtract: extract,
   documentMarkFailed: markFailed,
 }));
 
@@ -33,33 +32,22 @@ describe("documentExtract", () => {
     expect(bullQueue.add).toHaveBeenCalledWith("documentExtract", { documentId: DOCUMENT_ID }, { attempts: 5, jobId: `document-extract-${DOCUMENT_ID}` });
   });
 
-  it("hands off to the first poll once Textract has started", async () => {
-    extractStart.mockResolvedValue(true);
+  it("returns how the document's extraction ended", async () => {
+    extract.mockResolvedValue("extracted");
 
-    expect(await documentExtract.handler(job())).toBe("started");
-    expect(bullQueue.add).toHaveBeenCalledWith(
-      "documentExtractPoll",
-      { documentId: DOCUMENT_ID, attempt: 0 },
-      { attempts: 5, jobId: `document-extract-poll-${DOCUMENT_ID}-0`, delay: 2_000 },
-    );
-  });
-
-  it("enqueues no poll for a document that is already settled", async () => {
-    extractStart.mockResolvedValue(false);
-
-    expect(await documentExtract.handler(job())).toBe("skipped");
-    expect(bullQueue.add).not.toHaveBeenCalled();
+    expect(await documentExtract.handler(job())).toBe("extracted");
+    expect(extract).toHaveBeenCalledWith(DOCUMENT_ID);
   });
 
   it("lets an early failure retry without touching the document", async () => {
-    extractStart.mockRejectedValue(new Error("throttled"));
+    extract.mockRejectedValue(new Error("throttled"));
 
     await expect(documentExtract.handler(job(0))).rejects.toThrow("throttled");
     expect(markFailed).not.toHaveBeenCalled();
   });
 
   it("marks the document failed when its last retry fails, so the client isn't left waiting", async () => {
-    extractStart.mockRejectedValue(new Error("throttled"));
+    extract.mockRejectedValue(new Error("throttled"));
 
     await expect(documentExtract.handler(job(4))).rejects.toThrow("throttled");
     expect(markFailed).toHaveBeenCalledWith(DOCUMENT_ID, EXTRACTION_ERRORS.EXTRACTION_BUSY.MESSAGE);

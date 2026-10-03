@@ -1,0 +1,167 @@
+{
+ "_synthetic": "SYNTHETIC TEST DATA - recorded OpenDecision 0.1.2 response",
+ "chunks": 1,
+ "answers": {
+  "docType": {
+   "type": "choice",
+   "choice": "w2",
+   "probabilities": {
+    "w2": 0.9146226048469543,
+    "1099_int": 0.004822283051908016,
+    "1099_r": 0.0022595649352297187,
+    "1099_div": 0.0020700041204690933,
+    "1099_nec": 0.03308879677206278,
+    "1040": 0.010760019533336163,
+    "1098": 0.001019417803036049,
+    "5498_sa": 0.0014387614210136235,
+    "1095": 0.0011876154458150268,
+    "account_statement": 0.004858827916905284,
+    "unknown": 0.02387214731425047
+   },
+   "confidence": 0.8186157221911052,
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: J. Johnson\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "tag_tax": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.9879462122917175,
+     "false": 0.01205378770828247
+    },
+    "confidence": 0.9879462122917175
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.9771973490715027,
+     "contradicts": 0.006589771248400211
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document is tax-related.\" is yes.",
+    "contradiction": "The answer to the question \"This document is tax-related.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: J. Johnson\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "tag_income": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.9904406070709229,
+     "false": 0.009559392929077148
+    },
+    "confidence": 0.9904406070709229
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.9924227595329285,
+     "contradicts": 0.014503580518066883
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document reports employment earnings or wages.\" is yes.",
+    "contradiction": "The answer to the question \"This document reports employment earnings or wages.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: J. Johnson\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "member_john_johnson": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.9711290597915649,
+     "false": 0.02887094020843506
+    },
+    "confidence": 0.9711290597915649
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.9412234425544739,
+     "contradicts": 0.01578456163406372
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document concerns John Johnson.\" is yes.",
+    "contradiction": "The answer to the question \"This document concerns John Johnson.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: J. Johnson\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "member_sarah_johnson": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": false,
+   "status": "tentative",
+   "binary": {
+    "answer": false,
+    "probabilities": {
+     "true": 0.39606812596321106,
+     "false": 0.6039318740367889
+    },
+    "confidence": 0.6039318740367889
+   },
+   "three_way": {
+    "answer": null,
+    "relation": "unknown",
+    "scores": {
+     "supports": 0.0015487611526623368,
+     "contradicts": 0.004829721990972757
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document concerns Sarah Johnson.\" is yes.",
+    "contradiction": "The answer to the question \"This document concerns Sarah Johnson.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: J. Johnson\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  }
+ }
+}
