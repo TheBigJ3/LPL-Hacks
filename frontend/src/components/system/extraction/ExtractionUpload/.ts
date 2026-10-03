@@ -21,7 +21,11 @@ export const EXTRACTION_EMPTY_VALUE_LABEL = '—'
 export const EXTRACTION_EDITOR_DOM_ID = 'extraction-review-editor'
 export const EXTRACTION_PANEL_DOM_ID = 'extraction-review-panel'
 
-const EXTRACTION_CROP_PADDING = { x: 0.05, y: 0.025 }
+const EXTRACTION_CROP_MARGIN = { x: 0.02, y: 0.012 }
+const EXTRACTION_CROP_MIN_WIDTH = 0.16
+const EXTRACTION_CROP_FRAME_RATIO = { min: 0.3, max: 0.9 }
+const EXTRACTION_CROP_LABEL_REACH = { width: 0.45, height: 0.08 }
+const EXTRACTION_BOX_MIN = { width: 0.02, height: 0.01 }
 const EXTRACTION_HIGHLIGHT_PADDING = 0.003
 const EXTRACTION_WAIT_MAX_MS = 20 * 60 * 1000
 const EXTRACTION_CHECK_CONNECTED_MS = 10_000
@@ -56,10 +60,37 @@ type ExtractionItem = {
 
 const EXTRACTION_STATUS_LABELS: Record<ExtractionItemStatus, string> = {
   review: 'Needs review',
-  edited: 'Edited',
+  edited: 'Corrected',
   confirmed: 'Approved',
   plain: 'Looks fine',
 }
+
+const EXTRACTION_STATUS_ICONS: Record<ExtractionItemStatus, string> = {
+  review: 'error',
+  edited: 'edit',
+  confirmed: 'check_circle',
+  plain: 'check',
+}
+
+const EXTRACTION_GUIDANCE: Record<ExtractionItemStatus, string> = {
+  review: 'Compare what we read with the document. Approve it if it matches, or type the correct value.',
+  edited: 'Your correction will be used instead of what we read.',
+  confirmed: 'You approved this value as it was read.',
+  plain: "This value wasn't flagged. You can still correct it if something looks off.",
+}
+
+const EXTRACTION_CONFIDENCE_LABELS: Record<ExtractedConfidenceLevel, string> = {
+  high: 'High certainty',
+  medium: 'Medium certainty',
+  low: 'Low certainty',
+  unknown: 'Certainty unknown',
+}
+
+export const EXTRACTION_HIGHLIGHT_LEGEND: { status: ExtractionItemStatus, label: string }[] = [
+  { status: 'review', label: 'Needs review' },
+  { status: 'confirmed', label: 'Approved' },
+  { status: 'edited', label: 'Corrected' },
+]
 
 export type ExtractionHighlightView = {
   id: string
@@ -101,18 +132,28 @@ export type ExtractionCropView = {
 export type ExtractionSelectedView = {
   id: string
   label: string
+  context: string
+  guidance: string
   kind: 'text' | 'checkbox'
   text: string
   checked: boolean
   readAs: string
+  readAsMissing: boolean
   normalizedLabel: string | null
+  changedFrom: string | null
+  confidenceLabel: string
   confidencePercent: string
   confidenceLevel: ExtractedConfidenceLevel
   issues: string[]
   status: ExtractionItemStatus
   statusLabel: string
+  statusIcon: string
   canConfirm: boolean
+  canUnconfirm: boolean
   canRevert: boolean
+  canGoNext: boolean
+  pageLabel: string
+  locationNote: string | null
   crop: ExtractionCropView | null
 }
 
@@ -150,7 +191,7 @@ function extractionFormatRatio(ratio: number): string {
 
 function extractionFormatNormalized(value: ExtractedValue): string | null {
   if (value.value === null || typeof value.value === 'boolean') return null
-  return String(value.value) === value.rawValue ? null : `→ ${value.value}`
+  return String(value.value) === value.rawValue ? null : String(value.value)
 }
 
 function extractionFormatItemValue(item: ExtractionItem): string {
@@ -198,7 +239,20 @@ function extractionBuildItems(data: ExtractedAnalysis, edits: Record<string, Ext
   return [...fieldItems, ...cellItems]
 }
 
-function extractionBuildHighlight(item: ExtractionItem, box: ExtractedBox, aspect: number, selectedId: string | null): ExtractionHighlightView {
+function extractionUnionBox(a: ExtractedBox, b: ExtractedBox): ExtractedBox {
+  const left = Math.min(a.left, b.left)
+  const top = Math.min(a.top, b.top)
+  return { left, top, width: Math.max(a.left + a.width, b.left + b.width) - left, height: Math.max(a.top + a.height, b.top + b.height) - top }
+}
+
+function extractionExpandBox(box: ExtractedBox): ExtractedBox {
+  const width = Math.max(box.width, EXTRACTION_BOX_MIN.width)
+  const height = Math.max(box.height, EXTRACTION_BOX_MIN.height)
+  return { left: box.left + (box.width - width) / 2, top: box.top + (box.height - height) / 2, width, height }
+}
+
+function extractionBuildHighlight(item: ExtractionItem, rawBox: ExtractedBox, aspect: number, selectedId: string | null): ExtractionHighlightView {
+  const box = extractionExpandBox(rawBox)
   const padX = EXTRACTION_HIGHLIGHT_PADDING
   const padY = EXTRACTION_HIGHLIGHT_PADDING / aspect
   return {
@@ -228,11 +282,20 @@ function extractionBuildPages(items: ExtractionItem[], previews: DocumentPreview
   })
 }
 
-function extractionBuildCrop(box: ExtractedBox, preview: DocumentPreviewPage): ExtractionCropView {
-  const left = Math.max(0, box.left - EXTRACTION_CROP_PADDING.x)
-  const top = Math.max(0, box.top - EXTRACTION_CROP_PADDING.y)
-  const width = Math.min(1, box.left + box.width + EXTRACTION_CROP_PADDING.x) - left
-  const height = Math.min(1, box.top + box.height + EXTRACTION_CROP_PADDING.y) - top
+function extractionCenterCropSpan(start: number, size: number, span: number): number {
+  return Math.min(Math.max(start + size / 2 - span / 2, 0), 1 - span)
+}
+
+function extractionBuildCrop(valueBox: ExtractedBox, labelBox: ExtractedBox | null, preview: DocumentPreviewPage): ExtractionCropView {
+  const box = extractionExpandBox(valueBox)
+  const withLabel = labelBox && extractionUnionBox(box, labelBox)
+  const focus = withLabel && withLabel.width <= EXTRACTION_CROP_LABEL_REACH.width && withLabel.height <= EXTRACTION_CROP_LABEL_REACH.height ? withLabel : box
+  const fitWidth = Math.max(focus.width + EXTRACTION_CROP_MARGIN.x * 2, EXTRACTION_CROP_MIN_WIDTH)
+  const fitHeight = focus.height + EXTRACTION_CROP_MARGIN.y * 2
+  const width = Math.min(1, Math.max(fitWidth, fitHeight * preview.aspect / EXTRACTION_CROP_FRAME_RATIO.max))
+  const height = Math.min(1, Math.max(fitHeight, width * EXTRACTION_CROP_FRAME_RATIO.min / preview.aspect))
+  const left = extractionCenterCropSpan(focus.left, focus.width, width)
+  const top = extractionCenterCropSpan(focus.top, focus.height, height)
   return {
     imageUrl: preview.url,
     frameStyle: { aspectRatio: `${width} / ${height * preview.aspect}` },
@@ -246,24 +309,41 @@ function extractionBuildCrop(box: ExtractedBox, preview: DocumentPreviewPage): E
   }
 }
 
-function extractionBuildSelected(item: ExtractionItem, previews: DocumentPreviewPage[] | null): ExtractionSelectedView {
+function extractionFormatReadAs(item: ExtractionItem): string {
+  if (item.kind === 'checkbox') return item.source.value === null ? 'Nothing detected' : item.source.value ? 'Checked' : 'Unchecked'
+  return item.source.rawValue === null ? 'Nothing detected' : item.source.rawValue === '' ? 'Empty' : item.source.rawValue
+}
+
+function extractionBuildSelected(item: ExtractionItem, flagged: ExtractionItem[], unresolved: number, previews: DocumentPreviewPage[] | null): ExtractionSelectedView {
   const preview = previews?.[item.page - 1]
+  const flaggedIndex = flagged.indexOf(item)
+  const readAs = extractionFormatReadAs(item)
   return {
     id: item.id,
     label: item.label,
+    context: flaggedIndex === -1 ? 'Extracted field' : `Flagged field ${flaggedIndex + 1} of ${flagged.length}`,
+    guidance: EXTRACTION_GUIDANCE[item.status],
     kind: item.kind,
     text: item.text,
     checked: item.checked,
-    readAs: item.source.rawValue === null ? 'Nothing detected' : item.source.rawValue === '' ? 'Empty' : item.source.rawValue,
+    readAs,
+    readAsMissing: item.kind === 'checkbox' ? item.source.value === null : !item.source.rawValue,
     normalizedLabel: extractionFormatNormalized(item.source),
+    changedFrom: item.edited ? readAs : null,
+    confidenceLabel: EXTRACTION_CONFIDENCE_LABELS[item.source.confidenceLevel],
     confidencePercent: extractionFormatPercent(item.source.confidence),
     confidenceLevel: item.source.confidenceLevel,
     issues: item.source.issues,
     status: item.status,
     statusLabel: EXTRACTION_STATUS_LABELS[item.status],
+    statusIcon: EXTRACTION_STATUS_ICONS[item.status],
     canConfirm: item.status === 'review',
+    canUnconfirm: item.status === 'confirmed',
     canRevert: item.edited,
-    crop: item.box && preview ? extractionBuildCrop(item.box, preview) : null,
+    canGoNext: item.status !== 'review' && unresolved > 0,
+    pageLabel: `Page ${item.page}`,
+    locationNote: item.box ? null : "We couldn't find this field on the page. Enter the value if you know it.",
+    crop: item.box && preview ? extractionBuildCrop(item.box, item.labelBox, preview) : null,
   }
 }
 
@@ -301,7 +381,7 @@ function extractionBuildReview(items: ExtractionItem[], previews: DocumentPrevie
     missing: items
       .filter((item) => item.box === null && !item.source.requiresReview)
       .map((item) => extractionBuildReviewListItem(item, selectedId, item.edited ? `Filled in: ${item.text}` : 'Not found on the page')),
-    selected: selected ? extractionBuildSelected(selected, previews) : null,
+    selected: selected ? extractionBuildSelected(selected, flagged, flagged.length - resolved, previews) : null,
   }
 }
 
@@ -492,6 +572,10 @@ export function useExtractionUpload() {
     setConfirmed((current) => ({ ...current, [id]: true }))
   }
 
+  function unconfirm(id: string) {
+    setConfirmed((current) => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)))
+  }
+
   function revert(id: string) {
     setEdits((current) => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)))
   }
@@ -529,6 +613,7 @@ export function useExtractionUpload() {
     upload,
     edit,
     confirm,
+    unconfirm,
     revert,
     select,
     focusItem,

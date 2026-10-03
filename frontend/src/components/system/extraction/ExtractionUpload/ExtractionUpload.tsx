@@ -22,7 +22,7 @@ const ExtractionUpload = () => {
       <p className="extraction-upload__summary" aria-live="polite">{extraction.result.summary}</p>
       <div className="extraction-upload__workspace grid items-start">
         <ExtractionDocument document={extraction.result.document} onSelect={extraction.select} />
-        <ExtractionReviewPanel review={extraction.result.review} onEdit={extraction.edit} onConfirm={extraction.confirm} onRevert={extraction.revert} onFocusItem={extraction.focusItem} onNext={extraction.focusNext} onConfirmExport={extraction.confirmExport} />
+        <ExtractionReviewPanel review={extraction.result.review} onEdit={extraction.edit} onConfirm={extraction.confirm} onUnconfirm={extraction.unconfirm} onRevert={extraction.revert} onFocusItem={extraction.focusItem} onNext={extraction.focusNext} onConfirmExport={extraction.confirmExport} />
       </div>
     </div>}
   </div>
