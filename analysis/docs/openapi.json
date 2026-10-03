@@ -476,6 +476,11 @@
             },
             "title": "Status",
             "type": "array"
+          },
+          "tags": {
+            "additionalProperties": true,
+            "title": "Tags",
+            "type": "object"
           }
         },
         "required": [
@@ -490,7 +495,8 @@
           "severity",
           "filing_status",
           "checklist",
-          "checklist_label"
+          "checklist_label",
+          "tags"
         ],
         "title": "Enums",
         "type": "object"

@@ -11,6 +11,7 @@ Rules:
 from __future__ import annotations
 
 import datetime as dt
+import logging
 import math
 import re
 from dataclasses import dataclass, field
@@ -45,6 +46,7 @@ FILING_STATUS_ALIASES: dict[str, FilingStatus] = {
 }
 
 MAX_ABS_VALUE = 1e9
+log = logging.getLogger("rapid_analysis.normalization")
 
 # Pipeline / printed form names -> tags.json doc_types[].id. Anything else is "unknown".
 DOC_TYPE_IDS = ("w2", "1040", "1099_r", "1099_int", "1099_div", "1099_nec", "1098", "5498_sa", "1095",
@@ -346,7 +348,8 @@ def merge_candidates(candidates: list[Candidate]) -> FieldValue | None:
 def normalize_field(raw: Any, kind: str, path: str, errors: list[NormError]) -> FieldValue | None:
     """Scalar, FieldValue dict, or list of FieldValue dicts -> FieldValue | None."""
     parser = PARSERS[kind]
-    if isinstance(raw, dict) and isinstance(raw.get("candidates"), list):
+    # An already-normalized FieldValue carries its sources in candidates; an empty list means "use value".
+    if isinstance(raw, dict) and isinstance(raw.get("candidates"), list) and raw["candidates"]:
         raw = raw["candidates"]
     items = raw if isinstance(raw, list) else [raw]
     candidates: list[Candidate] = []
@@ -457,7 +460,33 @@ def _normalize_documents(raw: Any, path: str, errors: list[NormError]) -> list[D
     return documents
 
 
+def _warn_unknown(item: dict, known: set[str], path: str) -> None:
+    """Unknown keys are ignored with a warning; keys starting with '_' are metadata (e.g. _synthetic)."""
+    for key in item:
+        if isinstance(key, str) and key.startswith("_"):
+            continue
+        if key not in known:
+            log.warning("ignoring unknown field %s%s", path, key)
+
+
+HOUSEHOLD_KEYS = {"household_id", "tax_year", "filing_status", "members", "documents", "prior_year", *HOUSEHOLD_FIELDS}
+MEMBER_KEYS = {"person_id", "name", "household_member", *MEMBER_FIELDS}
+DOCUMENT_KEYS = {"name", "type", "date"}
+FIELD_VALUE_KEYS = {"value", "source_document", "page", "textract_confidence", "verified", "conflict", "candidates"}
+
+
 def _normalize_body(raw: dict, household_id: str, path: str, errors: list[NormError], require_year: bool) -> Household:
+    _warn_unknown(raw, HOUSEHOLD_KEYS, path)
+    for m_index, member in enumerate(raw.get("members") or [] if isinstance(raw.get("members"), list) else []):
+        if isinstance(member, dict):
+            _warn_unknown(member, MEMBER_KEYS, f"{path}members[{m_index}].")
+            for key in MEMBER_FIELDS:
+                for fv in member.get(key) if isinstance(member.get(key), list) else [member.get(key)]:
+                    if isinstance(fv, dict):
+                        _warn_unknown(fv, FIELD_VALUE_KEYS, f"{path}members[{m_index}].{key}.")
+    for d_index, doc in enumerate(raw.get("documents") or [] if isinstance(raw.get("documents"), list) else []):
+        if isinstance(doc, dict):
+            _warn_unknown(doc, DOCUMENT_KEYS, f"{path}documents[{d_index}].")
     tax_year = None
     year_raw = raw.get("tax_year")
     if year_raw is None:
@@ -512,3 +541,31 @@ def normalize_household(raw: Any) -> NormalizationResult:
         else:
             _err(errors, "invalid_prior_year", "prior_year", "prior_year must be an object")
     return NormalizationResult(household=household, errors=errors)
+
+
+def _field_to_raw(fv: FieldValue | None) -> Any:
+    if fv is None:
+        return None
+    body = fv.model_dump(mode="json")
+    if not fv.candidates:
+        body.pop("candidates")
+    return body
+
+
+def _body_to_raw(h: Household, top: bool) -> dict:
+    raw: dict[str, Any] = {"tax_year": h.tax_year, "filing_status": h.filing_status}
+    if top:
+        raw = {"household_id": h.household_id, **raw}
+    raw.update({name: _field_to_raw(fv) for name, fv in h.fields.items()})
+    raw["members"] = [{"person_id": m.person_id, "name": m.name,
+                       **{name: _field_to_raw(fv) for name, fv in m.fields.items()}} for m in h.members]
+    raw["documents"] = [d.model_dump(mode="json") for d in h.documents]
+    return raw
+
+
+def household_to_raw(household: Household) -> dict:
+    """A normalized household in the pipeline's input shape, so normalizing it again is a no-op."""
+    raw = _body_to_raw(household, top=True)
+    if household.prior_year is not None:
+        raw["prior_year"] = _body_to_raw(household.prior_year, top=False)
+    return raw

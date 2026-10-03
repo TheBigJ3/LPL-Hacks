@@ -6,7 +6,7 @@ the only model-derived field anywhere is `check`.
 
 from __future__ import annotations
 
-from typing import Literal, Union
+from typing import Any, Literal, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -219,6 +219,7 @@ class Enums(_Model):
     filing_status: list[str]
     checklist: list[ChecklistQuestion]
     checklist_label: str
+    tags: dict[str, Any]  # the full config/tags.json
 
 
 class HouseholdRow(_Model):

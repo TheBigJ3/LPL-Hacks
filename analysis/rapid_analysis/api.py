@@ -34,6 +34,7 @@ from rapid_analysis.rules import (
     STATUS_VALUES,
 )
 from rapid_analysis.store import Store
+from rapid_analysis.taxonomy import tags
 from rapid_analysis.textract import evidence_from_text, evidence_from_textract
 
 log = logging.getLogger("rapid_analysis.api")
@@ -157,6 +158,7 @@ def enums() -> dict:
         "filing_status": sorted(set(FILING_STATUS_ALIASES.values())),
         "checklist": [{"id": k, "question": v} for k, v in CHECKLIST_QUESTIONS.items()],
         "checklist_label": contract.CHECKLIST_LABEL,
+        "tags": tags(),
     }
 
 

@@ -14,7 +14,7 @@ from rapid_analysis.normalization import DOC_TYPE_IDS, doc_type_normalize
 from rapid_analysis.overview import overview_build
 
 DOCS = Path(__file__).resolve().parents[1] / "docs"
-TAGS = json.loads((DOCS / "tags.json").read_text(encoding="utf-8"))
+TAGS = json.loads((DOCS.parent / "config" / "tags.json").read_text(encoding="utf-8"))
 FINDING_TYPES = {f["id"]: f for f in TAGS["finding_types"]}
 DOC_TYPES = {d["id"] for d in TAGS["doc_types"]}
 CHECKLIST = {c["id"] for c in TAGS["checklist"]}
@@ -104,3 +104,4 @@ def test_enums_endpoint_uses_tags_ids(backend_none):
     assert [c["question"] for c in enums["checklist"]] == [c["question"] for c in TAGS["checklist"]]
     assert set(enums["change_type"]) <= set(FINDING_TYPES)
     assert set(enums["doc_type"]) == DOC_TYPES
+    assert enums["tags"] == TAGS

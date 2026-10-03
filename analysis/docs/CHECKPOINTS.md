@@ -22,3 +22,4 @@ Appended by `scripts/checkpoint.py`. One row per checkpoint run; never edited by
 | 2026-10-02T20:19:28-07:00 | Demo coverage (full suite) | `pytest -q tests` | 386 | 0 | 2 | 0 | 0 | after demo docs; gate on 8100 |
 | 2026-10-02T20:25:59-07:00 | Taxonomy ids + schema 1.1 (no model) | `pytest -q tests -m not model` | 287 | 0 | 0 | 0 | 0 | no-model suite |
 | 2026-10-02T20:26:15-07:00 | Taxonomy ids + schema 1.1 | `pytest -q tests` | 410 | 0 | 2 | 0 | 0 | tags.json ids adopted, schema 1.1, samples + openapi regenerated, CONTRACT 1.0->1.1 mapping; test_tags asserts every emitted id is in tags.json. Logged before amendment section 3. |
+| 2026-10-02T20:36:20-07:00 | CHECKPOINT P1+ | `pytest -q tests` | 429 | 0 | 2 | 0 | 0 | section 1: config/tags.json is the tag file, full content in /api/meta/enums.tags; section 2: idempotent normalize, FieldValue + conflict pass-through, confidence rescaled once, unknown fields warned and ignored |

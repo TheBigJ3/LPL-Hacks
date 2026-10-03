@@ -195,3 +195,66 @@ def test_textract_shaped_1099r_values():
     assert pat.value("distribution_code") == "1"
     assert pat.value("distribution_from_ira") is False
     assert pat.value("distribution_date") == "2025-03-14"
+
+
+
+# ---------------------------------------------------------------- §2 pass-through (CHECKPOINT P1+)
+
+from rapid_analysis.normalization import household_to_raw  # noqa: E402
+
+
+@pytest.mark.parametrize("household_id", FIXTURE_IDS)
+def test_idempotent(household_id):
+    once = normalize_household(fixture_household_raw(household_id))
+    twice = normalize_household(household_to_raw(once.household))
+    assert twice.errors == []
+    assert twice.household == once.household
+    thrice = normalize_household(household_to_raw(twice.household))
+    assert thrice.household == twice.household
+
+
+def test_already_normalized_field_value_passes_through():
+    normalized = {"value": 8200.0, "source_document": "john_w2_2025.pdf", "page": 1,
+                  "textract_confidence": 0.974, "verified": True, "conflict": False, "candidates": []}
+    errors = []
+    fv = normalize_field(normalized, "money", "x", errors)
+    assert errors == []
+    assert fv.model_dump() == normalized
+
+
+def test_already_normalized_conflict_is_preserved():
+    normalized = {"value": None, "conflict": True, "candidates": [
+        {"value": 120000.0, "source_document": "jordan_w2_2025.pdf", "page": 1, "textract_confidence": 0.981, "verified": False},
+        {"value": 165000.0, "source_document": "hh004_1040_2025.pdf", "page": 1, "textract_confidence": 0.976, "verified": False},
+    ]}
+    errors = []
+    fv = normalize_field(normalized, "money", "wages", errors)
+    assert errors == []
+    assert fv.conflict is True and fv.value is None
+    assert [(c.value, c.source_document, c.page, c.textract_confidence) for c in fv.candidates] == [
+        (120000.0, "jordan_w2_2025.pdf", 1, 0.981), (165000.0, "hh004_1040_2025.pdf", 1, 0.976)]
+
+
+@pytest.mark.parametrize("raw,expected", [(0.974, 0.974), (1.0, 1.0), (0.5, 0.5), (97.4, 0.974), (100, 1.0), (50, 0.5)])
+def test_confidence_rescaled_once(raw, expected):
+    errors = []
+    fv = normalize_field({"value": 1, "textract_confidence": raw}, "money", "x", errors)
+    assert errors == [] and fv.textract_confidence == pytest.approx(expected)
+    again = normalize_field(fv.model_dump(), "money", "x", errors)
+    assert again.textract_confidence == pytest.approx(expected)
+
+
+def test_unknown_extra_field_is_ignored_with_warning(caplog):
+    raw = fixture_household_raw("HH008")
+    raw["favorite_color"] = "teal"
+    raw["members"][0]["shoe_size"] = 10
+    raw["members"][0]["wages"]["ocr_engine"] = "x"
+    raw["documents"][0]["pages"] = 2
+    with caplog.at_level("WARNING", logger="rapid_analysis.normalization"):
+        result = normalize_household(raw)
+    assert result.errors == []
+    assert result.household == normalize_household(fixture_household_raw("HH008")).household
+    warned = " ".join(r.getMessage() for r in caplog.records)
+    for key in ("favorite_color", "shoe_size", "ocr_engine", "pages"):
+        assert key in warned
+    assert "_synthetic" not in warned

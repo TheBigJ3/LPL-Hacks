@@ -23,7 +23,7 @@ def test_every_enum_value_is_in_contract_docs(backend_none):
         enums = client.get("/api/meta/enums").json()
     missing = []
     for name, values in enums.items():
-        if name in ("check_descriptions", "checklist_label"):
+        if name in ("check_descriptions", "checklist_label", "tags"):
             continue
         for value in values:
             token = value["id"] if isinstance(value, dict) else value
