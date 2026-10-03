@@ -2,6 +2,7 @@ import { useMatch, useSearchParams } from 'react-router'
 import listClientsApi from '@api/clients/listClientsApi'
 import { SIDEBAR_CLIENT_MEMBER_PARAM } from '@components/template/Sidebar/.ts'
 import { useApiGetQuery } from '@features/apiLayer'
+import { useDocumentTitle } from '@hooks/useDocumentTitle'
 
 export type PageHeaderCrumb = {
   key: string
@@ -32,6 +33,8 @@ export function usePageHeader(title: string) {
   ]
 
   const crumbs: PageHeaderCrumb[] = trail.map((crumb, index) => index === trail.length - 1 ? { ...crumb, href: null } : crumb)
+
+  useDocumentTitle(title, member?.name ?? client?.name)
 
   return { crumbs }
 }
