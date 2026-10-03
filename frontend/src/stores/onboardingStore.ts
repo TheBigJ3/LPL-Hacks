@@ -2,6 +2,18 @@ import { useSyncExternalStore } from 'react'
 
 type OnboardingReplay = () => void
 
+const ONBOARDING_STORAGE_PREFIX = 'onboarding:'
+
+const onboardingClearSeen = () => {
+  try {
+    Object.keys(localStorage)
+      .filter((key) => key.startsWith(ONBOARDING_STORAGE_PREFIX))
+      .forEach((key) => localStorage.removeItem(key))
+  } catch {
+    return
+  }
+}
+
 class OnboardingLayer {
   private replays: OnboardingReplay[] = []
   private listeners = new Set<() => void>()
@@ -23,6 +35,7 @@ class OnboardingLayer {
   }
 
   replay() {
+    onboardingClearSeen()
     this.replays.at(-1)?.()
   }
 
