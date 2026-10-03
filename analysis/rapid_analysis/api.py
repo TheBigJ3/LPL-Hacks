@@ -19,6 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from rapid_analysis import RULESET_VERSION, SCHEMA_VERSION, contract
+from rapid_analysis.ask import ask
 from rapid_analysis.engine import engine_info, engine_load
 from rapid_analysis.evidence import CHECK_VALUES
 from rapid_analysis.fixtures import FIXTURE_IDS, fixture_household_raw, fixture_household_textract
@@ -254,6 +255,24 @@ def finding_evidence(household_id: str, finding_id: str):
         return _not_found("household", household_id)
     evidence = entry["evidence"].get(finding_id)
     return evidence if evidence else _not_found("finding", f"{household_id}/{finding_id}")
+
+
+@app.post("/api/households/{household_id}/ask", response_model=contract.AskResponse, tags=["households"],
+          responses={404: {"model": contract.ErrorResponse}, 422: {"model": contract.ErrorResponse}})
+async def household_ask(household_id: str, request: Request):
+    """Answer an advisor's question from this household's overview only (KeywordRouter; no model)."""
+    body, error = await _read_json(request)
+    if error is not None:
+        return error
+    question = body.get("question") if isinstance(body, dict) else None
+    if not isinstance(question, str) or not question.strip() or len(question) > 500:
+        return _needs_review([_error("invalid_question", "question must be 1-500 characters of text", "question")])
+    entry = _build(household_id)
+    if entry is None:
+        return _not_found("household", household_id)
+    if entry["overview"]["status"] == "needs_review":
+        return _needs_review(entry["overview"]["errors"])
+    return ask(question.strip(), entry["overview"])
 
 
 @app.post("/api/households/{household_id}/documents", response_model=contract.DocumentIngestResult, tags=["ingest"],

@@ -1,6 +1,230 @@
 {
   "components": {
     "schemas": {
+      "AskAnswer": {
+        "additionalProperties": false,
+        "properties": {
+          "dollar_impact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dollar Impact"
+          },
+          "short": {
+            "title": "Short",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "checklist",
+              "value",
+              "overview",
+              "documents",
+              "changes",
+              "verify",
+              "none"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/AskValue"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "type",
+          "short",
+          "text",
+          "dollar_impact",
+          "values"
+        ],
+        "title": "AskAnswer",
+        "type": "object"
+      },
+      "AskResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "$ref": "#/components/schemas/AskAnswer"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "suggestions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Suggestions",
+            "type": "array"
+          },
+          "understood": {
+            "$ref": "#/components/schemas/AskUnderstood"
+          }
+        },
+        "required": [
+          "question",
+          "understood",
+          "answer",
+          "suggestions"
+        ],
+        "title": "AskResponse",
+        "type": "object"
+      },
+      "AskUnderstood": {
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "intent": {
+            "title": "Intent",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          },
+          "router": {
+            "title": "Router",
+            "type": "string"
+          },
+          "time_ref": {
+            "title": "Time Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "intent",
+          "person_id",
+          "member",
+          "field",
+          "time_ref",
+          "router"
+        ],
+        "title": "AskUnderstood",
+        "type": "object"
+      },
+      "AskValue": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "field",
+          "value",
+          "check",
+          "source_document",
+          "page"
+        ],
+        "title": "AskValue",
+        "type": "object"
+      },
       "CashValue": {
         "additionalProperties": false,
         "properties": {
@@ -2403,6 +2627,59 @@
         "summary": "Household Ingest",
         "tags": [
           "ingest"
+        ]
+      }
+    },
+    "/api/households/{household_id}/ask": {
+      "post": {
+        "description": "Answer an advisor's question from this household's overview only (KeywordRouter; no model).",
+        "operationId": "household_ask_api_households__household_id__ask_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "household_id",
+            "required": true,
+            "schema": {
+              "title": "Household Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "summary": "Household Ask",
+        "tags": [
+          "households"
         ]
       }
     },

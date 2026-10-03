@@ -367,5 +367,37 @@ class ErrorResponse(_Model):
     errors: list[ErrorItem]
 
 
+class AskUnderstood(_Model):
+    intent: str  # tags.json intents[].id
+    person_id: str | None
+    member: str | None
+    field: str | None  # tags.json fields[].id
+    time_ref: str  # tags.json time_refs[].id
+    router: str
+
+
+class AskValue(_Model):
+    field: str | None
+    value: Scalar
+    check: Check
+    source_document: str | None
+    page: int | None
+
+
+class AskAnswer(_Model):
+    type: Literal["checklist", "value", "overview", "documents", "changes", "verify", "none"]
+    short: str
+    text: str
+    dollar_impact: float | int | None
+    values: list[AskValue]
+
+
+class AskResponse(_Model):
+    question: str
+    understood: AskUnderstood
+    answer: AskAnswer
+    suggestions: list[str]
+
+
 DataQuality.model_rebuild()
 

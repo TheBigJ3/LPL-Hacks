@@ -22,6 +22,7 @@ per-value `check`. No model internals (scores, probabilities, backend, model nam
 | GET | `/api/stats/overview` | `Stats` | dashboard tiles across all households |
 | POST | `/api/households` | `IngestResult` | a normalized household from the pipeline (§4 input) |
 | POST | `/api/households/{id}/documents` | `DocumentIngestResult` | `{name, textract}` (AnalyzeDocument JSON) or `{name, text, form_type?}` |
+| POST | `/api/households/{id}/ask` | `AskResponse` | `{question}`, routed by keyword rules and answered from the overview |
 
 Errors: unknown ids return **404** `{status: "not_found", errors}`. Bad input returns **422**
 `{status: "needs_review", errors}`; it never returns 500. Every error item is
@@ -114,6 +115,25 @@ Review reasons: `doc_type_unknown`, `doc_type_model_disagrees`, `tag_uncertain:t
 Checklist ids: `retirement_can_improve`, `tax_savings_possible`, `excess_cash`, `needs_documents`,
 `major_changes`, `insurance_review`, `estate_review`, `education_review` (the last three are always
 `not_assessed` placeholders).
+
+## Ask (`POST /api/households/{id}/ask`)
+
+Body `{"question": "can sarah make some savings"}` (1–500 characters). Response:
+
+```
+question
+understood {intent, person_id, member, field, time_ref, router: "keyword"}   (intent/field/time_ref are tags.json ids)
+answer     {type: checklist|value|overview|documents|changes|verify|none, short, text, dollar_impact, values[] {field, value, check, source_document, page}}
+suggestions[]
+```
+
+- Routing is `KeywordRouter` (pluggable `Router`), with no model. Member = name match (a unique first name is enough);
+  an unknown or ambiguous name never answers and asks which member. Time = `time_refs` synonyms or a
+  4-digit year. Intent precedence: verify > documents_status > changes > tax_opportunity > cash_opportunity >
+  savings_opportunity > overview > lookup. "income" means wages for a member and AGI for the household.
+- Answers are built only from the overview (values, checks, metrics, prior_year). A missing year or value is
+  `short: "No data"`. Nothing is computed or invented.
+- Out of scope gives `answer.type: "none"`, empty text and 4 suggestions built from the household.
 
 ## Schema 1.0 → 1.1 id mapping
 
