@@ -15,6 +15,7 @@ export async function documentIndexRun(documentId: string, reviewedAt: string): 
     extraction: documents.extraction,
     reviewedFields: documents.reviewedFields,
     tagging: documents.tagging,
+    tagStatus: documents.tagStatus,
     indexStatus: documents.indexStatus,
     reviewedAt: documents.reviewedAt,
   })
@@ -26,7 +27,8 @@ export async function documentIndexRun(documentId: string, reviewedAt: string): 
   if (!record || record.reviewedAt?.toISOString() !== reviewedAt) return "skipped";
   // A replay after the index commit still reports it, so the job queues the sync it may have missed.
   if (record.indexStatus === "indexed") return "indexed";
-  if (record.indexStatus !== "pending" || !record.clientId || !record.extraction || !record.tagging) return "skipped";
+  if (record.indexStatus !== "pending" || !record.clientId || !record.extraction) return "skipped";
+  if (!record.tagging && record.tagStatus !== "failed") return "skipped";
 
   const document = documentIndexBuildDocument({
     id: documentId,

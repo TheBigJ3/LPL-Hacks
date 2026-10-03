@@ -20,3 +20,11 @@ export function documentReviewCheckFields(extraction: ExtractedAnalysis, fields:
   if (Object.keys(fields).some((id) => !known.has(id))) throw new AppError(DOCUMENT_ERRORS.REVIEW_FIELD_UNKNOWN);
   if (items.some((item) => item.value.requiresReview && !(item.id in fields))) throw new AppError(DOCUMENT_ERRORS.REVIEW_INCOMPLETE);
 }
+
+// The tagging queue's retries all settle within a few minutes, so a run pending far longer was lost and a new confirmation may replace it.
+export const DOCUMENT_REVIEW_TAGGING_STALE_MS = 15 * 60 * 1000;
+
+export function documentReviewCheckTaggingBusy(tagStatus: string | null, reviewedAt: Date | null, now: Date): boolean {
+  if (tagStatus !== "pending") return false;
+  return !reviewedAt || now.getTime() - reviewedAt.getTime() < DOCUMENT_REVIEW_TAGGING_STALE_MS;
+}

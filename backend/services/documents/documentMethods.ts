@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import type { Readable } from "stream";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, desc, eq, getTableColumns, inArray, isNull, ne, or } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, inArray, isNull, lt, ne, or } from "drizzle-orm";
 import type { Document, DocumentListItem } from "@lpl-hacks/shared/src/types/native/documents/document.js";
 import type { DocumentReview, DocumentReviewField } from "@lpl-hacks/shared/src/types/native/documents/documentReview.js";
 import type { DocumentTagging } from "@lpl-hacks/shared/src/types/native/documents/documentTagging.js";
@@ -20,7 +20,7 @@ import { DOCUMENT_ERRORS } from "../../types/native/documents/errors.js";
 import { EXTRACTION_ERRORS } from "../../types/native/extraction/errors.js";
 import { extractedFieldAnalyze, type ExtractedFieldResult } from "../extraction/extractedFieldMethods.js";
 import { realtimeNotifyRooms } from "../realtime/realtimeMethods.js";
-import { documentReviewCheckFields } from "./documentReviewChecks.js";
+import { DOCUMENT_REVIEW_TAGGING_STALE_MS, documentReviewCheckFields, documentReviewCheckTaggingBusy } from "./documentReviewChecks.js";
 
 type DocumentUpload = UploadRequest & {
   fileName: string;
@@ -93,22 +93,26 @@ export async function documentGet(documentId: string): Promise<{
 
 // Saving the review is what makes its fields verified; it also hands the document to tagging, replacing any earlier result.
 export async function documentConfirm(documentId: string, fields: Record<string, DocumentReviewField>): Promise<{ document: Document; reviewedAt: string }> {
-  const [record] = await db.select({ status: documents.status, extraction: documents.extraction, tagStatus: documents.tagStatus })
+  const [record] = await db.select({ status: documents.status, extraction: documents.extraction, tagStatus: documents.tagStatus, reviewedAt: documents.reviewedAt })
     .from(documents)
     .where(eq(documents.id, documentId))
     .limit(1);
   if (!record) throw new AppError(DOCUMENT_ERRORS.DOCUMENT_NOT_FOUND);
   if (record.status !== "extracted" || !record.extraction) throw new AppError(DOCUMENT_ERRORS.DOCUMENT_NOT_EXTRACTED);
-  if (record.tagStatus === "pending") throw new AppError(DOCUMENT_ERRORS.TAGGING_IN_PROGRESS);
+  const reviewedAt = new Date();
+  if (documentReviewCheckTaggingBusy(record.tagStatus, record.reviewedAt, reviewedAt)) throw new AppError(DOCUMENT_ERRORS.TAGGING_IN_PROGRESS);
   documentReviewCheckFields(record.extraction, fields);
 
-  const reviewedAt = new Date();
   const [updated] = await db.update(documents)
     .set({ reviewedFields: fields, reviewedAt, tagStatus: "pending", tagging: null, tagFailureMessage: null, indexStatus: null })
     .where(and(
       eq(documents.id, documentId),
       eq(documents.status, "extracted"),
-      or(isNull(documents.tagStatus), ne(documents.tagStatus, "pending")),
+      or(
+        isNull(documents.tagStatus),
+        ne(documents.tagStatus, "pending"),
+        lt(documents.reviewedAt, new Date(reviewedAt.getTime() - DOCUMENT_REVIEW_TAGGING_STALE_MS)),
+      ),
     ))
     .returning();
   if (!updated) throw new AppError(DOCUMENT_ERRORS.TAGGING_IN_PROGRESS);

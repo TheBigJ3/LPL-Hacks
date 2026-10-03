@@ -148,10 +148,18 @@ describe("documentConfirm", () => {
   });
 
   it("rejects a second confirmation while tagging is still running", async () => {
-    rows.selected = [{ status: "extracted", extraction, tagStatus: "pending" }];
+    rows.selected = [{ status: "extracted", extraction, tagStatus: "pending", reviewedAt: new Date() }];
 
     await expect(documentConfirm(DOCUMENT_ID, fields)).rejects.toMatchObject({ _status: DOCUMENT_ERRORS.TAGGING_IN_PROGRESS.STATUS });
     expect(db.update).not.toHaveBeenCalled();
+  });
+
+  it("replaces a tagging run that has been pending long enough to be lost", async () => {
+    rows.selected = [{ status: "extracted", extraction, tagStatus: "pending", reviewedAt: new Date(Date.now() - 60 * 60 * 1000) }];
+    rows.updated = [record({ status: "extracted", tagStatus: "pending", tagFailureMessage: null, indexStatus: null })];
+
+    await expect(documentConfirm(DOCUMENT_ID, fields)).resolves.toMatchObject({ document: { tagStatus: "pending" } });
+    expect(rows.sets).toHaveLength(1);
   });
 
   it("stores the verified fields and resets any earlier tagging", async () => {

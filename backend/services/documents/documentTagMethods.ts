@@ -1,5 +1,5 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, sql } from "drizzle-orm";
 import documentsTagSettled from "@lpl-hacks/shared/src/types/native/sockets/documents/tagSettled.js";
 import { db } from "../../loaders/postgresLoader.js";
 import { S3_DOCUMENTS_BUCKET, s3_client } from "../../loaders/s3Loader.js";
@@ -82,9 +82,10 @@ export async function documentTagRun(documentId: string, reviewedAt: string): Pr
   return "tagged";
 }
 
+// A client's document still goes into search when tagging gives up, just without tags, so a down decision service never hides it.
 export async function documentTagMarkFailed(documentId: string, reviewedAt: string, tagFailureMessage: string): Promise<boolean> {
   const updated = await db.update(documents)
-    .set({ tagStatus: "failed", tagFailureMessage })
+    .set({ tagStatus: "failed", tagFailureMessage, indexStatus: sql`case when ${documents.clientId} is null then null else 'pending' end` })
     .where(and(eq(documents.id, documentId), eq(documents.tagStatus, "pending"), eq(documents.reviewedAt, new Date(reviewedAt))))
     .returning({ id: documents.id });
 
