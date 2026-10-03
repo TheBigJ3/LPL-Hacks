@@ -1,0 +1,68 @@
+{
+  "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+  "household_id": "HH010",
+  "tax_year": 2026,
+  "filing_status": "single",
+  "members": [
+    {
+      "person_id": "HH010-P1",
+      "name": "Alex Example",
+      "retirement_distribution": {
+        "value": "$ 18,750.00",
+        "source_document": "alex_example_1099r_2026.pdf",
+        "page": 1,
+        "textract_confidence": 0.951,
+        "verified": false
+      },
+      "retirement_distribution_taxable": {
+        "value": "$ 18,750.00",
+        "source_document": "alex_example_1099r_2026.pdf",
+        "page": 1,
+        "textract_confidence": 0.952,
+        "verified": false
+      },
+      "federal_tax_withheld": {
+        "value": "$ 1,875.00",
+        "source_document": "alex_example_1099r_2026.pdf",
+        "page": 1,
+        "textract_confidence": 0.954,
+        "verified": false
+      },
+      "state_tax_withheld": {
+        "value": "$ 375.00",
+        "source_document": "alex_example_1099r_2026.pdf",
+        "page": 1,
+        "textract_confidence": 0.95,
+        "verified": false
+      },
+      "distribution_code": {
+        "value": "7",
+        "source_document": "alex_example_1099r_2026.pdf",
+        "page": 1,
+        "textract_confidence": 0.945,
+        "verified": false
+      },
+      "distribution_from_ira": {
+        "value": false,
+        "source_document": "alex_example_1099r_2026.pdf",
+        "page": 1,
+        "textract_confidence": 0.947,
+        "verified": false
+      },
+      "distribution_date": {
+        "value": "06/30/2026",
+        "source_document": "alex_example_1099r_2026.pdf",
+        "page": 1,
+        "textract_confidence": 0.952,
+        "verified": false
+      }
+    }
+  ],
+  "documents": [
+    {
+      "name": "alex_example_1099r_2026.pdf",
+      "type": "1099-R",
+      "date": "2026-06-30"
+    }
+  ]
+}

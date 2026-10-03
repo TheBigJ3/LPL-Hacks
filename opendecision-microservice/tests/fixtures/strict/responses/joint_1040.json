@@ -1,0 +1,167 @@
+{
+ "_synthetic": "SYNTHETIC TEST DATA - recorded OpenDecision 0.1.2 response",
+ "chunks": 1,
+ "answers": {
+  "docType": {
+   "type": "choice",
+   "choice": "1040",
+   "probabilities": {
+    "w2": 0.006981722137425095,
+    "1099_int": 0.0005463032430270687,
+    "1099_r": 0.0003908668732037768,
+    "1099_div": 0.00024289280554512516,
+    "1099_nec": 0.0007543921819888055,
+    "1040": 0.9855432212352753,
+    "1098": 0.00013086990293231793,
+    "5498_sa": 0.00023124001745600253,
+    "1095": 0.0002085354717564769,
+    "account_statement": 0.0005525795859284699,
+    "unknown": 0.004417324671521783
+   },
+   "confidence": 0.9597151358558372,
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form 1040 U.S. Individual Income Tax Return 2024\nFiling status: Married filing jointly\nYour name: John R. Johnson\nSpouse's name: Sarah A. Johnson\nLine 1a Wages: 158,400\nLine 11 Adjusted gross income: 161,250",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "tag_tax": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.9920002222061157,
+     "false": 0.007999777793884277
+    },
+    "confidence": 0.9920002222061157
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.9935117363929749,
+     "contradicts": 0.015543648041784763
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document is tax-related.\" is yes.",
+    "contradiction": "The answer to the question \"This document is tax-related.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form 1040 U.S. Individual Income Tax Return 2024\nFiling status: Married filing jointly\nYour name: John R. Johnson\nSpouse's name: Sarah A. Johnson\nLine 1a Wages: 158,400\nLine 11 Adjusted gross income: 161,250",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "tag_income": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.970687747001648,
+     "false": 0.02931225299835205
+    },
+    "confidence": 0.970687747001648
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.9671630263328552,
+     "contradicts": 0.03258974850177765
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document reports employment earnings or wages.\" is yes.",
+    "contradiction": "The answer to the question \"This document reports employment earnings or wages.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form 1040 U.S. Individual Income Tax Return 2024\nFiling status: Married filing jointly\nYour name: John R. Johnson\nSpouse's name: Sarah A. Johnson\nLine 1a Wages: 158,400\nLine 11 Adjusted gross income: 161,250",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "member_john_johnson": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.957912266254425,
+     "false": 0.04208773374557495
+    },
+    "confidence": 0.957912266254425
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.929440438747406,
+     "contradicts": 0.025371313095092773
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document concerns John Johnson.\" is yes.",
+    "contradiction": "The answer to the question \"This document concerns John Johnson.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form 1040 U.S. Individual Income Tax Return 2024\nFiling status: Married filing jointly\nYour name: John R. Johnson\nSpouse's name: Sarah A. Johnson\nLine 1a Wages: 158,400\nLine 11 Adjusted gross income: 161,250",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "member_sarah_johnson": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "tentative",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.6306849718093872,
+     "false": 0.3693150281906128
+    },
+    "confidence": 0.6306849718093872
+   },
+   "three_way": {
+    "answer": null,
+    "relation": "unknown",
+    "scores": {
+     "supports": 0.23231014609336853,
+     "contradicts": 0.1139734759926796
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document concerns Sarah Johnson.\" is yes.",
+    "contradiction": "The answer to the question \"This document concerns Sarah Johnson.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form 1040 U.S. Individual Income Tax Return 2024\nFiling status: Married filing jointly\nYour name: John R. Johnson\nSpouse's name: Sarah A. Johnson\nLine 1a Wages: 158,400\nLine 11 Adjusted gross income: 161,250",
+     "relevance": 1.0
+    }
+   ]
+  }
+ }
+}

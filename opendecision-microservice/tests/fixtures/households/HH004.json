@@ -1,0 +1,74 @@
+{
+  "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+  "household_id": "HH004",
+  "tax_year": 2025,
+  "filing_status": "single",
+  "adjusted_gross_income": {
+    "value": 158000,
+    "source_document": "hh004_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.983,
+    "verified": false
+  },
+  "dependents": 0,
+  "cash_balance": {
+    "value": 40000,
+    "source_document": "hh004_bank_statement_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "members": [
+    {
+      "person_id": "HH004-P1",
+      "name": "Jordan Park",
+      "employer": {
+        "value": "Wingtip Sample Systems",
+        "source_document": "jordan_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.99,
+        "verified": false
+      },
+      "wages": [
+        {
+          "value": 120000,
+          "source_document": "jordan_w2_2025.pdf",
+          "page": 1,
+          "textract_confidence": 0.981,
+          "verified": false
+        },
+        {
+          "value": 165000,
+          "source_document": "hh004_1040_2025.pdf",
+          "page": 1,
+          "textract_confidence": 0.976,
+          "verified": false
+        }
+      ],
+      "employee_401k_contribution": {
+        "value": 15000,
+        "source_document": "jordan_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.973,
+        "verified": false
+      }
+    }
+  ],
+  "documents": [
+    {
+      "name": "jordan_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "hh004_1040_2025.pdf",
+      "type": "1040",
+      "date": "2026-04-12"
+    },
+    {
+      "name": "hh004_bank_statement_2025.pdf",
+      "type": "account_statement",
+      "date": "2025-12-31"
+    }
+  ]
+}

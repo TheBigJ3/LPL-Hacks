@@ -1,0 +1,90 @@
+{
+  "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+  "household_id": "HH002",
+  "tax_year": 2025,
+  "filing_status": "single",
+  "adjusted_gross_income": {
+    "value": 74500,
+    "source_document": "hh002_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.985,
+    "verified": false
+  },
+  "dependents": {
+    "value": 0,
+    "source_document": "hh002_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "cash_balance": {
+    "value": 26000,
+    "source_document": "hh002_bank_statement_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.99,
+    "verified": false
+  },
+  "members": [
+    {
+      "person_id": "HH002-P1",
+      "name": "Alex Rivera",
+      "employer": {
+        "value": "Northwind Sample Traders",
+        "source_document": "alex_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.99,
+        "verified": false
+      },
+      "wages": {
+        "value": 98000,
+        "source_document": "alex_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.98,
+        "verified": false
+      },
+      "employee_401k_contribution": {
+        "value": 23500,
+        "source_document": "alex_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.977,
+        "verified": false
+      },
+      "hsa_contribution": {
+        "value": 4300,
+        "source_document": "alex_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.972,
+        "verified": false
+      },
+      "hsa_eligible_health_plan": {
+        "value": true,
+        "source_document": "alex_hdhp_coverage_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.96,
+        "verified": false
+      }
+    }
+  ],
+  "documents": [
+    {
+      "name": "alex_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "hh002_1040_2025.pdf",
+      "type": "1040",
+      "date": "2026-04-02"
+    },
+    {
+      "name": "hh002_bank_statement_2025.pdf",
+      "type": "account_statement",
+      "date": "2025-12-31"
+    },
+    {
+      "name": "alex_hdhp_coverage_2025.pdf",
+      "type": "1095",
+      "date": "2025-01-01"
+    }
+  ]
+}

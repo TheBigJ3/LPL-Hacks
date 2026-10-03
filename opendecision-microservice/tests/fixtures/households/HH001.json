@@ -1,0 +1,102 @@
+{
+  "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+  "household_id": "HH001",
+  "tax_year": 2025,
+  "filing_status": "married_filing_jointly",
+  "adjusted_gross_income": {
+    "value": 185000,
+    "source_document": "hh001_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.982,
+    "verified": false
+  },
+  "dependents": {
+    "value": 2,
+    "source_document": "hh001_1040_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.991,
+    "verified": false
+  },
+  "mortgage_interest": null,
+  "cash_balance": {
+    "value": "$32,216.56",
+    "source_document": "hh001_bank_statement_2025.pdf",
+    "page": 1,
+    "textract_confidence": 0.988,
+    "verified": false
+  },
+  "members": [
+    {
+      "person_id": "HH001-P1",
+      "name": "John Sample",
+      "employer": {
+        "value": "Contoso Sample Co",
+        "source_document": "john_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.991,
+        "verified": false
+      },
+      "wages": {
+        "value": "$120,000.00",
+        "source_document": "john_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.981,
+        "verified": false
+      },
+      "employee_401k_contribution": {
+        "value": 8200,
+        "source_document": "john_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.974,
+        "verified": false
+      }
+    },
+    {
+      "person_id": "HH001-P2",
+      "name": "Sarah Sample",
+      "employer": {
+        "value": "Fabrikam Sample Inc",
+        "source_document": "sarah_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.99,
+        "verified": false
+      },
+      "wages": {
+        "value": "65,000.00",
+        "source_document": "sarah_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.979,
+        "verified": false
+      },
+      "employee_401k_contribution": {
+        "value": "4500",
+        "source_document": "sarah_w2_2025.pdf",
+        "page": 1,
+        "textract_confidence": 0.968,
+        "verified": false
+      }
+    }
+  ],
+  "documents": [
+    {
+      "name": "john_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "sarah_w2_2025.pdf",
+      "type": "W-2",
+      "date": "2026-01-31"
+    },
+    {
+      "name": "hh001_1040_2025.pdf",
+      "type": "1040",
+      "date": "2026-04-10"
+    },
+    {
+      "name": "hh001_bank_statement_2025.pdf",
+      "type": "account_statement",
+      "date": "2025-12-31"
+    }
+  ]
+}

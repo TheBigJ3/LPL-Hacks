@@ -1,0 +1,167 @@
+{
+  "docType": {
+    "type": "choice",
+    "choice": "w2",
+    "probabilities": {
+      "w2": 0.6817067265510559,
+      "1099_int": 0.012720483355224133,
+      "1099_r": 0.17334006167948246,
+      "1099_div": 0.004132211091928184,
+      "1099_nec": 0.032696180045604706,
+      "1040": 0.011055113980546594,
+      "1098": 0.002743263030424714,
+      "5498_sa": 0.014791377354413271,
+      "1095": 0.0047845367807894945,
+      "account_statement": 0.015946093248203397,
+      "unknown": 0.04608391597867012
+    },
+    "confidence": 0.5343025326674815,
+    "evidence": [
+      {
+        "id": "document",
+        "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+        "relevance": 1.0
+      }
+    ]
+  },
+  "tags": {
+    "tag_tax": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": true,
+      "status": "tentative",
+      "binary": {
+        "answer": true,
+        "probabilities": {
+          "true": 0.8028648495674133,
+          "false": 0.19713515043258667
+        },
+        "confidence": 0.8028648495674133
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 0.3144714832305908,
+          "contradicts": 0.02615562081336975
+        }
+      },
+      "compiler": "generic_yes_no",
+      "compiled": {
+        "proposition": "The answer to the question \"This document is tax-related.\" is yes.",
+        "contradiction": "The answer to the question \"This document is tax-related.\" is no."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ]
+    },
+    "tag_income": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": true,
+      "status": "confirmed",
+      "binary": {
+        "answer": true,
+        "probabilities": {
+          "true": 0.9826908707618713,
+          "false": 0.017309129238128662
+        },
+        "confidence": 0.9826908707618713
+      },
+      "three_way": {
+        "answer": true,
+        "relation": "supports",
+        "scores": {
+          "supports": 0.9738444089889526,
+          "contradicts": 0.011777843348681927
+        }
+      },
+      "compiler": "generic_yes_no",
+      "compiled": {
+        "proposition": "The answer to the question \"This document reports employment earnings or wages.\" is yes.",
+        "contradiction": "The answer to the question \"This document reports employment earnings or wages.\" is no."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ]
+    }
+  },
+  "members": {
+    "member_taylor_mock": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": true,
+      "status": "confirmed",
+      "binary": {
+        "answer": true,
+        "probabilities": {
+          "true": 0.9905874133110046,
+          "false": 0.009412586688995361
+        },
+        "confidence": 0.9905874133110046
+      },
+      "three_way": {
+        "answer": true,
+        "relation": "supports",
+        "scores": {
+          "supports": 0.9582260847091675,
+          "contradicts": 0.002323162741959095
+        }
+      },
+      "compiler": "generic_yes_no",
+      "compiled": {
+        "proposition": "The answer to the question \"This document concerns Taylor Mock.\" is yes.",
+        "contradiction": "The answer to the question \"This document concerns Taylor Mock.\" is no."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ]
+    },
+    "member_sam_mock": {
+      "type": "document_noul",
+      "mode": "both",
+      "answer": false,
+      "status": "tentative",
+      "binary": {
+        "answer": false,
+        "probabilities": {
+          "true": 0.49218809604644775,
+          "false": 0.5078119039535522
+        },
+        "confidence": 0.5078119039535522
+      },
+      "three_way": {
+        "answer": null,
+        "relation": "unknown",
+        "scores": {
+          "supports": 0.00247262348420918,
+          "contradicts": 0.00247262348420918
+        }
+      },
+      "compiler": "generic_yes_no",
+      "compiled": {
+        "proposition": "The answer to the question \"This document concerns Sam Mock.\" is yes.",
+        "contradiction": "The answer to the question \"This document concerns Sam Mock.\" is no."
+      },
+      "evidence": [
+        {
+          "id": "document",
+          "text": "Form W-2 for Taylor Mock (taylor_w2_2025.pdf). Every amount on this form belongs to Taylor Mock.\nEmployer's name: Adventure Works Sample.\ne Employee's name: Taylor Mock.\n1 Wages, tips, other compensation: 110,000.00.\n2 Federal income tax withheld: 14,300.00.\n12a Code D (401(k) elective deferrals): $ 2,000.00.\n13 Retirement plan: yes, this box is checked.",
+          "relevance": 1.0
+        }
+      ]
+    }
+  }
+}

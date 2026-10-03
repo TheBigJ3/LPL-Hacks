@@ -1,0 +1,77 @@
+{
+  "w2": {
+    "label": "Form W-2",
+    "description": "IRS Form W-2 wage and tax statement",
+    "form_number": "W-2",
+    "patterns": ["Form W-2", "Wage and Tax Statement"],
+    "topics": ["income", "retirement", "tax"]
+  },
+  "1099_int": {
+    "label": "Form 1099-INT",
+    "description": "IRS Form 1099-INT interest income",
+    "form_number": "1099-INT",
+    "patterns": ["1099-INT"],
+    "topics": ["income", "banking_cash", "tax"]
+  },
+  "1099_r": {
+    "label": "Form 1099-R",
+    "description": "IRS Form 1099-R distributions from pensions, annuities, retirement plans or IRAs",
+    "form_number": "1099-R",
+    "patterns": ["1099-R"],
+    "topics": ["retirement", "tax"]
+  },
+  "1099_div": {
+    "label": "Form 1099-DIV",
+    "description": "IRS Form 1099-DIV dividends and distributions",
+    "form_number": "1099-DIV",
+    "patterns": ["1099-DIV"],
+    "topics": ["income", "investments", "tax"]
+  },
+  "1099_nec": {
+    "label": "Form 1099-NEC",
+    "description": "IRS Form 1099-NEC nonemployee compensation",
+    "form_number": "1099-NEC",
+    "patterns": ["1099-NEC"],
+    "topics": ["income", "self_employment", "tax"]
+  },
+  "1040": {
+    "label": "Form 1040",
+    "description": "IRS Form 1040 individual income tax return",
+    "form_number": "1040",
+    "patterns": ["Form 1040"],
+    "topics": ["income", "tax"]
+  },
+  "1098": {
+    "label": "Form 1098",
+    "description": "IRS Form 1098 mortgage interest statement",
+    "form_number": "1098",
+    "patterns": ["Form 1098"],
+    "topics": ["mortgage_housing", "tax"]
+  },
+  "5498_sa": {
+    "label": "Form 5498-SA",
+    "description": "IRS Form 5498-SA health savings account contributions",
+    "form_number": "5498-SA",
+    "patterns": ["5498-SA"],
+    "topics": ["health_savings"]
+  },
+  "1095": {
+    "label": "Form 1095 (health coverage)",
+    "description": "IRS Form 1095 health coverage statement",
+    "form_number": "1095",
+    "patterns": ["Form 1095"],
+    "topics": ["health_savings", "insurance"]
+  },
+  "account_statement": {
+    "label": "Account statement",
+    "description": "A bank or brokerage account statement",
+    "patterns": ["Account statement", "Statement period", "Bank statement"],
+    "topics": ["banking_cash"]
+  },
+  "unknown": {
+    "label": "Unrecognized document",
+    "description": "None of the listed document types",
+    "patterns": [],
+    "topics": []
+  }
+}

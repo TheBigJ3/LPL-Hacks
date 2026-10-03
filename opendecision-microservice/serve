@@ -1,0 +1,4 @@
+#!/bin/sh
+# SageMaker starts the container as `docker run <image> serve` and sends /ping and /invocations to port 8080.
+export SAGEMAKER_MODE=1
+exec uvicorn rapid_analysis.api:app --host 0.0.0.0 --port 8080

@@ -1,0 +1,8 @@
+# Runtime only (what the Docker image installs). Install torch from the right index FIRST, e.g.:
+#   NVIDIA: pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cu130
+#   CPU:    pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+# then: pip install -r requirements.txt   (tests: requirements-dev.txt)
+OpenDecision==0.1.2
+fastapi==0.142.2
+uvicorn==0.54.0
+pydantic==2.13.5

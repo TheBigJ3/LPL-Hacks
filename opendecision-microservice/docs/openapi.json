@@ -1,0 +1,2364 @@
+{
+  "components": {
+    "schemas": {
+      "CashValue": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "default": "not_checked",
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "months_of_income": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Months Of Income"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "CashValue",
+        "type": "object"
+      },
+      "Change": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "text"
+        ],
+        "title": "Change",
+        "type": "object"
+      },
+      "CheckCounts": {
+        "additionalProperties": false,
+        "properties": {
+          "conflicted": {
+            "default": 0,
+            "title": "Conflicted",
+            "type": "integer"
+          },
+          "mismatch": {
+            "default": 0,
+            "title": "Mismatch",
+            "type": "integer"
+          },
+          "not_checked": {
+            "default": 0,
+            "title": "Not Checked",
+            "type": "integer"
+          },
+          "unconfirmed": {
+            "default": 0,
+            "title": "Unconfirmed",
+            "type": "integer"
+          },
+          "verified": {
+            "default": 0,
+            "title": "Verified",
+            "type": "integer"
+          }
+        },
+        "title": "CheckCounts",
+        "type": "object"
+      },
+      "CheckedValue": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "default": "not_checked",
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "CheckedValue",
+        "type": "object"
+      },
+      "ChecklistItem": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "enum": [
+              "yes",
+              "no",
+              "needs_data",
+              "not_assessed"
+            ],
+            "title": "Answer",
+            "type": "string"
+          },
+          "dollar_impact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dollar Impact"
+          },
+          "finding_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "metrics": {
+            "additionalProperties": true,
+            "title": "Metrics",
+            "type": "object"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "rule": {
+            "default": "",
+            "title": "Rule",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "answer",
+          "reason",
+          "dollar_impact",
+          "finding_ids"
+        ],
+        "title": "ChecklistItem",
+        "type": "object"
+      },
+      "ChecklistQuestion": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "question"
+        ],
+        "title": "ChecklistQuestion",
+        "type": "object"
+      },
+      "Conflict": {
+        "additionalProperties": false,
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/SourceCandidate"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          }
+        },
+        "required": [
+          "field",
+          "label",
+          "member",
+          "person_id",
+          "candidates"
+        ],
+        "title": "Conflict",
+        "type": "object"
+      },
+      "DataQuality": {
+        "additionalProperties": false,
+        "properties": {
+          "conflicts": {
+            "items": {
+              "$ref": "#/components/schemas/Conflict"
+            },
+            "title": "Conflicts",
+            "type": "array"
+          },
+          "documents": {
+            "default": 0,
+            "title": "Documents",
+            "type": "integer"
+          },
+          "documents_needing_review": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentReview"
+            },
+            "title": "Documents Needing Review",
+            "type": "array"
+          },
+          "low_confidence_fields": {
+            "items": {
+              "$ref": "#/components/schemas/LowConfidenceField"
+            },
+            "title": "Low Confidence Fields",
+            "type": "array"
+          },
+          "missing_documents": {
+            "items": {
+              "$ref": "#/components/schemas/MissingDocument"
+            },
+            "title": "Missing Documents",
+            "type": "array"
+          },
+          "unassigned_documents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unassigned Documents",
+            "type": "array"
+          },
+          "unchecked_values": {
+            "default": 0,
+            "title": "Unchecked Values",
+            "type": "integer"
+          }
+        },
+        "title": "DataQuality",
+        "type": "object"
+      },
+      "DocumentDecisionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "document": {
+            "$ref": "#/components/schemas/DocumentInput"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberInput"
+            },
+            "title": "Members",
+            "type": "array"
+          }
+        },
+        "required": [
+          "document",
+          "members"
+        ],
+        "title": "DocumentDecisionRequest",
+        "type": "object"
+      },
+      "DocumentInput": {
+        "additionalProperties": false,
+        "description": "One source document: exactly one of `textract` or `text`.",
+        "properties": {
+          "form_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Form Type"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Text"
+          },
+          "textract": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Textract"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "DocumentInput",
+        "type": "object"
+      },
+      "DocumentMember": {
+        "additionalProperties": false,
+        "properties": {
+          "method": {
+            "enum": [
+              "name_match",
+              "model",
+              "manual"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "person_id": {
+            "title": "Person Id",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "owner",
+              "joint",
+              "mentioned"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "person_id",
+          "name",
+          "role",
+          "method"
+        ],
+        "title": "DocumentMember",
+        "type": "object"
+      },
+      "DocumentResult": {
+        "additionalProperties": false,
+        "description": "Amendment §3.3: the strict per-document decision.",
+        "properties": {
+          "attribution_status": {
+            "enum": [
+              "assigned",
+              "ambiguous",
+              "unassigned"
+            ],
+            "title": "Attribution Status",
+            "type": "string"
+          },
+          "doc_subtype": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doc Subtype"
+          },
+          "doc_type": {
+            "title": "Doc Type",
+            "type": "string"
+          },
+          "doc_type_method": {
+            "enum": [
+              "pattern",
+              "none"
+            ],
+            "title": "Doc Type Method",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentMember"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "model_tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Model Tags",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "review_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Reasons",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "accepted",
+              "needs_review"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "suggested_doc_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SuggestedDocType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "doc_type",
+          "doc_subtype",
+          "doc_type_method",
+          "suggested_doc_type",
+          "topics",
+          "model_tags",
+          "members",
+          "attribution_status",
+          "status",
+          "review_reasons"
+        ],
+        "title": "DocumentResult",
+        "type": "object"
+      },
+      "DocumentReview": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "review_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Review Reasons",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "review_reasons"
+        ],
+        "title": "DocumentReview",
+        "type": "object"
+      },
+      "Enums": {
+        "additionalProperties": false,
+        "properties": {
+          "answer": {
+            "items": {
+              "enum": [
+                "yes",
+                "no",
+                "needs_data",
+                "not_assessed"
+              ],
+              "type": "string"
+            },
+            "title": "Answer",
+            "type": "array"
+          },
+          "category": {
+            "items": {
+              "enum": [
+                "retirement",
+                "tax",
+                "hsa",
+                "cash_management",
+                "life_event",
+                "data_quality"
+              ],
+              "type": "string"
+            },
+            "title": "Category",
+            "type": "array"
+          },
+          "change_type": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Change Type",
+            "type": "array"
+          },
+          "check": {
+            "items": {
+              "enum": [
+                "verified",
+                "mismatch",
+                "unconfirmed",
+                "conflicted",
+                "not_checked"
+              ],
+              "type": "string"
+            },
+            "title": "Check",
+            "type": "array"
+          },
+          "check_descriptions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Check Descriptions",
+            "type": "object"
+          },
+          "checklist": {
+            "items": {
+              "$ref": "#/components/schemas/ChecklistQuestion"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "checklist_label": {
+            "title": "Checklist Label",
+            "type": "string"
+          },
+          "doc_type": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Doc Type",
+            "type": "array"
+          },
+          "document_tags": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Document Tags",
+            "type": "object"
+          },
+          "filing_status": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Filing Status",
+            "type": "array"
+          },
+          "priority": {
+            "items": {
+              "enum": [
+                "informational",
+                "low",
+                "medium",
+                "high"
+              ],
+              "type": "string"
+            },
+            "title": "Priority",
+            "type": "array"
+          },
+          "severity": {
+            "items": {
+              "enum": [
+                "error",
+                "warning"
+              ],
+              "type": "string"
+            },
+            "title": "Severity",
+            "type": "array"
+          },
+          "status": {
+            "items": {
+              "enum": [
+                "findings",
+                "no_findings",
+                "needs_review"
+              ],
+              "type": "string"
+            },
+            "title": "Status",
+            "type": "array"
+          },
+          "tags": {
+            "additionalProperties": true,
+            "title": "Tags",
+            "type": "object"
+          }
+        },
+        "required": [
+          "check",
+          "check_descriptions",
+          "answer",
+          "priority",
+          "status",
+          "category",
+          "change_type",
+          "doc_type",
+          "document_tags",
+          "severity",
+          "filing_status",
+          "checklist",
+          "checklist_label",
+          "tags"
+        ],
+        "title": "Enums",
+        "type": "object"
+      },
+      "ErrorItem": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "severity": {
+            "default": "error",
+            "enum": [
+              "error",
+              "warning"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "path",
+          "message"
+        ],
+        "title": "ErrorItem",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorItem"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "needs_review",
+              "unauthorized"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "errors"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "EvidenceDocumentCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "document": {
+            "title": "Document",
+            "type": "string"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "document",
+          "page",
+          "value",
+          "check"
+        ],
+        "title": "EvidenceDocumentCheck",
+        "type": "object"
+      },
+      "EvidenceValue": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceDocumentCheck"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "key",
+          "field",
+          "label",
+          "member",
+          "value",
+          "check",
+          "documents"
+        ],
+        "title": "EvidenceValue",
+        "type": "object"
+      },
+      "Finding": {
+        "additionalProperties": false,
+        "properties": {
+          "action_label": {
+            "title": "Action Label",
+            "type": "string"
+          },
+          "category": {
+            "enum": [
+              "retirement",
+              "tax",
+              "hsa",
+              "cash_management",
+              "life_event",
+              "data_quality"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "dollar_impact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dollar Impact"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "metrics": {
+            "additionalProperties": true,
+            "title": "Metrics",
+            "type": "object"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          },
+          "priority": {
+            "enum": [
+              "informational",
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Priority",
+            "type": "string"
+          },
+          "rule": {
+            "default": "",
+            "title": "Rule",
+            "type": "string"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "category",
+          "priority",
+          "headline",
+          "explanation",
+          "dollar_impact",
+          "member",
+          "person_id",
+          "action_label",
+          "check"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
+      "FindingEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "household_id": {
+            "title": "Household Id",
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceValue"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "household_id",
+          "finding_id",
+          "headline",
+          "check",
+          "values"
+        ],
+        "title": "FindingEvidence",
+        "type": "object"
+      },
+      "Health": {
+        "additionalProperties": false,
+        "properties": {
+          "device": {
+            "title": "Device",
+            "type": "string"
+          },
+          "model_loaded": {
+            "title": "Model Loaded",
+            "type": "boolean"
+          },
+          "ruleset_version": {
+            "title": "Ruleset Version",
+            "type": "string"
+          },
+          "schema_version": {
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "degraded"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "model_loaded",
+          "device",
+          "ruleset_version",
+          "schema_version"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "HouseholdTags": {
+        "additionalProperties": false,
+        "properties": {
+          "categories_flagged": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Categories Flagged",
+            "type": "array"
+          },
+          "checklist_not_assessed": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Checklist Not Assessed",
+            "type": "array"
+          },
+          "checklist_yes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Checklist Yes",
+            "type": "array"
+          },
+          "data_quality": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Data Quality",
+            "type": "array"
+          },
+          "life_events": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Life Events",
+            "type": "array"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "topics",
+          "categories_flagged",
+          "checklist_yes",
+          "checklist_not_assessed",
+          "life_events",
+          "data_quality"
+        ],
+        "title": "HouseholdTags",
+        "type": "object"
+      },
+      "LowConfidenceField": {
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "textract_confidence": {
+            "title": "Textract Confidence",
+            "type": "number"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "field",
+          "label",
+          "member",
+          "person_id",
+          "value",
+          "textract_confidence",
+          "source_document",
+          "page"
+        ],
+        "title": "LowConfidenceField",
+        "type": "object"
+      },
+      "MemberCard": {
+        "additionalProperties": false,
+        "properties": {
+          "employer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employer"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "numbers": {
+            "items": {
+              "$ref": "#/components/schemas/MemberNumber"
+            },
+            "title": "Numbers",
+            "type": "array"
+          },
+          "person_id": {
+            "title": "Person Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "person_id",
+          "name",
+          "employer",
+          "numbers"
+        ],
+        "title": "MemberCard",
+        "type": "object"
+      },
+      "MemberInput": {
+        "additionalProperties": false,
+        "description": "Its answer comes back under members[\"member_<first>_<middle>_<last>_<suffix>\"] (absent parts skipped).",
+        "properties": {
+          "first_name": {
+            "title": "First Name",
+            "type": "string"
+          },
+          "last_name": {
+            "title": "Last Name",
+            "type": "string"
+          },
+          "middle_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Middle Name"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Person Id"
+          },
+          "suffix": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Suffix"
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name"
+        ],
+        "title": "MemberInput",
+        "type": "object"
+      },
+      "MemberNumber": {
+        "additionalProperties": false,
+        "properties": {
+          "candidates": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/SourceCandidate"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidates"
+          },
+          "check": {
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Check",
+            "type": "string"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "field",
+          "label",
+          "value",
+          "check"
+        ],
+        "title": "MemberNumber",
+        "type": "object"
+      },
+      "MemberTags": {
+        "additionalProperties": false,
+        "properties": {
+          "checks": {
+            "$ref": "#/components/schemas/CheckCounts"
+          },
+          "documents": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "fields_present": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Fields Present",
+            "type": "array"
+          },
+          "findings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "person_id": {
+            "title": "Person Id",
+            "type": "string"
+          },
+          "topics": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Topics",
+            "type": "array"
+          }
+        },
+        "required": [
+          "person_id",
+          "name",
+          "topics",
+          "fields_present",
+          "documents",
+          "findings",
+          "checks"
+        ],
+        "title": "MemberTags",
+        "type": "object"
+      },
+      "MissingDocument": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "member": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Member"
+          },
+          "person_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Person Id"
+          },
+          "type": {
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "member",
+          "person_id",
+          "description"
+        ],
+        "title": "MissingDocument",
+        "type": "object"
+      },
+      "Overview": {
+        "additionalProperties": false,
+        "properties": {
+          "changes_since_last_year": {
+            "items": {
+              "$ref": "#/components/schemas/Change"
+            },
+            "title": "Changes Since Last Year",
+            "type": "array"
+          },
+          "checklist": {
+            "items": {
+              "$ref": "#/components/schemas/ChecklistItem"
+            },
+            "title": "Checklist",
+            "type": "array"
+          },
+          "checklist_label": {
+            "const": "Flags for review, not advice",
+            "default": "Flags for review, not advice",
+            "title": "Checklist Label",
+            "type": "string"
+          },
+          "data_quality": {
+            "$ref": "#/components/schemas/DataQuality"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ErrorItem"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "household_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Household Id"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberCard"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "prior_year": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PriorYear"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "enum": [
+                  "informational",
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
+          "ruleset_version": {
+            "default": "2025.2",
+            "title": "Ruleset Version",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "1.1",
+            "default": "1.1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "findings",
+              "no_findings",
+              "needs_review"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Summary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Tags"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tax_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Year"
+          }
+        },
+        "required": [
+          "household_id",
+          "tax_year",
+          "status",
+          "priority",
+          "summary",
+          "members",
+          "checklist",
+          "changes_since_last_year",
+          "findings",
+          "data_quality",
+          "errors"
+        ],
+        "title": "Overview",
+        "type": "object"
+      },
+      "OverviewRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentInput"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "household": {
+            "additionalProperties": true,
+            "title": "Household",
+            "type": "object"
+          }
+        },
+        "required": [
+          "household"
+        ],
+        "title": "OverviewRequest",
+        "type": "object"
+      },
+      "OverviewResult": {
+        "additionalProperties": false,
+        "properties": {
+          "evidence": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/FindingEvidence"
+            },
+            "title": "Evidence",
+            "type": "object"
+          },
+          "overview": {
+            "$ref": "#/components/schemas/Overview"
+          }
+        },
+        "required": [
+          "overview",
+          "evidence"
+        ],
+        "title": "OverviewResult",
+        "type": "object"
+      },
+      "PriorYear": {
+        "additionalProperties": false,
+        "description": "Last year's values as received (no documents, so never checked).",
+        "properties": {
+          "filing_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filing Status"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/PriorYearMember"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "numbers": {
+            "items": {
+              "$ref": "#/components/schemas/PriorYearNumber"
+            },
+            "title": "Numbers",
+            "type": "array"
+          },
+          "tax_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Year"
+          }
+        },
+        "required": [
+          "tax_year",
+          "filing_status",
+          "numbers",
+          "members"
+        ],
+        "title": "PriorYear",
+        "type": "object"
+      },
+      "PriorYearMember": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "numbers": {
+            "items": {
+              "$ref": "#/components/schemas/PriorYearNumber"
+            },
+            "title": "Numbers",
+            "type": "array"
+          },
+          "person_id": {
+            "title": "Person Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "person_id",
+          "name",
+          "numbers"
+        ],
+        "title": "PriorYearMember",
+        "type": "object"
+      },
+      "PriorYearNumber": {
+        "additionalProperties": false,
+        "properties": {
+          "field": {
+            "title": "Field",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "field",
+          "label",
+          "value"
+        ],
+        "title": "PriorYearNumber",
+        "type": "object"
+      },
+      "RawDocumentDecision": {
+        "description": "The raw OpenDecision document decision, grouped by kind (answers with probabilities, scores and evidence).\nUncalibrated, for audit and downstream experiments; never shown to advisors or fed to an LLM as fact.",
+        "properties": {
+          "docType": {
+            "additionalProperties": true,
+            "title": "Doctype",
+            "type": "object"
+          },
+          "members": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Members",
+            "type": "object"
+          },
+          "tags": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Tags",
+            "type": "object"
+          }
+        },
+        "required": [
+          "docType",
+          "tags",
+          "members"
+        ],
+        "title": "RawDocumentDecision",
+        "type": "object"
+      },
+      "SourceCandidate": {
+        "additionalProperties": false,
+        "properties": {
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page"
+          },
+          "source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Document"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "source_document",
+          "page"
+        ],
+        "title": "SourceCandidate",
+        "type": "object"
+      },
+      "SuggestedDocType": {
+        "additionalProperties": false,
+        "properties": {
+          "doc_type": {
+            "title": "Doc Type",
+            "type": "string"
+          },
+          "model_choice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Choice"
+          },
+          "probability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Probability"
+          }
+        },
+        "required": [
+          "doc_type",
+          "model_choice",
+          "probability"
+        ],
+        "title": "SuggestedDocType",
+        "type": "object"
+      },
+      "Summary": {
+        "additionalProperties": false,
+        "properties": {
+          "agi": {
+            "$ref": "#/components/schemas/CheckedValue"
+          },
+          "cash": {
+            "$ref": "#/components/schemas/CashValue"
+          },
+          "dependents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dependents"
+          },
+          "dependents_check": {
+            "default": "not_checked",
+            "enum": [
+              "verified",
+              "mismatch",
+              "unconfirmed",
+              "conflicted",
+              "not_checked"
+            ],
+            "title": "Dependents Check",
+            "type": "string"
+          },
+          "dependents_source_document": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dependents Source Document"
+          },
+          "filing_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Filing Status"
+          },
+          "mortgage_interest": {
+            "$ref": "#/components/schemas/CheckedValue"
+          }
+        },
+        "required": [
+          "filing_status",
+          "dependents",
+          "agi",
+          "cash",
+          "mortgage_interest"
+        ],
+        "title": "Summary",
+        "type": "object"
+      },
+      "Tags": {
+        "additionalProperties": false,
+        "properties": {
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentResult"
+            },
+            "title": "Documents",
+            "type": "array"
+          },
+          "household": {
+            "$ref": "#/components/schemas/HouseholdTags"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/MemberTags"
+            },
+            "title": "Members",
+            "type": "array"
+          }
+        },
+        "required": [
+          "household",
+          "members",
+          "documents"
+        ],
+        "title": "Tags",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Stateless household analysis for the platform backend. Checklist answers are flags for review, not advice. Every displayed number carries a check: verified / mismatch / unconfirmed / conflicted / not_checked.",
+    "title": "Household Rapid Analysis",
+    "version": "1.1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "description": "Liveness and model state. Open (no token) so orchestrators can probe it.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "meta"
+        ]
+      }
+    },
+    "/v1/documents/decision": {
+      "post": {
+        "description": "RAW OpenDecision answers for one document, grouped so each kind can be iterated: `docType`, `tags`\n(tag_<name>, from config/document_tags.json) and `members` (member_<first>_<middle>_<last>_<suffix>, one per member sent).\nThe same response the strict document decision used.\n\nProbabilities and scores are uncalibrated. For audit and RAG experiments only; the overview never\nuses this. 503 when the model is off or failing (no answers to show).",
+        "operationId": "document_raw_decision_v1_documents_decision_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentDecisionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RawDocumentDecision"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Document Raw Decision",
+        "tags": [
+          "raw"
+        ]
+      }
+    },
+    "/v1/meta/enums": {
+      "get": {
+        "operationId": "enums_v1_meta_enums_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Enums"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Enums",
+        "tags": [
+          "meta"
+        ]
+      }
+    },
+    "/v1/overview": {
+      "post": {
+        "description": "Household + its documents -> the overview and, per finding, which document confirmed which number.\n\nAn overview whose errors include `validator_unavailable` was built with the model off or failing: show it,\nbut build it again later instead of keeping it as final.",
+        "operationId": "overview_v1_overview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OverviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Overview",
+        "tags": [
+          "analysis"
+        ]
+      }
+    }
+  }
+}
