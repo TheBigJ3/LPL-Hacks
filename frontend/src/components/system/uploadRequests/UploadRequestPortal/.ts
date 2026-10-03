@@ -6,6 +6,7 @@ import submitUploadRequestApi from '@api/uploadRequests/submitUploadRequestApi'
 import uploadUploadRequestFileApi from '@api/uploadRequests/uploadUploadRequestFileApi'
 import { apiPostRequest, apiUploadRequest, useApiGetQuery } from '@features/apiLayer'
 import { DOCUMENT_UPLOAD_ACCEPT, DOCUMENT_UPLOAD_HINT, documentUploadCheckFile } from '@features/documentUploadCheck'
+import { useDocumentTitle } from '@hooks/useDocumentTitle'
 import { UPLOAD_REQUEST_ERRORS } from '@typings/native/uploadRequests/errors'
 
 export type UploadRequestPortalFileStatus = 'ready' | 'invalid' | 'uploading' | 'uploaded' | 'failed'
@@ -33,6 +34,7 @@ type UploadRequestPortalFile = {
   message: string | null
 }
 
+const UPLOAD_REQUEST_PORTAL_TITLE = 'Send your documents'
 const UPLOAD_REQUEST_PORTAL_DATE_FORMAT = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' })
 
 export const UPLOAD_REQUEST_PORTAL_STEPS = [
@@ -77,6 +79,8 @@ export function useUploadRequestPortal() {
 
   const portal = portalQuery.data?.portal ?? null
   const sendable = files.filter((entry) => entry.status === 'ready' || entry.status === 'failed' || entry.status === 'uploaded')
+
+  useDocumentTitle(UPLOAD_REQUEST_PORTAL_TITLE)
 
   const addFiles = (incoming: FileList | null) => {
     if (!incoming || !portal || sending) return
