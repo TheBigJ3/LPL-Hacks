@@ -1,5 +1,5 @@
 import './.css'
-import type { ExtractionTagView } from '../../../../.ts'
+import type { ExtractionTagView } from '../../../../../../.ts'
 
 const ExtractionTagSummary = ({ tag, onRetry }: { tag: ExtractionTagView; onRetry: () => void }) =>
   <section className="extraction-tag-summary flex flex-col gap-3 rounded-lg p-4" data-state={tag.state} aria-live="polite" aria-label="Tags">

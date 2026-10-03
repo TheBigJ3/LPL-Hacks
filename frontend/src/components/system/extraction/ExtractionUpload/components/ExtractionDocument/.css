@@ -1,5 +1,22 @@
 .extraction-document {
+  /* The page is always white paper, so highlight colors stay on the light theme in both modes. */
   --extraction-document-paper: #FFFFFF;
+  --extraction-document-confirmed: #1F7A4D;
+  --extraction-document-ring: #062C7E;
+  --extraction-document-padding: 0;
+  --extraction-document-overflow: visible;
+  padding: var(--extraction-document-padding);
+  overflow-y: var(--extraction-document-overflow);
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 1100px) {
+  .extraction-document {
+    --extraction-document-padding: 16px;
+    --extraction-document-overflow: auto;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-hover);
+  }
 }
 
 .extraction-document__notice {
@@ -10,6 +27,7 @@
 }
 
 .extraction-document__page {
+  flex: none;
   border: 1px solid var(--color-border);
   background: var(--extraction-document-paper);
   box-shadow: var(--shadow-200);
@@ -30,21 +48,20 @@
 
 .extraction-document__highlight[data-status="review"]:hover {
   background: color-mix(in srgb, var(--color-review) 75%, transparent);
-  box-shadow: none;
 }
 
 .extraction-document__highlight[data-status="confirmed"] {
-  background: color-mix(in srgb, var(--color-review) 18%, transparent);
+  background: color-mix(in srgb, var(--extraction-document-confirmed) 22%, transparent);
 }
 
 .extraction-document__highlight[data-status="edited"] {
-  background: color-mix(in srgb, var(--color-accent-blue-light) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent-blue-light) 55%, transparent);
   box-shadow: 0 0 0 1px var(--color-accent-blue);
 }
 
 .extraction-document__highlight[data-selected="true"],
 .extraction-document__highlight:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
+  outline: 2px solid var(--extraction-document-ring);
   outline-offset: 2px;
 }
 

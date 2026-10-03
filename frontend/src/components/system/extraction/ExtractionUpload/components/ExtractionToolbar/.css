@@ -1,0 +1,106 @@
+.extraction-toolbar {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.extraction-toolbar__back,
+.extraction-toolbar__confirm {
+  padding: 7px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-default);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+
+.extraction-toolbar__back .material-symbols-outlined,
+.extraction-toolbar__confirm .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.extraction-toolbar__back:hover,
+.extraction-toolbar__confirm:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+
+.extraction-toolbar__confirm[data-ready="true"] {
+  border-color: var(--color-accent-blue);
+  background: var(--color-accent-blue);
+  color: #FFFFFF;
+}
+
+.extraction-toolbar__confirm[data-ready="true"]:hover {
+  opacity: 0.9;
+}
+
+.extraction-toolbar__confirm:disabled {
+  color: var(--color-dark-gray);
+  background: var(--color-surface);
+  cursor: default;
+}
+
+.extraction-toolbar__confirm [data-icon="progress_activity"] {
+  animation: extraction-toolbar-spin 900ms linear infinite;
+}
+
+@keyframes extraction-toolbar-spin {
+  to { transform: rotate(360deg); }
+}
+
+.extraction-toolbar__file-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  background: var(--color-surface-hover);
+  color: var(--color-dark-gray);
+  font-size: 20px;
+}
+
+.extraction-toolbar__name {
+  color: var(--color-text-default);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.extraction-toolbar__meta {
+  color: var(--color-dark-gray);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.extraction-toolbar__track {
+  width: 96px;
+  background: var(--color-border);
+}
+
+.extraction-toolbar__bar {
+  background: var(--color-review);
+  transition: width 300ms var(--ease-out-expo);
+}
+
+.extraction-toolbar__progress[data-complete="true"] .extraction-toolbar__bar {
+  background: var(--color-success);
+}
+
+.extraction-toolbar__count {
+  color: var(--color-text-default);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.extraction-toolbar__back:focus-visible,
+.extraction-toolbar__confirm:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .extraction-toolbar__back,
+  .extraction-toolbar__confirm,
+  .extraction-toolbar__bar { transition: none; }
+  .extraction-toolbar__confirm [data-icon="progress_activity"] { animation: none; }
+}

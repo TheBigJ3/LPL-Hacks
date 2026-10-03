@@ -1,0 +1,128 @@
+.extraction-progress {
+  max-width: 560px;
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-100);
+}
+
+.extraction-progress__file-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  background: color-mix(in srgb, var(--color-accent-blue-light) 45%, transparent);
+  color: var(--color-heading);
+  font-size: 22px;
+}
+
+.extraction-progress__title {
+  color: var(--color-text-default);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.extraction-progress__file {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+}
+
+.extraction-progress__step {
+  position: relative;
+}
+
+.extraction-progress__step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  bottom: 4px;
+  left: 11px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--color-border);
+}
+
+.extraction-progress__step[data-state="done"]:not(:last-child)::before {
+  background: var(--color-accent-blue);
+}
+
+.extraction-progress__marker {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-dark-gray);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.extraction-progress__marker .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.extraction-progress__step[data-state="done"] .extraction-progress__marker {
+  border-color: var(--color-accent-blue);
+  background: var(--color-accent-blue);
+  color: #FFFFFF;
+}
+
+.extraction-progress__step[data-state="active"] .extraction-progress__marker {
+  border-color: var(--color-accent-blue);
+}
+
+.extraction-progress__spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid color-mix(in srgb, var(--color-accent-blue) 25%, transparent);
+  border-top-color: var(--color-accent-blue);
+  animation: extraction-progress-spin 800ms linear infinite;
+}
+
+@keyframes extraction-progress-spin {
+  to { transform: rotate(360deg); }
+}
+
+.extraction-progress__label {
+  color: var(--color-dark-gray);
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.extraction-progress__step[data-state="active"] .extraction-progress__label,
+.extraction-progress__step[data-state="done"] .extraction-progress__label {
+  color: var(--color-text-default);
+  font-weight: 700;
+}
+
+.extraction-progress__hint {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.extraction-progress__step:not([data-state="active"]) .extraction-progress__hint {
+  display: none;
+}
+
+.extraction-progress__cancel {
+  padding: 7px 14px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-default);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 150ms ease;
+}
+
+.extraction-progress__cancel:hover {
+  background: var(--color-surface-hover);
+}
+
+.extraction-progress__cancel:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .extraction-progress__spinner { animation-duration: 2400ms; }
+  .extraction-progress__cancel { transition: none; }
+}
