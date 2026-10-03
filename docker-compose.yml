@@ -1,0 +1,21 @@
+# Local Valkey for BullMQ / cache / Socket.IO adapter. Matches the ElastiCache
+# setup in AWS: single node, no cluster mode, no AUTH, no TLS.
+# Use with REDIS_HOST=localhost, REDIS_PORT=6379 in backend/.env.
+services:
+  valkey:
+    image: valkey/valkey:9
+    ports:
+      - "6379:6379"
+    # BullMQ requires keys never be evicted.
+    command: ["valkey-server", "--maxmemory-policy", "noeviction", "--appendonly", "yes"]
+    volumes:
+      - valkey-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  valkey-data:
