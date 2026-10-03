@@ -1,0 +1,33 @@
+.onboarding-replay {
+  --onboarding-replay-inset: 16px;
+  right: var(--onboarding-replay-inset);
+  bottom: var(--onboarding-replay-inset);
+  z-index: 50;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-onboarding);
+  font-size: 16px;
+  box-shadow: var(--shadow-200);
+  opacity: .8;
+  transition: opacity 120ms ease, background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.onboarding-replay:hover {
+  opacity: 1;
+  border-color: var(--color-onboarding);
+  background: var(--color-onboarding);
+  color: #FFFFFF;
+}
+
+.onboarding-replay:focus-visible {
+  outline: 2px solid var(--color-onboarding);
+  outline-offset: 2px;
+}
+
+@media (min-width: 640px) {
+  .onboarding-replay {
+    --onboarding-replay-inset: 20px;
+  }
+}

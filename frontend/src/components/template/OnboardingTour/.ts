@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react'
 import type { Variants } from 'motion/react'
+import { onboardingRegister } from '@stores/onboardingStore'
 
 export type OnboardingTourPlacement = 'top' | 'bottom' | 'left' | 'right'
 
@@ -153,6 +154,13 @@ export function useOnboardingTour(steps: OnboardingTourStep[], storageKey: strin
     }, ONBOARDING_TOUR_START_DELAY_MS)
     return () => window.clearTimeout(timer)
   }, [steps, storageKey])
+
+  useEffect(() => onboardingRegister(() => {
+    const first = onboardingTourFindVisible(steps, 0, 1)
+    if (first === null) return
+    setDirection(1)
+    setIndex(first)
+  }), [steps])
 
   useEffect(() => {
     if (!step) return

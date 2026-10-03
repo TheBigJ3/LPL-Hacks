@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router'
 import Sidebar from '@components/template/Sidebar/Sidebar'
+import OnboardingReplay from '@components/template/OnboardingReplay/OnboardingReplay'
 import { APP_LAYOUT_CONTENT_ID, useAppLayout } from './.ts'
 
 const AppLayout = () => {
@@ -12,6 +13,7 @@ const AppLayout = () => {
         <Outlet />
       </main>
     </div>
+    <OnboardingReplay />
   </div>
 }
 
