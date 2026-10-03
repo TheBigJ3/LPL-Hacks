@@ -9,7 +9,7 @@
 # Specifics
 - A service function receives plain, already-validated arguments — the caller (`api/` handler or `mq/` job) validates with zod before calling in. Don't re-validate the same shape again here; a service only defines its own zod schema when it needs an internal-only shape the caller doesn't already provide, and that schema stays local to the file unless a second caller needs it too.
 - Keep service signatures free of `req`/`res` and queue/job objects — take the specific fields needed as arguments and return plain data. That's what lets the same service be called from an `api/` handler and an `mq/` job without adapting it.
-- Import DB/cache/AWS access via `loaders/` singletons (e.g. `redis_client` from `redisLoader`, `db` from `postgresLoader`, a Textract/Bedrock client from its own loader) — never instantiate a client inline (see `loaders/agent.md`).
+- Import DB/cache/AWS access via `loaders/` singletons (e.g. `redis_client` from `redisLoader`, `db` from `postgresLoader`, an S3/Textract/Bedrock client from its own loader) — never instantiate a client inline (see `loaders/agent.md`).
 - On a domain failure (not found, invalid state, etc.), throw `AppError` from the system's error catalog rather than returning an error shape — same convention as `api/agent.md`, so it formats consistently regardless of whether the caller is a route or a job.
 - Audit logging for sensitive mutations (verifying/correcting a field, deleting a document) stays out of services — that's logged explicitly by the caller after the service call succeeds, per `api/agent.md`.
 - Job-triggered functionality lives in the same file as its api-triggered counterpart when they act on the same thing (`documentCreate` and `documentMarkExtracted` both in `services/documents/documentMethods.ts`) — group by what's acted on, not by which layer calls it.
@@ -22,12 +22,12 @@
 - An answer service returns citations as structured data (`documentId`, `page`, `verified`) next to the text, not baked into the prose, so the UI can render and link them.
 
 # Data access
-Latency is set by how many sequential trips a request makes to Postgres, Redis and external APIs (Textract, Bedrock), not by how many files the code spans — every `await` on one of them is a network round trip.
+Latency is set by how many sequential trips a request makes to Postgres, Redis and external APIs (Textract, Bedrock, S3), not by how many files the code spans — every `await` on one of them is a network round trip.
 
 - The function a route or job calls is the entry point, and it owns the request's query plan: it decides every trip and keeps them within budget — a read ≤ 2 sequential trips, a write ≤ 3, not counting middleware.
 - What an entry point calls is either another export of its own system's file, or a pure function that takes data and returns values or throws. Pure checks live in `<thing>Checks.ts` beside the methods file (`extractedFieldChecks.ts`): `extractedFieldCheckNeedsReview(field, threshold)` checks the field it's handed rather than fetching one.
 - An exported getter that runs its own query is for callers that need only that. Never chain several of them in one request — fetch what the flow needs in one query (a join, or `inArray` over the ids) instead.
-- Independent reads against different backends (Postgres + Redis + Bedrock) go in `Promise.all`; don't serialize them.
+- Independent reads against different backends (Postgres + S3 + Bedrock) go in `Promise.all`; don't serialize them.
 - Filter in the datastore, not in JS: use `WHERE` clauses on indexed columns, and pass metadata filters into the Knowledge Base/vector search call rather than loading everything and `.filter()`-ing it.
 - Several Redis commands in a row go in one pipeline, `MULTI`, or Lua script — never `await` Redis in a loop.
 - Long-running AWS work (Textract analysis, bulk tagging, indexing into the Knowledge Base) goes to an `mq/` job, not the request path. The request records the document and enqueues; the client hears back over a socket event.

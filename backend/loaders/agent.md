@@ -1,7 +1,7 @@
 # Rules
 - A loader runs exactly once, at server startup — never on a request path, never lazily on first use.
 - A loader's job is to stand up a resource (DB pool, cache client, connection) or wire up a subsystem (routes, sockets) that the rest of the app then depends on. It doesn't contain business logic.
-- One resource/subsystem per file, named `<thing>Loader.ts` (`postgresLoader.ts`, `redisLoader.ts`, `routeLoader.ts`). AWS clients the pipeline adds follow the same rule — `textractLoader.ts`, `bedrockLoader.ts` — each exporting one client singleton, with region/credentials read from env at the top of that file.
+- One resource/subsystem per file, named `<thing>Loader.ts` (`postgresLoader.ts`, `redisLoader.ts`, `routeLoader.ts`). AWS clients the pipeline adds follow the same rule — `s3Loader.ts`, `textractLoader.ts`, `bedrockLoader.ts` — each exporting one client singleton, with region/credentials read from env at the top of that file.
 - Read required config via env at the top of the file (fail fast if missing) — don't scatter env reads for the same resource across the codebase.
 
 # Specifics
