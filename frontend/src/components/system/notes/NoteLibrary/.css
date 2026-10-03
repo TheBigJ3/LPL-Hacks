@@ -1,0 +1,31 @@
+.note-library {
+  --note-library-padding-x: 16px;
+  --note-library-padding-top: 24px;
+  min-height: 100%;
+  padding: var(--note-library-padding-top) var(--note-library-padding-x) 60px;
+}
+
+@media (min-width: 640px) {
+  .note-library {
+    --note-library-padding-x: var(--spacing-section);
+    --note-library-padding-top: 62px;
+  }
+}
+
+.note-library__content {
+  max-width: 1040px;
+  gap: 24px;
+}
+
+.note-library__title {
+  color: var(--color-heading);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 20px;
+  line-height: normal;
+}
+
+.note-library__notes {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+}

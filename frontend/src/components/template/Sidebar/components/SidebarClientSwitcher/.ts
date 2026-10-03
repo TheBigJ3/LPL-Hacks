@@ -1,5 +1,5 @@
 import { useEffect, useState, type KeyboardEvent } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import type { Variants } from 'motion/react'
 import {
   SIDEBAR_DEMO_CLIENTS,
@@ -83,8 +83,14 @@ const sidebarClientSearch = (query: string, recentIds: string[]) => {
   )
 }
 
+const sidebarClientGetSection = (pathname: string) => {
+  const segments = pathname.split('/').filter(Boolean)
+  return segments[0] === 'clients' ? segments.slice(2).join('/') : segments.join('/')
+}
+
 export function useSidebarClientSwitcher(client: SidebarClient | null, member: SidebarClientMember | null, open: boolean, onExpand: () => void) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [pickerOpen, setPickerOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [recentIds, setRecentIds] = useState(sidebarClientReadRecent)
@@ -115,7 +121,9 @@ export function useSidebarClientSwitcher(client: SidebarClient | null, member: S
 
   const select = (id: string) => {
     closePicker()
-    if (id !== clientId) navigate(`/clients/${id}`)
+    if (id === clientId) return
+    const section = sidebarClientGetSection(pathname)
+    navigate(section ? `/clients/${id}/${section}` : `/clients/${id}`)
   }
 
   const closeOnEscape = (event: KeyboardEvent) => {

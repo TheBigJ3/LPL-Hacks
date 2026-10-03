@@ -1,0 +1,152 @@
+.note-table {
+  --note-table-preview-display: none;
+  --note-table-member-display: none;
+  table-layout: fixed;
+  border-collapse: collapse;
+  color: var(--color-main-black);
+  font-size: 16px;
+  line-height: normal;
+}
+
+@media (min-width: 760px) {
+  .note-table {
+    --note-table-member-display: table-cell;
+  }
+}
+
+@media (min-width: 1100px) {
+  .note-table {
+    --note-table-preview-display: table-cell;
+  }
+}
+
+.note-table th,
+.note-table td {
+  height: 64px;
+  padding: 0 12px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.note-table thead th {
+  height: 48px;
+  color: var(--color-dark-gray);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.note-table tbody th {
+  font-weight: 400;
+}
+
+.note-table__name-cell {
+  width: 38%;
+}
+
+.note-table__preview-cell {
+  display: var(--note-table-preview-display);
+  width: 32%;
+}
+
+.note-table__member-cell {
+  display: var(--note-table-member-display);
+  width: 18%;
+}
+
+.note-table__date-cell {
+  width: 152px;
+  color: var(--color-dark-gray);
+  font-variant-numeric: tabular-nums;
+}
+
+.note-table__menu-cell {
+  width: 52px;
+}
+
+.note-table td.note-table__menu-cell {
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+}
+
+.note-table__row:has(.note-menu__popover) {
+  z-index: 3;
+}
+
+.note-table__row {
+  position: relative;
+  transition: background-color 150ms ease;
+}
+
+.note-table__open {
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+
+.note-table__open::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.note-table__open:focus-visible::after {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: -2px;
+}
+
+.note-table__icons > * {
+  grid-area: 1 / 1;
+}
+
+.note-table__icon-edit {
+  opacity: 0;
+}
+
+.note-table__row:hover .note-table__icon-note,
+.note-table__open:focus-visible .note-table__icon-note {
+  opacity: 0;
+}
+
+.note-table__row:hover .note-table__icon-edit,
+.note-table__open:focus-visible .note-table__icon-edit {
+  opacity: 1;
+}
+
+.note-table__row:hover {
+  background: var(--color-surface-hover);
+}
+
+.note-table__icon {
+  color: var(--color-dark-gray);
+  font-size: 22px;
+}
+
+.note-table__icon-edit {
+  color: var(--color-main-black);
+}
+
+.note-table__title {
+  font-weight: 500;
+}
+
+.note-table__preview {
+  color: var(--color-dark-gray);
+}
+
+.note-table__avatar {
+  width: 28px;
+  height: 28px;
+  background: var(--color-navy);
+  color: var(--color-accent-blue-light);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-table__row { transition: none; }
+}

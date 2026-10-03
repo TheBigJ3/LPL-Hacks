@@ -17,8 +17,14 @@
 }
 
 .sidebar-theme-switcher__highlight {
-  background: var(--color-surface);
-  box-shadow: var(--shadow-100);
+  background: var(--color-surface-hover);
+  box-shadow: inset 0 0 0 1px var(--color-border), 0 1px 4px rgba(0, 0, 0, .4);
+  view-transition-name: sidebar-theme-switcher-highlight;
+}
+
+::view-transition-group(sidebar-theme-switcher-highlight) {
+  animation-duration: var(--duration-panel);
+  animation-timing-function: var(--ease-out-expo);
 }
 
 .sidebar-theme-switcher__icon {

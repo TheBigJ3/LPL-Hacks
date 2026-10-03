@@ -1,0 +1,36 @@
+.note-view-toggle__option {
+  background: var(--color-navy-muted);
+  color: #FFFFFF;
+  transition: background-color 320ms var(--ease-out-expo), color 320ms var(--ease-out-expo);
+}
+
+.note-view-toggle__option[data-selected="false"]:hover {
+  background: var(--color-navy-hover);
+}
+
+.note-view-toggle__option[data-selected="true"] {
+  background: var(--color-navy);
+  color: var(--color-accent-blue-light);
+}
+
+.note-view-toggle__icon {
+  width: 26px;
+  height: 26px;
+  font-size: 18px;
+  line-height: 26px;
+}
+
+.note-view-toggle__label-text {
+  padding: 0 4px 0 2px;
+  font-size: 14px;
+  line-height: normal;
+}
+
+.note-view-toggle__option:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-view-toggle__option { transition: none; }
+}
