@@ -406,7 +406,9 @@
           "tax"
         ],
         "model_tags": [
-          "income"
+          "income",
+          "retirement",
+          "tax"
         ],
         "members": [
           {
@@ -420,7 +422,15 @@
         "status": "accepted",
         "review_reasons": [],
         "notes": [
-          "tag_uncertain:tax"
+          "tag_uncertain:self_employment",
+          "tag_uncertain:health_savings",
+          "tag_uncertain:mortgage_housing",
+          "tag_uncertain:insurance",
+          "tag_uncertain:education",
+          "tag_uncertain:life_event",
+          "tag_uncertain:equity_compensation",
+          "tag_uncertain:debt",
+          "tag_uncertain:social_security"
         ]
       },
       {
@@ -434,8 +444,8 @@
           "tax"
         ],
         "model_tags": [
-          "tax",
-          "income"
+          "income",
+          "tax"
         ],
         "members": [
           {
@@ -448,7 +458,22 @@
         "attribution_status": "assigned",
         "status": "accepted",
         "review_reasons": [],
-        "notes": []
+        "notes": [
+          "tag_uncertain:retirement",
+          "tag_uncertain:self_employment",
+          "tag_uncertain:health_savings",
+          "tag_uncertain:banking_cash",
+          "tag_uncertain:investments",
+          "tag_uncertain:mortgage_housing",
+          "tag_uncertain:insurance",
+          "tag_uncertain:estate",
+          "tag_uncertain:education",
+          "tag_uncertain:life_event",
+          "tag_uncertain:equity_compensation",
+          "tag_uncertain:debt",
+          "tag_uncertain:charitable_giving",
+          "tag_uncertain:social_security"
+        ]
       },
       {
         "name": "hh005_1098_2025.pdf",
@@ -460,7 +485,11 @@
           "mortgage_housing",
           "tax"
         ],
-        "model_tags": [],
+        "model_tags": [
+          "income",
+          "self_employment",
+          "mortgage_housing"
+        ],
         "members": [
           {
             "person_id": "HH005-P1",
@@ -473,8 +502,18 @@
         "status": "accepted",
         "review_reasons": [],
         "notes": [
+          "tag_uncertain:retirement",
           "tag_uncertain:tax",
-          "tag_uncertain:income"
+          "tag_uncertain:health_savings",
+          "tag_uncertain:banking_cash",
+          "tag_uncertain:investments",
+          "tag_uncertain:insurance",
+          "tag_uncertain:estate",
+          "tag_uncertain:education",
+          "tag_uncertain:life_event",
+          "tag_uncertain:equity_compensation",
+          "tag_uncertain:debt",
+          "tag_uncertain:social_security"
         ]
       },
       {
@@ -486,7 +525,9 @@
         "topics": [
           "banking_cash"
         ],
-        "model_tags": [],
+        "model_tags": [
+          "banking_cash"
+        ],
         "members": [
           {
             "person_id": "HH005-P1",
@@ -499,8 +540,21 @@
         "status": "accepted",
         "review_reasons": [],
         "notes": [
+          "tag_uncertain:income",
+          "tag_uncertain:retirement",
           "tag_uncertain:tax",
-          "tag_uncertain:income"
+          "tag_uncertain:self_employment",
+          "tag_uncertain:health_savings",
+          "tag_uncertain:investments",
+          "tag_uncertain:mortgage_housing",
+          "tag_uncertain:insurance",
+          "tag_uncertain:estate",
+          "tag_uncertain:education",
+          "tag_uncertain:life_event",
+          "tag_uncertain:equity_compensation",
+          "tag_uncertain:debt",
+          "tag_uncertain:charitable_giving",
+          "tag_uncertain:social_security"
         ]
       }
     ]

@@ -13,6 +13,14 @@ export const RawDecisionAnswerZod = z.looseObject({
   evidence: z.array(RawDecisionEvidenceZod).optional(),
 });
 
+// What the tagging step settled on after its own rules; the raw answers alone undercount it.
+export const RawDecisionDecidedZod = z.looseObject({
+  docType: z.string().nullable(),
+  tags: z.array(z.string()),
+  members: z.array(z.string()),
+});
+
 export const RawDecisionZod = z.looseObject({
   answers: z.record(z.string(), RawDecisionAnswerZod),
+  decided: RawDecisionDecidedZod.optional(),
 });

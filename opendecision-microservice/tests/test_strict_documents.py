@@ -9,12 +9,14 @@ import pytest
 
 from rapid_analysis.documents import (
     REVIEW_REASONS,
+    TAG_CHECK_PROBABILITY,
     MemberRef,
     decision_request,
     document_classify,
     document_decide,
     doc_type_detect,
     members_match,
+    noul_any,
 )
 from rapid_analysis.taxonomy import doc_types, document_tags, tag_ids
 from rapid_analysis.textract import redact
@@ -89,10 +91,12 @@ def test_request_format_is_exact():
     body = decision_request("Form W-2 ...", MEMBERS)
     assert {k: body[k] for k in ("noul_mode", "top_k", "chunk_tokens")} == {"noul_mode": "both", "top_k": 4, "chunk_tokens": 384}
     criteria = body["questions"]["docType"]["criteria"]
-    assert list(criteria) == list(doc_types()) and criteria["unknown"] == "None of the listed document types"
-    assert criteria["w2"] == "IRS Form W-2 wage and tax statement"
-    assert body["questions"]["tag_tax"] == {"type": "noul", "instructions": "This document is tax-related."}
-    assert body["questions"]["tag_income"] == {"type": "noul", "instructions": "This document reports employment earnings or wages."}
+    assert criteria == {doc_id: doc_type.description for doc_id, doc_type in doc_types().items()}
+    assert criteria["w2"] == "a Form W-2 Wage and Tax Statement from an employer, showing wages and tax withheld"
+    assert [k for k in body["questions"] if k.startswith("tag_")] == [f"tag_{name}" for name in document_tags()]
+    assert body["questions"]["tag_income"]["type"] == "noul_any"
+    assert body["questions"]["tag_income"]["checks"][0] == {"true": "This document reports employment earnings or wages.",
+                                                            "false": "This document does not report employment earnings or wages."}
     assert body["questions"]["member_sarah_johnson"] == {"type": "noul", "instructions": "This document concerns Sarah Johnson."}
     assert body["document"] == "Form W-2 ..."
 
@@ -181,7 +185,8 @@ def test_uncertain_tag_on_certain_w2_is_accepted():
     assert r["doc_type"] == "w2" and r["attribution_status"] == "assigned"
     assert [m["person_id"] for m in r["members"]] == ["HHJ-P2"]
     assert r["status"] == "accepted" and r["review_reasons"] == []
-    assert r["notes"] == ["tag_uncertain:tax", "member_model_only"]
+    # every tag the response has no confirmed answer for is a note; income is the only confirmed one
+    assert r["notes"] == [f"tag_uncertain:{tag}" for tag in document_tags() if tag != "income"] + ["member_model_only"]
 
 
 def test_only_listed_reasons_set_needs_review():
@@ -221,3 +226,31 @@ def test_live_equals_recorded(loaded_engine):
     for doc in DOCS:
         live = document_classify(doc["id"], redact(doc["text"]), MEMBERS, document_decide(redact(doc["text"]), MEMBERS))
         assert live.result == classify(doc, recorded(doc["id"])).result, doc["id"]
+
+
+def _check(statement, status, answer, true_probability):
+    return {"type": "document_noul", "status": status, "answer": answer, "binary": {"probabilities": {"true": true_probability}},
+            "compiled": {"proposition": statement, "contradiction": f"not {statement}"}, "evidence": []}
+
+
+def test_a_tag_is_confirmed_by_any_one_check():
+    out = noul_any([_check("a", "confirmed", False, 0.1), _check("b", "confirmed", True, 0.9), _check("c", "tentative", True, 0.99)])
+    assert (out["status"], out["answer"], out["basis"], out["compiled"]["proposition"]) == ("confirmed", True, "confirmed", "b")
+    assert [c["statement"] for c in out["checks"]] == ["a", "b", "c"]
+
+
+def test_a_clear_tentative_yes_confirms_a_tag():
+    out = noul_any([_check("a", "tentative", False, 0.3), _check("b", "tentative", True, TAG_CHECK_PROBABILITY)])
+    assert (out["status"], out["answer"], out["basis"]) == ("confirmed", True, "probability")
+    assert out["checks"][1]["status"] == "tentative"
+
+
+@pytest.mark.parametrize("checks,status,answer,decided_by", [
+    ([("a", "tentative", True, 0.79)], "tentative", True, "a"),
+    ([("a", "conflicted", None, 0.95)], "conflicted", None, "a"),
+    ([("a", "confirmed", False, 0.1), ("b", "tentative", True, 0.6)], "tentative", True, "b"),
+    ([("a", "confirmed", False, 0.1), ("b", "confirmed", False, 0.2)], "confirmed", False, "a"),
+])
+def test_a_tag_without_a_yes_reports_its_first_undecided_check(checks, status, answer, decided_by):
+    out = noul_any([_check(*c) for c in checks])
+    assert (out["status"], out["answer"], out["basis"], out["compiled"]["proposition"]) == (status, answer, None, decided_by)

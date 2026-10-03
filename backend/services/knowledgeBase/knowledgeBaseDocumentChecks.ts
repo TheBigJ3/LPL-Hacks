@@ -90,14 +90,15 @@ export function knowledgeBaseDocumentFromDecision(clientId: string, fileName: st
   }
 
   const docType = decision.answers.docType;
+  const { decided } = decision;
 
   return {
     documentId: knowledgeBaseDocumentCheckId(clientId, fileName),
     clientId,
     fileName,
-    docType: docType?.type === "choice" && docType.choice ? docType.choice : null,
-    tags: knowledgeBaseDocumentConfirmedKeys(decision, TAG_PREFIX),
-    familyMembers: knowledgeBaseDocumentConfirmedKeys(decision, MEMBER_PREFIX),
+    docType: decided ? decided.docType : docType?.type === "choice" && docType.choice ? docType.choice : null,
+    tags: decided ? decided.tags : knowledgeBaseDocumentConfirmedKeys(decision, TAG_PREFIX),
+    familyMembers: decided ? decided.members : knowledgeBaseDocumentConfirmedKeys(decision, MEMBER_PREFIX),
     taxYear: knowledgeBaseDocumentCheckTaxYear(fileName, decision),
     sections,
   };

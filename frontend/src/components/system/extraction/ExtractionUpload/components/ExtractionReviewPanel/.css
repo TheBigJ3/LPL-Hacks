@@ -103,8 +103,21 @@
   font-size: 16px;
 }
 
-.extraction-review-panel__confirm:hover {
+.extraction-review-panel__confirm:hover:not(:disabled) {
   background: var(--color-surface-hover);
+}
+
+.extraction-review-panel__confirm:disabled {
+  color: var(--color-dark-gray);
+  cursor: default;
+}
+
+.extraction-review-panel__confirm [data-icon="progress_activity"] {
+  animation: extraction-review-panel-spin 900ms linear infinite;
+}
+
+@keyframes extraction-review-panel-spin {
+  to { transform: rotate(360deg); }
 }
 
 .extraction-review-panel__confirm[data-ready="true"] {
@@ -131,4 +144,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .extraction-review-panel__progress, .extraction-review-panel__next, .extraction-review-panel__confirm { transition: none; }
+  .extraction-review-panel__confirm [data-icon="progress_activity"] { animation: none; }
 }

@@ -23,11 +23,14 @@ if (S3_DOCUMENTS_BUCKET === BEDROCK_KNOWLEDGE_BASE_BUCKET) {
   throw new ServerError(undefined, "[knowledgeBase] S3_DOCUMENTS_BUCKET must differ from BEDROCK_KNOWLEDGE_BASE_BUCKET");
 }
 
-export type KnowledgeBaseDocumentIngestResult = {
+export type KnowledgeBaseDocumentIndexResult = {
   document: KnowledgeBaseDocument;
-  originalKey: string;
   sectionKeys: string[];
   removedKeys: string[];
+};
+
+export type KnowledgeBaseDocumentIngestResult = KnowledgeBaseDocumentIndexResult & {
+  originalKey: string;
 };
 
 function knowledgeBaseDocumentPrefix(documentId: string): string {
@@ -102,16 +105,13 @@ async function knowledgeBaseDocumentDeleteKeys(bucket: string, keys: string[]): 
   }
 }
 
-// Re-ingesting the same household + file overwrites it, and sections the new decision no longer has are removed.
-export async function knowledgeBaseDocumentIngestDecision(clientId: string, fileName: string, rawBytes: Uint8Array): Promise<KnowledgeBaseDocumentIngestResult> {
-  const decision = knowledgeBaseDocumentCheckDecision(rawBytes);
-  const document = knowledgeBaseDocumentFromDecision(clientId, fileName, decision);
-  const originalKey = knowledgeBaseDocumentOriginalKey(clientId, fileName);
+// Re-indexing the same client + file overwrites it, and sections the new decision no longer has are removed.
+async function knowledgeBaseDocumentWriteSections(document: KnowledgeBaseDocument, alongside: Promise<unknown>[]): Promise<KnowledgeBaseDocumentIndexResult> {
   const sectionKeys = document.sections.map((section) => knowledgeBaseDocumentSectionKey(document.documentId, section.sectionId));
 
   const [existingKeys] = await Promise.all([
     knowledgeBaseDocumentListKeys(document.documentId),
-    knowledgeBaseDocumentPut(S3_DOCUMENTS_BUCKET, originalKey, rawBytes),
+    ...alongside,
     ...document.sections.flatMap((section, index) => [
       knowledgeBaseDocumentPut(BEDROCK_KNOWLEDGE_BASE_BUCKET, sectionKeys[index]!, knowledgeBaseDocumentSectionBody(document, section)),
       knowledgeBaseDocumentPut(BEDROCK_KNOWLEDGE_BASE_BUCKET, `${sectionKeys[index]!}.metadata.json`, knowledgeBaseDocumentSectionMetadata(document, section)),
@@ -122,7 +122,21 @@ export async function knowledgeBaseDocumentIngestDecision(clientId: string, file
   const removedKeys = existingKeys.filter((key) => !writtenKeys.has(key));
   await knowledgeBaseDocumentDeleteKeys(BEDROCK_KNOWLEDGE_BASE_BUCKET, removedKeys);
 
-  return { document, originalKey, sectionKeys, removedKeys };
+  return { document, sectionKeys, removedKeys };
+}
+
+export async function knowledgeBaseDocumentIngestDecision(clientId: string, fileName: string, rawBytes: Uint8Array): Promise<KnowledgeBaseDocumentIngestResult> {
+  const document = knowledgeBaseDocumentFromDecision(clientId, fileName, knowledgeBaseDocumentCheckDecision(rawBytes));
+  const originalKey = knowledgeBaseDocumentOriginalKey(clientId, fileName);
+  const result = await knowledgeBaseDocumentWriteSections(document, [knowledgeBaseDocumentPut(S3_DOCUMENTS_BUCKET, originalKey, rawBytes)]);
+
+  return { ...result, originalKey };
+}
+
+// Tagging already stored the decision as the original, so only its sections are written.
+export async function knowledgeBaseDocumentIndexDecision(clientId: string, fileName: string, rawBytes: Uint8Array): Promise<KnowledgeBaseDocumentIndexResult> {
+  const document = knowledgeBaseDocumentFromDecision(clientId, fileName, knowledgeBaseDocumentCheckDecision(rawBytes));
+  return knowledgeBaseDocumentWriteSections(document, []);
 }
 
 export async function knowledgeBaseDocumentRemove(clientId: string, fileName: string): Promise<string[]> {

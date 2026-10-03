@@ -140,8 +140,12 @@ everything else uncertain is recorded in `notes[]` and leaves `status` alone:
   (`doc_type_method: "pattern"`); with no match it is `unknown` (`doc_type_unknown`). The model chooses between
   every doc type's `description`, and its guess is only stored as `suggested_doc_type`. A pattern result the model
   contradicts with probability ≥ 0.90 keeps the pattern and adds the note `doc_type_model_disagrees`.
-- `topics` come from the doc type's `topics`. `model_tags` (one per `config/document_tags.json` entry, today `tax`
-  and `income`) count only when the model's status is `confirmed` (else the note `tag_uncertain:<tag>`).
+- `topics` come from the doc type's `topics`. `model_tags` (one per `config/document_tags.json` entry, each a topic id:
+  `income` · `retirement` · `tax` · `self_employment` · `health_savings` · `banking_cash` · `investments` ·
+  `mortgage_housing` · `insurance` · `estate` · `education` · `life_event` · `equity_compensation` · `debt` ·
+  `charitable_giving` · `social_security`) count only when the model confirms one of the tag's checks (else the note
+  `tag_uncertain:<tag>`). A check is a statement and its opposite; it says yes when OpenDecision confirms it, or when it
+  is tentative and the statement beats its opposite with binary probability ≥ 0.80.
 - `members` come from name matching (`method: "name_match"`, `owner` or `joint`). Surname/initial-only is
   `ambiguous` (`member_ambiguous`); no match is `unassigned` (`member_unassigned` if it carries amounts). The model can
   only veto (`member_model_disagrees`); a model-only yes is ignored (note `member_model_only`).
@@ -197,7 +201,7 @@ Response, grouped so each kind can be iterated:
 
 ```
 {"docType": {...},
- "tags":    {"tag_tax": {...}, "tag_income": {...}},                             one per config/document_tags.json entry
+ "tags":    {"tag_income": {...}, "tag_retirement": {...}, ...},                 one per config/document_tags.json entry
  "members": {"member_taylor_ann_mock_jr": {...}, "member_sam_mock": {...}}}     in the order sent
 ```
 
@@ -206,6 +210,11 @@ Sample: `tests/fixtures/expected/raw_decision_HH006_taylor_w2.json`.
 - `docType`: `{type: "choice", choice, probabilities, confidence, evidence[] {id, text, relevance}}`.
 - every `tags` and `members` entry: `{type: "document_noul", mode, answer, status, binary {answer, probabilities, confidence},
   three_way {answer, relation, scores}, evidence[], compiler, compiled {proposition, contradiction}}`.
+- a `tags` entry is the tag's deciding check plus `basis` and `checks[] {statement, status, answer}` (every check, in
+  config order). When a check says yes, the entry is that check with `status: "confirmed"`, `answer: true` and `basis`
+  `"confirmed"` (OpenDecision confirmed it) or `"probability"` (tentative, binary probability ≥ 0.80); its own raw status
+  stays in `checks[]`. Otherwise `basis` is null and the entry is the first check that is not a confirmed no (or the
+  first check when all are).
 - `three_way.scores` has only `supports` and `contradicts` (no `unknown`: read it with `.get`). Short documents give
   **one** evidence entry with `id: "document"` and the whole text. `compiled` is the statement the model was asked.
 - It is the same response the strict document decision used (memoized; no second model call), so it always agrees

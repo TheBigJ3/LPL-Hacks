@@ -10,7 +10,7 @@ vi.mock("../../../loaders/bedrockAgentLoader.js", () => ({
   BEDROCK_KNOWLEDGE_BASE_BUCKET: "kb-bucket",
 }));
 
-const { knowledgeBaseDocumentIngestDecision, knowledgeBaseDocumentRemove, knowledgeBaseDocumentSyncStart } = await import("../../../services/knowledgeBase/knowledgeBaseDocumentMethods.js");
+const { knowledgeBaseDocumentIngestDecision, knowledgeBaseDocumentIndexDecision, knowledgeBaseDocumentRemove, knowledgeBaseDocumentSyncStart } = await import("../../../services/knowledgeBase/knowledgeBaseDocumentMethods.js");
 const { knowledgeBaseDocumentCheckId } = await import("../../../services/knowledgeBase/knowledgeBaseDocumentChecks.js");
 
 const RAW = `{"answers":{"docType":{"type":"choice","choice":"w2","probabilities":{"w2":0.89},"confidence":0.73,"evidence":[{"id":"document","text":"W-2 2025. Wages: 110,000.00."}]},"tag_earnings":{"answer":true,"status":"confirmed","binary":{"confidence":0.98},"evidence":[{"id":"document","text":"W-2 2025. Wages: 110,000.00."}]}}}`;
@@ -70,6 +70,23 @@ describe("knowledgeBaseDocumentIngestDecision", () => {
   it("writes nothing when the decision is invalid", async () => {
     await expect(knowledgeBaseDocumentIngestDecision("HH006", "x.pdf", Buffer.from("{}"))).rejects.toMatchObject({ _statusCode: 422 });
     expect(s3Send).not.toHaveBeenCalled();
+  });
+});
+
+describe("knowledgeBaseDocumentIndexDecision", () => {
+  it("indexes the sections without rewriting the stored original", async () => {
+    await knowledgeBaseDocumentIndexDecision("HH006", "taylor_w2_2025.pdf", Buffer.from(RAW));
+
+    const buckets = sent("PutObjectCommand").map((input) => input.Bucket);
+    expect(buckets).toEqual(["kb-bucket", "kb-bucket"]);
+  });
+
+  it("reads the decision as tagging stores it, with what it decided beside the raw answers", async () => {
+    const stored = JSON.stringify({ decided: { docType: "w2", tags: ["income"], members: ["m1"] }, answers: JSON.parse(RAW).answers });
+
+    const result = await knowledgeBaseDocumentIndexDecision("HH006", "taylor_w2_2025.pdf", Buffer.from(stored));
+
+    expect(result.document).toMatchObject({ docType: "w2", tags: ["income"], familyMembers: ["m1"], taxYear: 2025 });
   });
 });
 

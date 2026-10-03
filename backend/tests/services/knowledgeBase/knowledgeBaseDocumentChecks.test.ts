@@ -110,4 +110,26 @@ describe("knowledgeBaseDocumentFromDecision", () => {
 
     expect(knowledgeBaseDocumentFromDecision("H", "f.pdf", decision).docType).toBeNull();
   });
+
+  it("takes the tagging step's decided type, tags and members over the raw answers", () => {
+    const decided = { docType: "1099_r", tags: ["retirement", "tax"], members: ["b98345ba-704a-4a3c-b46a-f1e4651ca281"] };
+    const decision = knowledgeBaseDocumentCheckDecision(bytes({ ...DECISION, decided }));
+
+    expect(knowledgeBaseDocumentFromDecision("H", "taylor_w2_2025.pdf", decision)).toMatchObject({
+      docType: "1099_r",
+      tags: ["retirement", "tax"],
+      familyMembers: ["b98345ba-704a-4a3c-b46a-f1e4651ca281"],
+      taxYear: 2025,
+    });
+  });
+
+  it("keeps a decided empty result rather than falling back to the raw answers", () => {
+    const decision = knowledgeBaseDocumentCheckDecision(bytes({ ...DECISION, decided: { docType: null, tags: [], members: [] } }));
+
+    expect(knowledgeBaseDocumentFromDecision("H", "f.pdf", decision)).toMatchObject({ docType: null, tags: [], familyMembers: [] });
+  });
+
+  it("throws DECISION_INVALID when decided is malformed", () => {
+    expect(() => knowledgeBaseDocumentCheckDecision(bytes({ ...DECISION, decided: { tags: "tax" } }))).toThrow(expect.objectContaining({ _statusCode: 422 }));
+  });
 });

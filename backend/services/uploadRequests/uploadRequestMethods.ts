@@ -36,6 +36,9 @@ const UPLOAD_REQUEST_DOCUMENT_COLUMNS = {
   status: documents.status,
   pageCount: documents.pageCount,
   failureMessage: documents.failureMessage,
+  tagStatus: documents.tagStatus,
+  tagFailureMessage: documents.tagFailureMessage,
+  indexStatus: documents.indexStatus,
 };
 
 const UPLOAD_REQUEST_LIFECYCLE_COLUMNS = {
