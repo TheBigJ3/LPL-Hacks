@@ -2,7 +2,14 @@ import './.css'
 import { AnimatePresence, motion } from 'motion/react'
 import PageHeader from '@components/template/PageHeader/PageHeader'
 import EmptyState from '@components/template/EmptyState/EmptyState'
-import { CLIENT_DIRECTORY_ITEM_VARIANTS, CLIENT_DIRECTORY_LIST_VARIANTS, useClientDirectory } from './.ts'
+import OnboardingTour from '@components/template/OnboardingTour/OnboardingTour'
+import {
+  CLIENT_DIRECTORY_ITEM_VARIANTS,
+  CLIENT_DIRECTORY_LIST_VARIANTS,
+  CLIENT_DIRECTORY_TOUR_STEPS,
+  CLIENT_DIRECTORY_TOUR_STORAGE_KEY,
+  useClientDirectory,
+} from './.ts'
 import ClientToolbar from './components/ClientToolbar/ClientToolbar'
 import ClientCard from './components/ClientCard/ClientCard'
 import ClientOnboarding from './popup/ClientOnboarding/ClientOnboarding'
@@ -17,7 +24,7 @@ const ClientDirectory = () => {
 
     <div className="client-directory flex flex-col items-center">
       <h1 className="sr-only">Clients</h1>
-      <section className="client-directory__content flex w-full flex-col" aria-labelledby="client-directory-title">
+      <section data-onboarding="client-list" className="client-directory__contentflex w-full flex-col" aria-labelledby="client-directory-title">
         <header className="flex items-baseline gap-3">
           <h2 id="client-directory-title" className="client-directory__title">All clients</h2>
           {!directory.loading && <span className="client-directory__count">{directory.total}</span>}
@@ -41,6 +48,8 @@ const ClientDirectory = () => {
           </motion.ul>}
       </section>
     </div>
+
+    <OnboardingTour steps={CLIENT_DIRECTORY_TOUR_STEPS} storageKey={CLIENT_DIRECTORY_TOUR_STORAGE_KEY} />
 
     <AnimatePresence>
       {directory.onboarding.open && <ClientOnboarding onClose={directory.onboarding.close} />}

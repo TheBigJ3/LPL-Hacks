@@ -4,6 +4,7 @@ import type { Client, ClientKind } from '@lpl-hacks/shared/src/types/native/clie
 import listClientsApi from '@api/clients/listClientsApi'
 import { useApiGetQuery } from '@features/apiLayer'
 import { CLIENT_ERRORS } from '@typings/native/clients/errors'
+import type { OnboardingTourStep } from '@components/template/OnboardingTour/.ts'
 
 export type ClientCardPerson = {
   key: string
@@ -28,6 +29,35 @@ const CLIENT_KIND_LABELS: Record<ClientKind, string> = {
 }
 
 const CLIENT_CARD_PEOPLE_LIMIT = 4
+
+export const CLIENT_DIRECTORY_TOUR_STORAGE_KEY = 'onboarding:client-directory-seen'
+
+export const CLIENT_DIRECTORY_TOUR_STEPS: OnboardingTourStep[] = [
+  {
+    target: 'client-switcher',
+    title: 'Switch between clients',
+    body: 'Jump into any household or individual from here. Their documents, notes and insights follow you across every tab.',
+    placement: 'right',
+  },
+  {
+    target: 'client-search',
+    title: 'Find anyone fast',
+    body: 'Search by household name or any member of the household.',
+    placement: 'bottom',
+  },
+  {
+    target: 'client-add',
+    title: 'Add a client',
+    body: 'Create a household or an individual, then start bringing in their documents.',
+    placement: 'bottom',
+  },
+  {
+    target: 'client-list',
+    title: 'Open a client',
+    body: 'Pick a client to see their verified documents, notes and an assistant that cites every answer.',
+    placement: 'top',
+  },
+]
 
 const CLIENT_DIRECTORY_EASE = [0.16, 1, 0.3, 1] as const
 
