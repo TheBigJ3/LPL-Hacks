@@ -1,0 +1,34 @@
+.insight-message__bubble {
+  background: #DFE8FB;
+  color: var(--color-main-black);
+  font-size: 16px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.insight-message__body {
+  color: #000;
+  font-size: 20px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.insight-message__action {
+  background: rgba(9, 9, 11, 0.09);
+  color: var(--color-main-black);
+  transition: background-color 150ms ease;
+}
+
+.insight-message__action:hover {
+  background: rgba(9, 9, 11, 0.14);
+}
+
+.insight-message__action:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insight-message__action { transition: none; }
+}
