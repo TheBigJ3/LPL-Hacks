@@ -1,7 +1,13 @@
 import { createHash } from "crypto";
 import { AppError } from "../../modules/AppError.js";
 import { KNOWLEDGE_BASE_ERRORS } from "../../types/native/knowledgeBase/errors.js";
-import type { KnowledgeBaseDocument, KnowledgeBaseSection } from "../../types/native/knowledgeBase/index.js";
+import type {
+  KnowledgeBaseDocument,
+  KnowledgeBaseDocumentPage,
+  KnowledgeBaseIndexedDocument,
+  KnowledgeBasePageField,
+  KnowledgeBaseSection,
+} from "../../types/native/knowledgeBase/index.js";
 import type { RawDecision } from "../../types/native/knowledgeBase/rawDecision.js";
 import { RawDecisionZod } from "../../types/zod/knowledgeBase/rawDecision.js";
 
@@ -43,7 +49,7 @@ function knowledgeBaseDocumentYears(text: string): number[] {
   return [...new Set([...text.matchAll(YEAR_PATTERN)].map((match) => Number(match[1])))];
 }
 
-export function knowledgeBaseDocumentCheckTaxYear(fileName: string, decision: RawDecision): number | null {
+export function knowledgeBaseDocumentCheckTaxYearFrom(fileName: string, evidenceTexts: string[]): number | null {
   const fromFileName = knowledgeBaseDocumentYears(fileName);
 
   if (fromFileName.length === 1) {
@@ -54,8 +60,12 @@ export function knowledgeBaseDocumentCheckTaxYear(fileName: string, decision: Ra
     return null;
   }
 
-  const fromDocType = knowledgeBaseDocumentYears((decision.answers.docType?.evidence ?? []).map((evidence) => evidence.text).join("\n"));
+  const fromDocType = knowledgeBaseDocumentYears(evidenceTexts.join("\n"));
   return fromDocType.length === 1 ? fromDocType[0]! : null;
+}
+
+export function knowledgeBaseDocumentCheckTaxYear(fileName: string, decision: RawDecision): number | null {
+  return knowledgeBaseDocumentCheckTaxYearFrom(fileName, (decision.answers.docType?.evidence ?? []).map((evidence) => evidence.text));
 }
 
 function knowledgeBaseDocumentSections(decision: RawDecision): KnowledgeBaseSection[] {
@@ -102,4 +112,57 @@ export function knowledgeBaseDocumentFromDecision(clientId: string, fileName: st
     taxYear: knowledgeBaseDocumentCheckTaxYear(fileName, decision),
     sections,
   };
+}
+
+export function knowledgeBaseDocumentPageSectionId(page: number): string {
+  return `page-${page}`;
+}
+
+function knowledgeBaseDocumentFieldStatus(field: KnowledgeBasePageField): string {
+  if (field.corrected) return "corrected by advisor";
+  if (field.verified) return "verified";
+  return field.confidence === null ? "unverified" : `unverified, ${Math.round(field.confidence)}% confidence`;
+}
+
+// Plain text rather than JSON, so every chunk the knowledge base splits a page into still reads on its own.
+export function knowledgeBaseDocumentPageBody(document: KnowledgeBaseIndexedDocument, page: KnowledgeBaseDocumentPage): string {
+  const header = [
+    `Document: ${document.fileName}`,
+    `Type: ${document.docType ?? "unknown"} · Tax year: ${document.taxYear ?? "unknown"} · Page ${page.page} of ${document.pageCount}`,
+    `Members: ${document.memberNames.join(", ") || "none tagged"}`,
+  ];
+  const fields = page.fields.length > 0
+    ? ["", "Fields:", ...page.fields.map((field) => `- ${field.label}: ${field.value} [${knowledgeBaseDocumentFieldStatus(field)}]`)]
+    : [];
+  const text = page.lines.length > 0 ? ["", "Page text:", ...page.lines] : [];
+
+  return [...header, ...fields, ...text].join("\n");
+}
+
+export function knowledgeBaseDocumentPageMetadata(document: KnowledgeBaseIndexedDocument, page: KnowledgeBaseDocumentPage): string {
+  return JSON.stringify({
+    metadataAttributes: {
+      sourceType: "document",
+      documentId: document.documentId,
+      clientId: document.clientId,
+      fileName: document.fileName,
+      sectionId: knowledgeBaseDocumentPageSectionId(page.page),
+      page: page.page,
+      // Bedrock skips a document whose metadata has an empty list, so empty lists are left out like the other optional keys.
+      ...(document.tags.length > 0 ? { tags: document.tags } : {}),
+      ...(document.familyMembers.length > 0 ? { familyMembers: document.familyMembers } : {}),
+      ...(document.docType !== null ? { docType: document.docType } : {}),
+      ...(document.taxYear !== null ? { taxYear: document.taxYear } : {}),
+    },
+  });
+}
+
+export function knowledgeBaseDocumentCheckIndexable(document: KnowledgeBaseIndexedDocument): KnowledgeBaseIndexedDocument {
+  const pages = document.pages.filter((page) => page.fields.length > 0 || page.lines.length > 0);
+
+  if (pages.length === 0) {
+    throw new AppError(KNOWLEDGE_BASE_ERRORS.DOCUMENT_EMPTY);
+  }
+
+  return { ...document, pages };
 }

@@ -1,10 +1,9 @@
-import { GetObjectCommand } from "@aws-sdk/client-s3";
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 import { db } from "../../loaders/postgresLoader.js";
-import { S3_DOCUMENTS_BUCKET, s3_client } from "../../loaders/s3Loader.js";
 import { AppError } from "../../modules/AppError.js";
 import { documents } from "../../schemas/documents.js";
-import { knowledgeBaseDocumentIndexDecision } from "../knowledgeBase/knowledgeBaseDocumentMethods.js";
+import { knowledgeBaseDocumentIndexPages } from "../knowledgeBase/knowledgeBaseDocumentMethods.js";
+import { documentIndexBuildDocument } from "./documentIndexChecks.js";
 
 export type DocumentIndexOutcome = "skipped" | "indexed" | "failed";
 
@@ -12,7 +11,10 @@ export async function documentIndexRun(documentId: string, reviewedAt: string): 
   const [record] = await db.select({
     fileName: documents.fileName,
     clientId: documents.clientId,
-    decisionS3Key: documents.decisionS3Key,
+    pageCount: documents.pageCount,
+    extraction: documents.extraction,
+    reviewedFields: documents.reviewedFields,
+    tagging: documents.tagging,
     indexStatus: documents.indexStatus,
     reviewedAt: documents.reviewedAt,
   })
@@ -24,13 +26,20 @@ export async function documentIndexRun(documentId: string, reviewedAt: string): 
   if (!record || record.reviewedAt?.toISOString() !== reviewedAt) return "skipped";
   // A replay after the index commit still reports it, so the job queues the sync it may have missed.
   if (record.indexStatus === "indexed") return "indexed";
-  if (record.indexStatus !== "pending" || !record.clientId || !record.decisionS3Key) return "skipped";
+  if (record.indexStatus !== "pending" || !record.clientId || !record.extraction || !record.tagging) return "skipped";
 
-  const object = await s3_client.send(new GetObjectCommand({ Bucket: S3_DOCUMENTS_BUCKET, Key: record.decisionS3Key }));
-  const decision = await object.Body!.transformToByteArray();
+  const document = documentIndexBuildDocument({
+    id: documentId,
+    clientId: record.clientId,
+    fileName: record.fileName,
+    pageCount: record.pageCount,
+    extraction: record.extraction,
+    reviewedFields: record.reviewedFields ?? {},
+    tagging: record.tagging,
+  });
 
   try {
-    await knowledgeBaseDocumentIndexDecision(record.clientId, record.fileName, decision);
+    await knowledgeBaseDocumentIndexPages(document);
   } catch (err) {
     if (!(err instanceof AppError)) throw err;
     console.warn(`[documentIndex] ${record.fileName} (${documentId}) not indexed: ${err.message}`);
@@ -53,4 +62,14 @@ export async function documentIndexMarkFailed(documentId: string, reviewedAt: st
     .returning({ id: documents.id });
 
   return updated.length > 0;
+}
+
+// Marks every tagged, client-linked document for indexing again, for a backfill after the page format changes.
+export async function documentIndexRequeueTagged(): Promise<{ id: string; reviewedAt: string }[]> {
+  const requeued = await db.update(documents)
+    .set({ indexStatus: "pending" })
+    .where(and(eq(documents.tagStatus, "tagged"), isNotNull(documents.clientId), isNotNull(documents.reviewedAt)))
+    .returning({ id: documents.id, reviewedAt: documents.reviewedAt });
+
+  return requeued.flatMap((row) => row.reviewedAt ? [{ id: row.id, reviewedAt: row.reviewedAt.toISOString() }] : []);
 }

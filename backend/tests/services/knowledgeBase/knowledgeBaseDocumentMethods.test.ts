@@ -10,7 +10,7 @@ vi.mock("../../../loaders/bedrockAgentLoader.js", () => ({
   BEDROCK_KNOWLEDGE_BASE_BUCKET: "kb-bucket",
 }));
 
-const { knowledgeBaseDocumentIngestDecision, knowledgeBaseDocumentIndexDecision, knowledgeBaseDocumentRemove, knowledgeBaseDocumentSyncStart } = await import("../../../services/knowledgeBase/knowledgeBaseDocumentMethods.js");
+const { knowledgeBaseDocumentIngestDecision, knowledgeBaseDocumentIndexPages, knowledgeBaseDocumentRemove, knowledgeBaseDocumentSyncStart } = await import("../../../services/knowledgeBase/knowledgeBaseDocumentMethods.js");
 const { knowledgeBaseDocumentCheckId } = await import("../../../services/knowledgeBase/knowledgeBaseDocumentChecks.js");
 
 const RAW = `{"answers":{"docType":{"type":"choice","choice":"w2","probabilities":{"w2":0.89},"confidence":0.73,"evidence":[{"id":"document","text":"W-2 2025. Wages: 110,000.00."}]},"tag_earnings":{"answer":true,"status":"confirmed","binary":{"confidence":0.98},"evidence":[{"id":"document","text":"W-2 2025. Wages: 110,000.00."}]}}}`;
@@ -81,20 +81,53 @@ describe("knowledgeBaseDocumentIngestDecision", () => {
   });
 });
 
-describe("knowledgeBaseDocumentIndexDecision", () => {
-  it("indexes the sections without rewriting the stored original", async () => {
-    await knowledgeBaseDocumentIndexDecision("HH006", "taylor_w2_2025.pdf", Buffer.from(RAW));
+describe("knowledgeBaseDocumentIndexPages", () => {
+  const UUID = "2f1c8f0e-5d1a-4c47-9a3e-8f0a2b6c9d11";
+  const LEGACY_ID = knowledgeBaseDocumentCheckId("HH006", "taylor_w2_2025.pdf");
+  const indexed = {
+    documentId: UUID,
+    clientId: "HH006",
+    fileName: "taylor_w2_2025.pdf",
+    docType: "w2",
+    taxYear: 2025,
+    tags: ["income"],
+    familyMembers: ["member-1"],
+    memberNames: ["Taylor Reed"],
+    pageCount: 2,
+    pages: [
+      { page: 1, fields: [{ fieldId: "f1", label: "Wages", value: "110,000.00", confidence: 99, verified: true, corrected: false }], lines: ["W-2 Wage and Tax Statement"] },
+      { page: 2, fields: [], lines: [] },
+    ],
+  };
 
-    const buckets = sent("PutObjectCommand").map((input) => input.Bucket);
-    expect(buckets).toEqual(["kb-bucket", "kb-bucket"]);
+  it("writes one page file per page with text under the document's own id, skipping empty pages", async () => {
+    const result = await knowledgeBaseDocumentIndexPages(indexed);
+
+    const puts = sent("PutObjectCommand").filter((input) => input.Bucket === "kb-bucket");
+    expect(puts.map((input) => input.Key)).toEqual([`documents/${UUID}/page-1.json`, `documents/${UUID}/page-1.json.metadata.json`]);
+    expect(puts[0]!.Body).toContain("- Wages: 110,000.00 [verified]");
+    expect(JSON.parse(puts[1]!.Body).metadataAttributes).toMatchObject({ sourceType: "document", documentId: UUID, sectionId: "page-1", page: 1 });
+    expect(result.pageKeys).toEqual([`documents/${UUID}/page-1.json`]);
   });
 
-  it("reads the decision as tagging stores it, with what it decided beside the raw answers", async () => {
-    const stored = JSON.stringify({ decided: { docType: "w2", tags: ["income"], members: ["m1"] }, answers: JSON.parse(RAW).answers });
+  it("removes stale pages and the entries indexed under the old client and file name id", async () => {
+    s3Send.mockImplementation(async (command) => {
+      if (command.constructor.name !== "ListObjectsV2Command") return {};
+      const prefix = command.input.Prefix as string;
+      if (prefix === `documents/${UUID}/`) return { Contents: [{ Key: `documents/${UUID}/page-1.json` }, { Key: `documents/${UUID}/page-3.json` }] };
+      if (prefix === `documents/${LEGACY_ID}/`) return { Contents: [{ Key: `documents/${LEGACY_ID}/document.json` }] };
+      return { Contents: [] };
+    });
 
-    const result = await knowledgeBaseDocumentIndexDecision("HH006", "taylor_w2_2025.pdf", Buffer.from(stored));
+    const result = await knowledgeBaseDocumentIndexPages(indexed);
 
-    expect(result.document).toMatchObject({ docType: "w2", tags: ["income"], familyMembers: ["m1"], taxYear: 2025 });
+    expect(result.removedKeys).toEqual([`documents/${UUID}/page-3.json`, `documents/${LEGACY_ID}/document.json`]);
+    expect(sent("DeleteObjectsCommand")[0]).toMatchObject({ Bucket: "kb-bucket" });
+  });
+
+  it("refuses a document with no text on any page", async () => {
+    await expect(knowledgeBaseDocumentIndexPages({ ...indexed, pages: [{ page: 1, fields: [], lines: [] }] })).rejects.toMatchObject({ message: "The document has no extracted text to index" });
+    expect(sent("PutObjectCommand")).toEqual([]);
   });
 });
 

@@ -8,11 +8,15 @@ import {
   BEDROCK_KNOWLEDGE_BASE_ID,
 } from "../../loaders/bedrockAgentLoader.js";
 import { ServerError } from "../../modules/ServerError.js";
-import type { KnowledgeBaseDocument, KnowledgeBaseSection } from "../../types/native/knowledgeBase/index.js";
+import type { KnowledgeBaseDocument, KnowledgeBaseIndexedDocument, KnowledgeBaseSection } from "../../types/native/knowledgeBase/index.js";
 import {
   knowledgeBaseDocumentCheckDecision,
   knowledgeBaseDocumentCheckId,
+  knowledgeBaseDocumentCheckIndexable,
   knowledgeBaseDocumentFromDecision,
+  knowledgeBaseDocumentPageBody,
+  knowledgeBaseDocumentPageMetadata,
+  knowledgeBaseDocumentPageSectionId,
 } from "./knowledgeBaseDocumentChecks.js";
 
 const KNOWLEDGE_BASE_PREFIX = "documents";
@@ -26,6 +30,12 @@ if (S3_DOCUMENTS_BUCKET === BEDROCK_KNOWLEDGE_BASE_BUCKET) {
 export type KnowledgeBaseDocumentIndexResult = {
   document: KnowledgeBaseDocument;
   sectionKeys: string[];
+  removedKeys: string[];
+};
+
+export type KnowledgeBaseDocumentPagesResult = {
+  document: KnowledgeBaseIndexedDocument;
+  pageKeys: string[];
   removedKeys: string[];
 };
 
@@ -134,10 +144,25 @@ export async function knowledgeBaseDocumentIngestDecision(clientId: string, file
   return { ...result, originalKey };
 }
 
-// Tagging already stored the decision as the original, so only its sections are written.
-export async function knowledgeBaseDocumentIndexDecision(clientId: string, fileName: string, rawBytes: Uint8Array): Promise<KnowledgeBaseDocumentIndexResult> {
-  const document = knowledgeBaseDocumentFromDecision(clientId, fileName, knowledgeBaseDocumentCheckDecision(rawBytes));
-  return knowledgeBaseDocumentWriteSections(document, []);
+// Pages replace whatever this document had indexed, including entries from before ids were the document's own.
+export async function knowledgeBaseDocumentIndexPages(source: KnowledgeBaseIndexedDocument): Promise<KnowledgeBaseDocumentPagesResult> {
+  const document = knowledgeBaseDocumentCheckIndexable(source);
+  const pageKeys = document.pages.map((page) => knowledgeBaseDocumentSectionKey(document.documentId, knowledgeBaseDocumentPageSectionId(page.page)));
+
+  const [existingKeys, legacyKeys] = await Promise.all([
+    knowledgeBaseDocumentListKeys(document.documentId),
+    knowledgeBaseDocumentListKeys(knowledgeBaseDocumentCheckId(document.clientId, document.fileName)),
+    Promise.all(document.pages.flatMap((page, index) => [
+      knowledgeBaseDocumentPut(BEDROCK_KNOWLEDGE_BASE_BUCKET, pageKeys[index]!, knowledgeBaseDocumentPageBody(document, page)),
+      knowledgeBaseDocumentPut(BEDROCK_KNOWLEDGE_BASE_BUCKET, `${pageKeys[index]!}.metadata.json`, knowledgeBaseDocumentPageMetadata(document, page)),
+    ])),
+  ]);
+
+  const writtenKeys = new Set(pageKeys.flatMap((key) => [key, `${key}.metadata.json`]));
+  const removedKeys = [...existingKeys, ...legacyKeys].filter((key) => !writtenKeys.has(key));
+  await knowledgeBaseDocumentDeleteKeys(BEDROCK_KNOWLEDGE_BASE_BUCKET, removedKeys);
+
+  return { document, pageKeys, removedKeys };
 }
 
 export async function knowledgeBaseDocumentRemove(clientId: string, fileName: string): Promise<string[]> {

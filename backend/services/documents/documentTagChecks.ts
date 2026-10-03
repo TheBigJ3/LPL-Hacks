@@ -50,7 +50,7 @@ export function documentTagBuildPeople(
   });
 }
 
-function documentTagFormatValue(value: string | number | boolean | null): string | null {
+export function documentTagFormatValue(value: string | number | boolean | null): string | null {
   if (value === null || value === "") return null;
   if (typeof value === "boolean") return value ? "checked" : "not checked";
   return String(value);
@@ -72,7 +72,7 @@ function documentTagOverlap(a: ExtractedBox, b: ExtractedBox): number {
   return (width * height) / Math.min(a.width * a.height, b.width * b.height);
 }
 
-function documentTagCorrections(extraction: ExtractedAnalysis, reviewed: Record<string, DocumentReviewField>): DocumentTagCorrection[] {
+export function documentTagCorrections(extraction: ExtractedAnalysis, reviewed: Record<string, DocumentReviewField>): DocumentTagCorrection[] {
   const items = [
     ...extraction.fields.map((field) => ({ id: field.id, page: field.page, box: field.valueBox, rawValue: field.rawValue })),
     ...extraction.tables.flatMap((table) => table.cells.map((cell) => ({ id: cell.id, page: table.page, box: cell.box, rawValue: cell.rawValue }))),
@@ -85,7 +85,7 @@ function documentTagCorrections(extraction: ExtractedAnalysis, reviewed: Record<
 }
 
 // A correction replaces the value where Textract read it on the page too, so the page text can't contradict it.
-function documentTagCorrectLine(line: ExtractedLine, corrections: DocumentTagCorrection[]): string {
+export function documentTagCorrectLine(line: ExtractedLine, corrections: DocumentTagCorrection[]): string {
   return corrections.reduce((text, correction) => {
     if (correction.page !== line.page) return text;
     const located = correction.box && line.box

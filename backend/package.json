@@ -17,6 +17,7 @@
     "kb:seed": "dotenv -e .env.development -- tsx scripts/knowledgeBaseSeed.ts",
     "kb:unseed": "dotenv -e .env.development -- tsx scripts/knowledgeBaseSeed.ts --remove",
     "kb:ingest": "dotenv -e .env.development -- tsx scripts/knowledgeBaseIngest.ts",
+    "kb:reindex": "dotenv -e .env.development -- tsx scripts/knowledgeBaseReindex.ts",
     "db:seed": "dotenv -e .env.development -- tsx scripts/seedDemo.ts"
   },
   "dependencies": {
