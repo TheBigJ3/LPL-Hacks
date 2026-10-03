@@ -408,18 +408,5 @@ class AskResponse(_Model):
     suggestions: list[str]
 
 
-class RagChunk(BaseModel):
-    """id "<HH>:<chunk_type>:<key>"; text is plain English; metadata follows tags.json rag_chunk_metadata."""
-
-    id: str
-    text: str
-    metadata: dict[str, Any]
-
-
-class RagChunks(_Model):
-    household_id: str
-    chunks: list[RagChunk]
-
-
 DataQuality.model_rebuild()
 

@@ -53,3 +53,5 @@ Appended by `scripts/checkpoint.py`. One row per checkpoint run; never edited by
 | 2026-10-02T21:25:45-07:00 | FINAL full suite after R fixes (no model) | `pytest -q tests -m not model` | 403 | 0 | 0 | 0 | 0 | DECISION_BACKEND=none |
 | 2026-10-02T21:39:10-07:00 | Raw decision endpoint (model on) | `pytest -q tests` | 558 | 0 | 2 | 0 | 0 | GET /api/households/{id}/documents/{name}/decision returns the raw OpenDecision answers (memoized decision response, no extra model call); 503 when model off; rag-chunks unchanged; sample raw_decision_HH006_taylor_w2.json |
 | 2026-10-02T21:39:19-07:00 | Raw decision endpoint (no model) | `pytest -q tests -m not model` | 404 | 0 | 0 | 0 | 0 | DECISION_BACKEND=none |
+| 2026-10-02T22:02:44-07:00 | Remove rag-chunks (model on) | `pytest -q tests` | 529 | 0 | 2 | 0 | 0 | rag-chunks endpoint, rag.py, export_rag.py, rag_chunks.jsonl and test_rag_export.py deleted; the raw document decision endpoint is the RAG team's only output |
+| 2026-10-02T22:02:54-07:00 | Remove rag-chunks (no model) | `pytest -q tests -m not model` | 388 | 0 | 0 | 0 | 0 | DECISION_BACKEND=none |

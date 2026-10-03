@@ -28,7 +28,6 @@ def main() -> int:
     api_module.STORE.clear()
     api_module.seed_fixtures()
     with TestClient(api_module.app) as client:
-        rag = client.get("/api/households/HH006/rag-chunks").json()["chunks"]
         example = {
             "_about": ("SYNTHETIC TEST DATA. Real responses from the rapid analysis service for household HH006 "
                        "(schema 1.1, ruleset 2025.2, model on). Full samples for all households are in docs/samples/."),
@@ -37,11 +36,8 @@ def main() -> int:
             "GET /api/households/HH006/findings/F1/evidence": client.get("/api/households/HH006/findings/F1/evidence").json(),
             "POST /api/households/HH006/ask {question: 'can taylor save more'}":
                 client.post("/api/households/HH006/ask", json={"question": "can taylor save more"}).json(),
-            "GET /api/households/HH006/rag-chunks (4 of %d chunks)" % len(rag): {
-                "household_id": "HH006",
-                "chunks": [c for c in rag if c["id"] in ("HH006:household_summary:HH006", "HH006:member:HH006-P1",
-                                                         "HH006:checklist:retirement_can_improve", "HH006:finding:F1")],
-            },
+            "GET /api/households/HH006/documents/taylor_w2_2025.pdf/decision":
+                client.get("/api/households/HH006/documents/taylor_w2_2025.pdf/decision").json(),
         }
     api_module.STORE.clear()
     OUT.write_text(json.dumps(example, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

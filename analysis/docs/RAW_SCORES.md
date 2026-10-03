@@ -96,7 +96,4 @@ Differences from a hand-written mock to watch for:
 
 ## Related
 
-- `GET /api/households/{id}/rag-chunks`: plain-English chunks with filter metadata, ready to embed
-  (sample: [`samples/rag_chunks.jsonl`](samples/rag_chunks.jsonl)). Its `metadata.model_scores` holds the raw
-  value-check scores (supports / contradicts per number), also audit-only.
 - Full contract: [`CONTRACT.md`](CONTRACT.md).

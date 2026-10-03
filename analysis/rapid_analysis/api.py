@@ -21,7 +21,6 @@ from fastapi.responses import JSONResponse
 from rapid_analysis import RULESET_VERSION, SCHEMA_VERSION, contract
 from rapid_analysis.ask import ask
 from rapid_analysis.documents import MemberRef, document_decision
-from rapid_analysis.rag import rag_chunks
 from rapid_analysis.engine import engine_info, engine_load
 from rapid_analysis.evidence import CHECK_VALUES
 from rapid_analysis.fixtures import FIXTURE_IDS, fixture_household_raw, fixture_household_textract
@@ -276,19 +275,6 @@ async def household_ask(household_id: str, request: Request):
     if entry["overview"]["status"] == "needs_review":
         return _needs_review(entry["overview"]["errors"])
     return ask(question.strip(), entry["overview"])
-
-
-@app.get("/api/households/{household_id}/rag-chunks", response_model=contract.RagChunks, tags=["households"],
-         responses={404: {"model": contract.ErrorResponse}, 422: {"model": contract.ErrorResponse}})
-def household_rag_chunks(household_id: str):
-    """Plain-English chunks + filter metadata for a RAG. Model scores appear only in metadata.model_scores."""
-    entry = _build(household_id)
-    if entry is None:
-        return _not_found("household", household_id)
-    if entry["overview"]["status"] == "needs_review":
-        return _needs_review(entry["overview"]["errors"])
-    chunks = rag_chunks(entry["overview"], entry["evidence"], entry.get("value_checks"), entry.get("textract_confidence"))
-    return {"household_id": household_id, "chunks": chunks}
 
 
 @app.get("/api/households/{household_id}/documents/{name}/decision", response_model=contract.RawDocumentDecision,

@@ -23,7 +23,7 @@ per-value `check`. No model internals (scores, probabilities, backend, model nam
 | POST | `/api/households` | `IngestResult` | a normalized household from the pipeline (§4 input) |
 | POST | `/api/households/{id}/documents` | `DocumentIngestResult` | `{name, textract}` (AnalyzeDocument JSON) or `{name, text, form_type?}` |
 | POST | `/api/households/{id}/ask` | `AskResponse` | `{question}`, routed by keyword rules and answered from the overview |
-| GET | `/api/households/{id}/rag-chunks` | `RagChunks` | plain-English chunks + filter metadata for a RAG |
+| GET | `/api/households/{id}/documents/{name}/decision` | `RawDocumentDecision` | raw OpenDecision answers for one document (the RAG team's endpoint) |
 
 Errors: unknown ids return **404** `{status: "not_found", errors}`. Bad input returns **422**
 `{status: "needs_review", errors}`; it never returns 500. Every error item is
@@ -138,26 +138,6 @@ suggestions[]
   `short: "No data"`. Nothing is computed or invented.
 - Out of scope gives `answer.type: "none"`, empty text and 4 suggestions built from the household.
 
-## RAG chunks (`GET /api/households/{id}/rag-chunks`, `scripts/export_rag.py`)
-
-`{household_id, chunks[] {id, text, metadata}}`; the sample for all 10 households is `samples/rag_chunks.jsonl`.
-
-- One chunk per household summary, member, checklist item, finding, document and changes-since-last-year.
-  Ids are `"<HH>:<chunk_type>:<key>"`, e.g. `HH006:checklist:retirement_can_improve`.
-- `text` is plain English under 700 characters. Every number states its check ("verified against <doc>",
-  "unconfirmed: not found in <doc>", "documents disagree: $120,000 (…) vs $165,000 (…)", "not checked").
-  Checklist and finding chunks state the exact metrics, then `Rule: …`, then `Result: …`, and end with
-  "Flag for review, not advice." Placeholders say "has not been assessed".
-- Every checklist chunk states its reason before `Rule:`, including `no` ("No self-employment income or 1099-R on
-  file."), `needs_data` ("Jordan's wages conflict ($120,000 vs $165,000), so this can't be assessed.") and
-  `not_assessed` ("No wage earners in this household."). A verified value always names its document.
-- Document chunks say "needs review" only for the four review reasons; `notes` are in `metadata.notes` only.
-- `metadata.member_roles` is always `{person_id: [roles]}`; `metadata.metrics.events` (major_changes, changes) is
-  always a list of change types, with `event_count` when a prior year is on file.
-- `metadata` has the tag file's `rag_chunk_metadata` fields plus `chunk_type`, `checklist_id`, `answer`, `dollar_impact`,
-  `metrics`, `rule`, `checks` and `ruleset_version`. **`model_scores`** (raw OpenDecision relation and scores) appears
-  only here, for audit. It is uncalibrated and never appears in `text`; the LLM must not see or repeat it.
-
 ## Raw document decision (`GET /api/households/{id}/documents/{name}/decision`)
 
 `{answers: {docType, tag_tax, tag_earnings, member_<first>_<last>...}}`: the raw OpenDecision response for one
@@ -172,7 +152,7 @@ stored document, exactly as the model returned it; sample `samples/raw_decision_
   decided values (type, owner, tags, status) are in `tags.documents[]`. Do not show these numbers to advisors as
   confidence, and do not let an LLM quote them.
 - 404 for an unknown household or document; 503 `validator_unavailable` when the model is off or failing.
-  `rag-chunks` is unchanged and remains available.
+  This is the service's only RAG-facing output; the old `rag-chunks` endpoint and export were removed.
 
 ## Schema 1.0 → 1.1 id mapping
 

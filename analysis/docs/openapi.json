@@ -2189,53 +2189,6 @@
         "title": "PriorYearNumber",
         "type": "object"
       },
-      "RagChunk": {
-        "description": "id \"<HH>:<chunk_type>:<key>\"; text is plain English; metadata follows tags.json rag_chunk_metadata.",
-        "properties": {
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "metadata": {
-            "additionalProperties": true,
-            "title": "Metadata",
-            "type": "object"
-          },
-          "text": {
-            "title": "Text",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "text",
-          "metadata"
-        ],
-        "title": "RagChunk",
-        "type": "object"
-      },
-      "RagChunks": {
-        "additionalProperties": false,
-        "properties": {
-          "chunks": {
-            "items": {
-              "$ref": "#/components/schemas/RagChunk"
-            },
-            "title": "Chunks",
-            "type": "array"
-          },
-          "household_id": {
-            "title": "Household Id",
-            "type": "string"
-          }
-        },
-        "required": [
-          "household_id",
-          "chunks"
-        ],
-        "title": "RagChunks",
-        "type": "object"
-      },
       "RawDocumentDecision": {
         "description": "The raw OpenDecision document decision (docType, tag_*, member_* answers with probabilities, scores and\nevidence). Uncalibrated, for audit and downstream experiments; never shown to advisors or fed to an LLM as fact.",
         "properties": {
@@ -3057,59 +3010,6 @@
           }
         },
         "summary": "Household Overview",
-        "tags": [
-          "households"
-        ]
-      }
-    },
-    "/api/households/{household_id}/rag-chunks": {
-      "get": {
-        "description": "Plain-English chunks + filter metadata for a RAG. Model scores appear only in metadata.model_scores.",
-        "operationId": "household_rag_chunks_api_households__household_id__rag_chunks_get",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "household_id",
-            "required": true,
-            "schema": {
-              "title": "Household Id",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RagChunks"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Not Found"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            },
-            "description": "Unprocessable Content"
-          }
-        },
-        "summary": "Household Rag Chunks",
         "tags": [
           "households"
         ]
