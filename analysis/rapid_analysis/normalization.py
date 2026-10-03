@@ -478,6 +478,10 @@ def normalize_household(raw: Any) -> NormalizationResult:
     household_id = household_id.strip()
 
     household = _normalize_body(raw, household_id, "", errors, require_year=True)
+    has_values = any(fv is not None for fv in household.fields.values()) or any(
+        fv is not None for m in household.members for fv in m.fields.values())
+    if not has_values and not errors:
+        _err(errors, "empty_profile", "", "household has no financial values to analyze")
     prior = raw.get("prior_year")
     if prior is not None:
         if isinstance(prior, dict):

@@ -160,6 +160,12 @@ def test_all_errors_are_collected():
     assert result.household.value("adjusted_gross_income") is None
 
 
+def test_all_null_profile_is_an_error():
+    raw = {"household_id": "HHN", "tax_year": 2025, "filing_status": None, "adjusted_gross_income": None,
+           "dependents": None, "cash_balance": None, "members": [{"person_id": "P1", "name": "Nul Test", "wages": None}]}
+    assert [e.code for e in normalize_household(raw).errors] == ["empty_profile"]
+
+
 def test_non_object_and_missing_id():
     assert normalize_household([1, 2]).errors[0].code == "invalid_household"
     result = normalize_household({"tax_year": 2025})

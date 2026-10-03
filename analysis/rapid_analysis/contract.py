@@ -188,3 +188,82 @@ class FindingEvidence(_Model):
     headline: str
     check: Check
     values: list[EvidenceValue]
+
+
+# ---------------------------------------------------------------- API envelopes
+
+
+class Health(_Model):
+    status: Literal["ok"]
+    model_loaded: bool
+    device: str
+    ruleset_version: str
+    schema_version: str
+
+
+class ChecklistQuestion(_Model):
+    id: str
+    question: str
+
+
+class Enums(_Model):
+    check: list[Check]
+    check_descriptions: dict[str, str]
+    answer: list[Answer]
+    priority: list[Priority]
+    status: list[Status]
+    category: list[Category]
+    change_type: list[str]
+    severity: list[Severity]
+    filing_status: list[str]
+    checklist: list[ChecklistQuestion]
+    checklist_label: str
+
+
+class HouseholdRow(_Model):
+    household_id: str
+    tax_year: int | None
+    members: list[str]
+    status: Status
+    priority: Priority | None
+    findings: int
+    needs_documents: bool
+    top_finding: str | None
+    dollar_impact: float | int
+
+
+class HouseholdList(_Model):
+    total: int
+    households: list[HouseholdRow]
+
+
+class Stats(_Model):
+    households: int
+    by_status: dict[str, int]
+    by_priority: dict[str, int]
+    findings_by_category: dict[str, int]
+    checklist_yes: dict[str, int]
+    needs_documents: int
+    conflicts: int
+    values_checked: int
+    values_by_check: dict[str, int]
+    dollar_impact: float | int
+
+
+class IngestResult(_Model):
+    household_id: str | None
+    status: Literal["accepted", "needs_review"]
+    errors: list[ErrorItem]
+
+
+class DocumentIngestResult(_Model):
+    household_id: str
+    name: str
+    form_type: str | None
+    fields: list[str]
+    status: Literal["accepted"]
+
+
+class ErrorResponse(_Model):
+    status: Literal["needs_review", "not_found"]
+    errors: list[ErrorItem]
