@@ -6,3 +6,10 @@ export const DOCUMENT_UPLOAD_ERRORS = {
 
 export type DocumentUploadErrorKey = keyof typeof DOCUMENT_UPLOAD_ERRORS
 export type DocumentUploadError = (typeof DOCUMENT_UPLOAD_ERRORS)[DocumentUploadErrorKey]
+
+export const DOCUMENT_LIBRARY_ERRORS = {
+  LOAD_FAILED: { STATUS: "LOAD_FAILED", MESSAGE: "Couldn't load this client's documents" },
+} as const
+
+export type DocumentLibraryErrorKey = keyof typeof DOCUMENT_LIBRARY_ERRORS
+export type DocumentLibraryError = (typeof DOCUMENT_LIBRARY_ERRORS)[DocumentLibraryErrorKey]

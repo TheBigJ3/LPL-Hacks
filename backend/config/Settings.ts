@@ -11,4 +11,7 @@ export default  {
     CONFIDENCE_HIGH: 95,
     CONFIDENCE_MEDIUM: 85,
   },
+  ANSWER: {
+    MAX_SOURCES: 8,
+  },
 }

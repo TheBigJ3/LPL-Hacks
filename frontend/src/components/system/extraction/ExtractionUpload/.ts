@@ -7,7 +7,7 @@ import documentsExtractionSettled from '@lpl-hacks/shared/src/types/native/socke
 import documentsWatch from '@lpl-hacks/shared/src/types/native/sockets/documents/watch'
 import type { Document } from '@lpl-hacks/shared/src/types/native/documents/document'
 import type { DocumentReview, DocumentReviewField } from '@lpl-hacks/shared/src/types/native/documents/documentReview'
-import type { DocumentTagging } from '@lpl-hacks/shared/src/types/native/documents/documentTagging'
+import type { DocumentIndexStatus, DocumentTagging } from '@lpl-hacks/shared/src/types/native/documents/documentTagging'
 import documentsTagSettled from '@lpl-hacks/shared/src/types/native/sockets/documents/tagSettled'
 import listClientsApi from '@api/clients/listClientsApi'
 import confirmDocumentApi from '@api/documents/confirmDocumentApi'
@@ -33,6 +33,12 @@ const EXTRACTION_HIGHLIGHT_PADDING = 0.003
 const EXTRACTION_WAIT_MAX_MS = 20 * 60 * 1000
 const EXTRACTION_CHECK_CONNECTED_MS = 10_000
 const EXTRACTION_CHECK_DISCONNECTED_MS = 3_000
+const EXTRACTION_INDEX_NOTES: Record<DocumentIndexStatus, string> = {
+  pending: 'Adding to client search',
+  indexed: 'Added to client search',
+  failed: EXTRACTION_ERRORS.INDEX_FAILED.MESSAGE,
+}
+const EXTRACTION_INDEX_NOTE_UNLINKED = "Not linked to a client, so it won't be added to search"
 const EXTRACTION_TAG_WAIT_MAX_MS = 10 * 60 * 1000
 
 const EXTRACTION_DOC_TYPE_LABELS: Record<string, string> = {
@@ -532,7 +538,7 @@ function extractionLogTagging(fileName: string, document: Document, tagging: Doc
     docType: tagging.docType?.choice ?? null,
     tags: tagging.tags.map((tag) => `${tag.name} (${tag.source})`),
     members: tagging.members.map((member) => ({ id: member.memberId, name: member.name, basis: member.basis })),
-    readyToIndex: document.indexStatus === 'pending',
+    indexStatus: document.indexStatus,
     taggedAt: tagging.taggedAt,
     evidence: Object.fromEntries([
       ...(tagging.docType ? [['docType', tagging.docType.evidence]] : []),
@@ -583,7 +589,7 @@ function extractionBuildTagView(state: ExtractionTagState): ExtractionTagView | 
     docType,
     tags: tagging.tags.map((tag) => extractionFormatTagName(tag.name)),
     members: tagging.members.map((member) => member.name),
-    indexNote: document.indexStatus === 'pending' ? 'Ready to add to client search' : "Not linked to a client, so it won't be added to search",
+    indexNote: document.indexStatus ? EXTRACTION_INDEX_NOTES[document.indexStatus] : EXTRACTION_INDEX_NOTE_UNLINKED,
     canRetry: false,
   }
 }

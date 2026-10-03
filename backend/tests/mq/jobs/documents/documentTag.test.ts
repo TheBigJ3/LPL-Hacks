@@ -3,11 +3,12 @@ import { AppError } from "../../../../modules/AppError.js";
 import { DOCUMENT_ERRORS } from "../../../../types/native/documents/errors.js";
 import { OPENDECISION_ERRORS } from "../../../../types/native/opendecision/errors.js";
 
-const { bullQueue, tagRun, markFailed } = vi.hoisted(() => ({ bullQueue: { add: vi.fn() }, tagRun: vi.fn(), markFailed: vi.fn() }));
+const { bullQueue, tagRun, markFailed, indexProducer } = vi.hoisted(() => ({ bullQueue: { add: vi.fn() }, tagRun: vi.fn(), markFailed: vi.fn(), indexProducer: vi.fn() }));
 
 vi.mock("../../../../mq/queues/tagging.js", () => ({
   default: { name: "tagging", concurrency: 2, jobOptions: { attempts: 4 }, queue: () => bullQueue },
 }));
+vi.mock("../../../../mq/jobs/documents/documentIndex.js", () => ({ default: { producer: indexProducer } }));
 vi.mock("../../../../services/documents/documentTagMethods.js", () => ({ documentTagRun: tagRun, documentTagMarkFailed: markFailed }));
 
 const { default: documentTag } = await import("../../../../mq/jobs/documents/documentTag.js");
@@ -31,11 +32,26 @@ describe("documentTag", () => {
     });
   });
 
+  it.each(["tagged", "skipped"])("queues indexing for this confirmation when the run is %s", async (outcome) => {
+    tagRun.mockResolvedValue(outcome);
+
+    await expect(documentTag.handler(job())).resolves.toBe(outcome);
+    expect(indexProducer).toHaveBeenCalledWith({ documentId: DOCUMENT_ID, reviewedAt: REVIEWED_AT });
+  });
+
+  it("queues no indexing when tagging failed", async () => {
+    tagRun.mockResolvedValue("failed");
+
+    await expect(documentTag.handler(job())).resolves.toBe("failed");
+    expect(indexProducer).not.toHaveBeenCalled();
+  });
+
   it("leaves the tagging pending while retries remain", async () => {
     tagRun.mockRejectedValue(new AppError(OPENDECISION_ERRORS.ANALYSIS_BUSY));
 
     await expect(documentTag.handler(job(1))).rejects.toBeInstanceOf(AppError);
     expect(markFailed).not.toHaveBeenCalled();
+    expect(indexProducer).not.toHaveBeenCalled();
   });
 
   it("fails the tagging with the error's message on the last attempt", async () => {

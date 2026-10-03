@@ -33,6 +33,8 @@ const NoteLibrary = () => {
           <NoteViewToggle view={library.view} onChange={library.setView} />
         </header>
 
+        {library.error && <p className="note-library__error" role="alert">{library.error}</p>}
+
         <AnimatePresence mode="wait">
           <motion.div
             key={library.view}
@@ -41,7 +43,7 @@ const NoteLibrary = () => {
             animate="center"
             exit="exit"
           >
-            {!library.notes.length && <EmptyState title={library.empty.title} subtitle={library.empty.subtitle} />}
+            {!library.loading && !library.notes.length && <EmptyState title={library.empty.title} subtitle={library.empty.subtitle} />}
             {!!library.notes.length && library.view === 'grid' &&
               <ul className="note-library__notes grid">
                 {library.notes.map((note) => <NoteCard key={note.id} note={note} variants={library.itemVariants} onOpen={library.viewNote} onEdit={library.editNote} onDelete={library.deleteNote} />)}

@@ -1,6 +1,6 @@
 export type DocumentTagStatus = "pending" | "tagged" | "failed";
 
-export type DocumentIndexStatus = "pending";
+export type DocumentIndexStatus = "pending" | "indexed" | "failed";
 
 export type DocumentTagEvidence = {
   id: string;
