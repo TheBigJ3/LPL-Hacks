@@ -4,6 +4,7 @@ import { queryClient } from '@features/queryClient'
 import { socketLayer } from '@stores/socketStore'
 import { themeLayer } from '@stores/themeStore'
 import AppLayout from '@components/template/AppLayout/AppLayout'
+import SplashScreen from '@components/template/SplashScreen/SplashScreen'
 import DocumentLibrary from '@components/system/documents/DocumentLibrary/DocumentLibrary'
 import ExtractionUpload from '@components/system/extraction/ExtractionUpload/ExtractionUpload'
 
@@ -26,5 +27,6 @@ const router = createBrowserRouter([
 export default function App() {
   return <QueryClientProvider client={queryClient}>
     <RouterProvider router={router} />
+    <SplashScreen />
   </QueryClientProvider>
 }

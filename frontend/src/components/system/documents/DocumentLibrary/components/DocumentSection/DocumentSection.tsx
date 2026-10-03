@@ -1,8 +1,7 @@
 import './.css'
 import { Link } from 'react-router'
-import { motion } from 'motion/react'
 import type { DocumentSectionMode, DocumentSectionView } from '../../.ts'
-import { DOCUMENT_CARD_VARIANTS, DOCUMENT_SECTION_VARIANTS, useDocumentSection } from './.ts'
+import { useDocumentSection } from './.ts'
 import DocumentCard from './components/DocumentCard/DocumentCard'
 
 type DocumentSectionProps = {
@@ -15,7 +14,7 @@ type DocumentSectionProps = {
 const DocumentSection = ({ section, mode, columns, wide }: DocumentSectionProps) => {
   const view = useDocumentSection(section, mode, columns)
 
-  return <motion.section className="document-section flex flex-col" aria-label={section.title} variants={DOCUMENT_SECTION_VARIANTS}>
+  return <section className="document-section flex flex-col" aria-label={section.title}>
     <header className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
@@ -37,9 +36,9 @@ const DocumentSection = ({ section, mode, columns, wide }: DocumentSectionProps)
 
     <ul className="document-section__grid grid" data-columns={columns} data-wide={wide}>
       {view.documents.map((document) =>
-        <motion.li key={document.id} className="min-w-0" variants={DOCUMENT_CARD_VARIANTS}>
+        <li key={document.id} className="min-w-0">
           <DocumentCard document={document} />
-        </motion.li>
+        </li>
       )}
     </ul>
 
@@ -51,7 +50,7 @@ const DocumentSection = ({ section, mode, columns, wide }: DocumentSectionProps)
           <span className="material-symbols-outlined document-section__load-more-icon" aria-hidden="true">expand_more</span>
         </button>
       </footer>}
-  </motion.section>
+  </section>
 }
 
 export default DocumentSection
