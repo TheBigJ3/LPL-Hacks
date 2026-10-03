@@ -44,6 +44,7 @@ const record = (overrides: Record<string, unknown> = {}) => ({
   extraction: EXTRACTION,
   reviewedFields: {},
   tagging: TAGGING,
+  tagStatus: "tagged",
   indexStatus: "pending",
   reviewedAt: new Date(REVIEWED_AT),
   ...overrides,
@@ -66,7 +67,7 @@ describe("documentIndexRun", () => {
     ["already failed", [record({ indexStatus: "failed" })]],
     ["not linked to a client", [record({ clientId: null })]],
     ["not extracted", [record({ extraction: null })]],
-    ["not tagged", [record({ tagging: null })]],
+    ["not tagged yet", [record({ tagging: null, tagStatus: "pending" })]],
   ])("skips a document that is %s, without reading or indexing anything", async (_case, selected) => {
     results.push(selected);
 
@@ -96,6 +97,20 @@ describe("documentIndexRun", () => {
       taxYear: 2024,
       familyMembers: ["member-1"],
       pages: [{ page: 1, fields: [], lines: ["W-2 Wage and Tax Statement 2024"] }],
+    }));
+    expect(setArgs()).toEqual([{ indexStatus: "indexed" }]);
+  });
+
+  it("indexes a document whose tagging failed without any type, tags or members", async () => {
+    results.push([record({ tagging: null, tagStatus: "failed" })], [{ id: DOCUMENT_ID }]);
+
+    expect(await documentIndexRun(DOCUMENT_ID, REVIEWED_AT)).toBe("indexed");
+    expect(indexPages).toHaveBeenCalledWith(expect.objectContaining({
+      documentId: DOCUMENT_ID,
+      docType: null,
+      taxYear: 2024,
+      tags: [],
+      familyMembers: [],
     }));
     expect(setArgs()).toEqual([{ indexStatus: "indexed" }]);
   });

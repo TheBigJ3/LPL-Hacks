@@ -8,6 +8,7 @@ import SplashScreen from '@components/template/SplashScreen/SplashScreen'
 import DocumentLibrary from '@components/system/documents/DocumentLibrary/DocumentLibrary'
 import NoteLibrary from '@components/system/notes/NoteLibrary/NoteLibrary'
 import ExtractionUpload from '@components/system/extraction/ExtractionUpload/ExtractionUpload'
+import ClientDirectory from '@components/system/clients/ClientDirectory/ClientDirectory'
 import InsightChat from '@components/system/insight/InsightChat/InsightChat'
 import UploadRequestPortal from '@components/system/uploadRequests/UploadRequestPortal/UploadRequestPortal'
 
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
   {
     element: <AppLayout />,
     children: [
+      { index: true, element: <ClientDirectory /> },
       { path: 'clients/:clientId', element: <InsightChat /> },
       { path: 'documents', element: <DocumentLibrary /> },
       { path: 'clients/:clientId/documents', element: <DocumentLibrary /> },

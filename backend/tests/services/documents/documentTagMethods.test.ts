@@ -117,7 +117,7 @@ describe("documentTagRun", () => {
     invoke.mockRejectedValue(new AppError(OPENDECISION_ERRORS.REQUEST_TOO_LARGE));
 
     expect(await documentTagRun(DOCUMENT_ID, REVIEWED_AT)).toBe("failed");
-    expect(setArgs()).toEqual([{ tagStatus: "failed", tagFailureMessage: OPENDECISION_ERRORS.REQUEST_TOO_LARGE.MESSAGE }]);
+    expect(setArgs()).toEqual([{ tagStatus: "failed", tagFailureMessage: OPENDECISION_ERRORS.REQUEST_TOO_LARGE.MESSAGE, indexStatus: expect.anything() }]);
   });
 
   it("refuses a decision in an unexpected shape", async () => {

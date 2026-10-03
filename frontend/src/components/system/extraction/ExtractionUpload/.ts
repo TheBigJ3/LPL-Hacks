@@ -39,7 +39,12 @@ const EXTRACTION_INDEX_NOTES: Record<DocumentIndexStatus, string> = {
   indexed: 'Added to client search',
   failed: EXTRACTION_ERRORS.INDEX_FAILED.MESSAGE,
 }
-const EXTRACTION_INDEX_NOTE_UNLINKED = "Not linked to a client, so it won't be added to search"
+const EXTRACTION_INDEX_NOTES_UNTAGGED: Record<DocumentIndexStatus, string> = {
+  pending: 'Adding to client search without tags',
+  indexed: 'Added to client search without tags',
+  failed: EXTRACTION_ERRORS.INDEX_FAILED.MESSAGE,
+}
+const EXTRACTION_INDEX_NOTE_UNLINKED ="Not linked to a client, so it won't be added to search"
 const EXTRACTION_TAG_WAIT_MAX_MS = 10 * 60 * 1000
 
 const EXTRACTION_DOC_TYPE_LABELS: Record<string, string> = {
@@ -723,7 +728,7 @@ function extractionBuildTagView(state: ExtractionTagState): ExtractionTagView | 
     return { state: 'pending', icon: 'progress_activity', title: 'Tagging', message: 'Finding the document type, topics and family members…', docType: null, tags: [], members: [], indexNote: null, canRetry: false }
   }
   if (document.tagStatus === 'failed') {
-    return { state: 'failed', icon: 'error', title: "Tagging didn't finish", message: document.tagFailureMessage ?? EXTRACTION_ERRORS.TAG_WAIT_TIMED_OUT.MESSAGE, docType: null, tags: [], members: [], indexNote: null, canRetry: true }
+    return { state: 'failed', icon: 'error', title: "Tagging didn't finish", message: document.tagFailureMessage ?? EXTRACTION_ERRORS.TAG_WAIT_TIMED_OUT.MESSAGE, docType: null, tags: [], members: [], indexNote: document.indexStatus ? EXTRACTION_INDEX_NOTES_UNTAGGED[document.indexStatus] : EXTRACTION_INDEX_NOTE_UNLINKED, canRetry: true }
   }
   if (document.tagStatus !== 'tagged' || !tagging) return null
   const docType = tagging.docType ? EXTRACTION_DOC_TYPE_LABELS[tagging.docType.choice] ?? extractionFormatTagName(tagging.docType.choice) : null
@@ -1054,6 +1059,7 @@ export function useExtractionUpload() {
     modes: EXTRACTION_MODE_OPTIONS.map((option) => ({ ...option, selected: option.mode === mode })),
     selectMode,
     client,
+    clientSelected: !!clientSlug || !!openDocumentId,
     reviewDocument,
   }
 }

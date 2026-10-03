@@ -16,7 +16,7 @@ export type DocumentIndexSource = {
   pageCount: number | null;
   extraction: ExtractedAnalysis;
   reviewedFields: Record<string, DocumentReviewField>;
-  tagging: DocumentTagging;
+  tagging: DocumentTagging | null;
 };
 
 export function documentIndexBuildPages(extraction: ExtractedAnalysis, reviewed: Record<string, DocumentReviewField>): KnowledgeBaseDocumentPage[] {
@@ -55,11 +55,11 @@ export function documentIndexBuildDocument(source: DocumentIndexSource): Knowled
     documentId: source.id,
     clientId: source.clientId,
     fileName: source.fileName,
-    docType: tagging.docType?.choice ?? null,
-    taxYear: knowledgeBaseDocumentCheckTaxYearFrom(source.fileName, (tagging.docType?.evidence ?? []).map((evidence) => evidence.text)),
-    tags: tagging.tags.map((tag) => tag.name),
-    familyMembers: tagging.members.map((member) => member.memberId),
-    memberNames: tagging.members.map((member) => member.name),
+    docType: tagging?.docType?.choice ?? null,
+    taxYear: knowledgeBaseDocumentCheckTaxYearFrom(source.fileName, (tagging?.docType?.evidence ?? []).map((evidence) => evidence.text)),
+    tags: (tagging?.tags ?? []).map((tag) => tag.name),
+    familyMembers: (tagging?.members ?? []).map((member) => member.memberId),
+    memberNames: (tagging?.members ?? []).map((member) => member.name),
     pageCount: source.pageCount ?? Math.max(1, ...pages.map((page) => page.page)),
     pages,
   };

@@ -32,18 +32,11 @@ describe("documentTag", () => {
     });
   });
 
-  it.each(["tagged", "skipped"])("queues indexing for this confirmation when the run is %s", async (outcome) => {
+  it.each(["tagged", "skipped", "failed"])("queues indexing for this confirmation when the run is %s", async (outcome) => {
     tagRun.mockResolvedValue(outcome);
 
     await expect(documentTag.handler(job())).resolves.toBe(outcome);
     expect(indexProducer).toHaveBeenCalledWith({ documentId: DOCUMENT_ID, reviewedAt: REVIEWED_AT });
-  });
-
-  it("queues no indexing when tagging failed", async () => {
-    tagRun.mockResolvedValue("failed");
-
-    await expect(documentTag.handler(job())).resolves.toBe("failed");
-    expect(indexProducer).not.toHaveBeenCalled();
   });
 
   it("leaves the tagging pending while retries remain", async () => {
@@ -59,6 +52,14 @@ describe("documentTag", () => {
 
     await expect(documentTag.handler(job(3))).rejects.toBeInstanceOf(AppError);
     expect(markFailed).toHaveBeenCalledWith(DOCUMENT_ID, REVIEWED_AT, OPENDECISION_ERRORS.ANALYSIS_BUSY.MESSAGE);
+  });
+
+  it("still queues indexing after the last attempt fails, only once the failure is saved", async () => {
+    tagRun.mockRejectedValue(new AppError(OPENDECISION_ERRORS.ANALYSIS_BUSY));
+
+    await expect(documentTag.handler(job(3))).rejects.toBeInstanceOf(AppError);
+    expect(indexProducer).toHaveBeenCalledWith({ documentId: DOCUMENT_ID, reviewedAt: REVIEWED_AT });
+    expect(markFailed.mock.invocationCallOrder[0]).toBeLessThan(indexProducer.mock.invocationCallOrder[0]!);
   });
 
   it("hides an unexpected error's detail behind the generic message", async () => {
