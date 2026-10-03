@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping
 
 from rapid_analysis import contract
+from rapid_analysis.documents import DocumentDecision, MemberRef, document_decision
 from rapid_analysis.evidence import Check, CheckRequest, EvidenceChecker, FieldCheck, money_format
 from rapid_analysis.normalization import FieldValue, Household, Member, normalize_household
 from rapid_analysis.rules import (
@@ -169,14 +170,35 @@ def overview_build(raw: Any, documents: Mapping[str, EvidenceDocument] | None = 
     return overview_build_household(household, documents or {})
 
 
+def documents_classify(household: Household, documents: Mapping[str, EvidenceDocument]) -> tuple[dict[str, DocumentDecision], dict[str, set[str]]]:
+    """Strict per-document decisions (§3) and, from them, which documents each value may be checked against."""
+    members = [MemberRef(m.person_id, m.name) for m in household.members if m.name]
+    decisions = {name: document_decision(name, doc.text, members) for name, doc in sorted(documents.items())}
+    member_docs: dict[str, set[str]] = {m.person_id: set() for m in household.members}
+    household_docs: set[str] = set()
+    all_people = {m.person_id for m in household.members}
+    for name, decision in decisions.items():
+        people = {m["person_id"] for m in decision.result["members"]}
+        for person_id in people:
+            member_docs.setdefault(person_id, set()).add(name)
+        # Household values use joint documents, or a document covering every member of the household.
+        if people and (len(people) > 1 or people == all_people):
+            household_docs.add(name)
+    allowed = {f"household.{name}": household_docs for name in household.fields}
+    for m in household.members:
+        allowed.update({f"{m.person_id}.{name}": member_docs.get(m.person_id, set()) for name in m.fields})
+    return decisions, allowed
+
+
 def overview_build_household(household: Household, documents: Mapping[str, EvidenceDocument]) -> OverviewBuild:
-    checker = EvidenceChecker(documents)
+    decisions, allowed = documents_classify(household, documents)
+    checker = EvidenceChecker(documents, allowed)
     field_checks: dict[str, FieldCheck] = checker.check_many(_requests(household))
     checks: dict[str, Check] = {key: fc.check for key, fc in field_checks.items()}
     result = rules_evaluate(household, checks)
 
     errors: list[contract.ErrorItem] = []
-    if checker.validator_unavailable:
+    if checker.validator_unavailable or any(d.model_failed for d in decisions.values()):
         errors.append(contract.ErrorItem(code="validator_unavailable", path="",
                                          message="Value checks are unavailable; every value is not_checked",
                                          severity="warning"))

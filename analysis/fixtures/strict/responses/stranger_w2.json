@@ -1,0 +1,162 @@
+{
+ "_synthetic": "SYNTHETIC TEST DATA - recorded OpenDecision 0.1.2 response",
+ "chunks": 1,
+ "answers": {
+  "docType": {
+   "type": "choice",
+   "choice": "w2",
+   "probabilities": {
+    "w2": 0.9300593733787537,
+    "1099": 0.02820646669715643,
+    "1040": 0.013438854366540909,
+    "1098": 0.0011419387301430106,
+    "bank_statement": 0.004046721383929253,
+    "other": 0.023106697015464306
+   },
+   "confidence": 0.8085182165216005,
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: Michael T. Lee\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "tag_tax": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.9893474578857422,
+     "false": 0.010652542114257812
+    },
+    "confidence": 0.9893474578857422
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.9759464263916016,
+     "contradicts": 0.005641908850520849
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document is tax-related.\" is yes.",
+    "contradiction": "The answer to the question \"This document is tax-related.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: Michael T. Lee\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "tag_earnings": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": true,
+   "status": "confirmed",
+   "binary": {
+    "answer": true,
+    "probabilities": {
+     "true": 0.9908034801483154,
+     "false": 0.00919651985168457
+    },
+    "confidence": 0.9908034801483154
+   },
+   "three_way": {
+    "answer": true,
+    "relation": "supports",
+    "scores": {
+     "supports": 0.9928786158561707,
+     "contradicts": 0.01640303246676922
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document reports employment earnings or wages.\" is yes.",
+    "contradiction": "The answer to the question \"This document reports employment earnings or wages.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: Michael T. Lee\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "member_john_johnson": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": false,
+   "status": "tentative",
+   "binary": {
+    "answer": false,
+    "probabilities": {
+     "true": 0.2782568037509918,
+     "false": 0.7217431962490082
+    },
+    "confidence": 0.7217431962490082
+   },
+   "three_way": {
+    "answer": null,
+    "relation": "unknown",
+    "scores": {
+     "supports": 0.00016346470511052758,
+     "contradicts": 0.001782196224667132
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document concerns John Johnson.\" is yes.",
+    "contradiction": "The answer to the question \"This document concerns John Johnson.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: Michael T. Lee\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  },
+  "member_sarah_johnson": {
+   "type": "document_noul",
+   "mode": "both",
+   "answer": false,
+   "status": "tentative",
+   "binary": {
+    "answer": false,
+    "probabilities": {
+     "true": 0.3415825068950653,
+     "false": 0.6584174931049347
+    },
+    "confidence": 0.6584174931049347
+   },
+   "three_way": {
+    "answer": null,
+    "relation": "unknown",
+    "scores": {
+     "supports": 0.0005976693355478346,
+     "contradicts": 0.0027149852830916643
+    }
+   },
+   "compiler": "generic_yes_no",
+   "compiled": {
+    "proposition": "The answer to the question \"This document concerns Sarah Johnson.\" is yes.",
+    "contradiction": "The answer to the question \"This document concerns Sarah Johnson.\" is no."
+   },
+   "evidence": [
+    {
+     "id": "document",
+     "text": "Form W-2 Wage and Tax Statement 2024\nEmployer: Acme Corp\nEmployee: Michael T. Lee\nSSN: ***-**-1234\nBox 1 Wages, tips, other comp: 84,200.00\nBox 2 Federal income tax withheld: 12,630.00\nBox 17 State income tax: 4,210.00",
+     "relevance": 1.0
+    }
+   ]
+  }
+ }
+}

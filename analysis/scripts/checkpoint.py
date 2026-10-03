@@ -53,7 +53,7 @@ def main() -> int:
 
     notes = args.notes
     if args.metrics:
-        for path in (METRICS, PERF_METRICS):
+        for path in sorted(METRICS.parent.glob("*_metrics.json")):
             if path.exists():
                 metrics = json.loads(path.read_text())
                 notes = (notes + " " if notes else "") + ", ".join(f"{k}={v}" for k, v in metrics.items())

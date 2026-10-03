@@ -195,8 +195,10 @@ class CheckRequest:
 class EvidenceChecker:
     """Checks many values in one batched model call; records whether the model was unavailable."""
 
-    def __init__(self, documents: Mapping[str, EvidenceDocument]):
+    def __init__(self, documents: Mapping[str, EvidenceDocument], allowed: Mapping[str, set[str]] | None = None):
         self.documents = documents  # ONLY this household's documents
+        # Amendment §3.2 rule 7: value key -> documents assigned to that member (or joint/household ones).
+        self.allowed = allowed
         self.validator_unavailable = False
 
     def _pairs(self, request: CheckRequest) -> list[tuple[str, Any, int | None]]:
@@ -204,11 +206,12 @@ class EvidenceChecker:
         fv = request.value
         if fv is None:
             return []
+        usable = self.documents.keys() if self.allowed is None else self.allowed.get(request.key, set()) & self.documents.keys()
         if fv.conflict:
             return [(c.source_document, c.value, c.page) for c in fv.candidates
-                    if c.source_document in self.documents and c.value is not None]
+                    if c.source_document in usable and c.value is not None]
         return [(name, fv.value, fv.page if name == fv.source_document else None)
-                for name in fv.sources if name in self.documents]
+                for name in fv.sources if name in usable]
 
     def check_many(self, requests: list[CheckRequest], extra_documents: Mapping[str, list[str]] | None = None) -> dict[str, FieldCheck]:
         """extra_documents: request key -> document names to check an absent fact against."""
