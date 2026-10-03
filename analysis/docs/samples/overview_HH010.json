@@ -1,0 +1,202 @@
+{
+  "schema_version": "1.0",
+  "ruleset_version": "2025.1",
+  "household_id": "HH010",
+  "tax_year": 2026,
+  "status": "no_findings",
+  "priority": "low",
+  "checklist_label": "Flags for review, not advice",
+  "summary": {
+    "filing_status": "single",
+    "dependents": null,
+    "dependents_check": "not_checked",
+    "agi": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    },
+    "cash": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null,
+      "months_of_income": null
+    },
+    "mortgage_interest": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    }
+  },
+  "members": [
+    {
+      "person_id": "HH010-P1",
+      "name": "Alex Example",
+      "employer": null,
+      "numbers": [
+        {
+          "field": "retirement_distribution",
+          "label": "Gross distribution",
+          "value": 18750,
+          "check": "verified",
+          "source_document": "alex_example_1099r_2026.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "retirement_distribution_taxable",
+          "label": "Taxable distribution",
+          "value": 18750,
+          "check": "verified",
+          "source_document": "alex_example_1099r_2026.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "federal_tax_withheld",
+          "label": "Federal withholding",
+          "value": 1875,
+          "check": "verified",
+          "source_document": "alex_example_1099r_2026.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "state_tax_withheld",
+          "label": "State withholding",
+          "value": 375,
+          "check": "verified",
+          "source_document": "alex_example_1099r_2026.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "distribution_code",
+          "label": "Distribution code",
+          "value": "7",
+          "check": "verified",
+          "source_document": "alex_example_1099r_2026.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "distribution_from_ira",
+          "label": "IRA distribution",
+          "value": false,
+          "check": "verified",
+          "source_document": "alex_example_1099r_2026.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "distribution_date",
+          "label": "Distribution date",
+          "value": "2026-06-30",
+          "check": "verified",
+          "source_document": "alex_example_1099r_2026.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "id": "retirement_can_improve",
+      "question": "Can retirement savings be improved?",
+      "answer": "not_assessed",
+      "reason": "No household member has wages",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "tax_savings_possible",
+      "question": "Can tax savings be made?",
+      "answer": "no",
+      "reason": "No self-employment income, early distribution or under-withheld distribution",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "excess_cash",
+      "question": "Is there excess cash to put to work?",
+      "answer": "needs_data",
+      "reason": "Missing cash balance and adjusted gross income",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "needs_documents",
+      "question": "Is more documentation needed?",
+      "answer": "no",
+      "reason": "No conflicts, missing proof or mismatched values",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "major_changes",
+      "question": "Anything major changed since last year?",
+      "answer": "not_assessed",
+      "reason": "No prior year on file",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "insurance_review",
+      "question": "Insurance coverage reviewed?",
+      "answer": "not_assessed",
+      "reason": "No insurance data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "estate_review",
+      "question": "Estate plan reviewed?",
+      "answer": "not_assessed",
+      "reason": "No estate planning data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "education_review",
+      "question": "Education savings reviewed?",
+      "answer": "not_assessed",
+      "reason": "No education savings data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    }
+  ],
+  "changes_since_last_year": [],
+  "findings": [
+    {
+      "id": "F1",
+      "type": "normal_distribution",
+      "category": "tax",
+      "priority": "low",
+      "headline": "Alex took a normal retirement distribution",
+      "explanation": "Alex's 1099-R shows code 7 (normal distribution): $1,875 federal withholding on $18,750 taxable (10.0%).",
+      "dollar_impact": null,
+      "member": "Alex Example",
+      "person_id": "HH010-P1",
+      "action_label": "Note distribution",
+      "check": "verified"
+    }
+  ],
+  "data_quality": {
+    "documents": 1,
+    "conflicts": [],
+    "low_confidence_fields": [],
+    "unchecked_values": 0,
+    "missing_documents": []
+  },
+  "errors": []
+}

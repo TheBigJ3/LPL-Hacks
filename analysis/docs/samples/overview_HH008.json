@@ -1,0 +1,154 @@
+{
+  "schema_version": "1.0",
+  "ruleset_version": "2025.1",
+  "household_id": "HH008",
+  "tax_year": 2025,
+  "status": "findings",
+  "priority": "medium",
+  "checklist_label": "Flags for review, not advice",
+  "summary": {
+    "filing_status": "single",
+    "dependents": 0,
+    "dependents_check": "not_checked",
+    "agi": {
+      "value": 81000,
+      "check": "not_checked",
+      "source_document": "hh008_1040_2025.pdf",
+      "page": 1
+    },
+    "cash": {
+      "value": 15000,
+      "check": "not_checked",
+      "source_document": "hh008_bank_statement_2025.pdf",
+      "page": 1,
+      "months_of_income": 2.2
+    },
+    "mortgage_interest": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    }
+  },
+  "members": [
+    {
+      "person_id": "HH008-P1",
+      "name": "Quinn Harper",
+      "employer": "Margie's Sample Travel",
+      "numbers": [
+        {
+          "field": "wages",
+          "label": "Wages",
+          "value": 88000,
+          "check": "not_checked",
+          "source_document": "quinn_w2_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "employee_401k_contribution",
+          "label": "401(k)",
+          "value": 8800,
+          "check": "not_checked",
+          "source_document": "quinn_w2_2025.pdf",
+          "page": 1,
+          "context": "10.0% of pay · 37% of limit · $14,700 room left",
+          "candidates": null
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "id": "retirement_can_improve",
+      "question": "Can retirement savings be improved?",
+      "answer": "yes",
+      "reason": "Quinn uses 37% of the 401(k) limit",
+      "dollar_impact": 14700,
+      "finding_ids": [
+        "F1"
+      ]
+    },
+    {
+      "id": "tax_savings_possible",
+      "question": "Can tax savings be made?",
+      "answer": "no",
+      "reason": "No self-employment income, early distribution or under-withheld distribution",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "excess_cash",
+      "question": "Is there excess cash to put to work?",
+      "answer": "no",
+      "reason": "Cash covers 2.2 months of income, within 6 months",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "needs_documents",
+      "question": "Is more documentation needed?",
+      "answer": "no",
+      "reason": "No conflicts, missing proof or mismatched values",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "major_changes",
+      "question": "Anything major changed since last year?",
+      "answer": "not_assessed",
+      "reason": "No prior year on file",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "insurance_review",
+      "question": "Insurance coverage reviewed?",
+      "answer": "not_assessed",
+      "reason": "No insurance data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "estate_review",
+      "question": "Estate plan reviewed?",
+      "answer": "not_assessed",
+      "reason": "No estate planning data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "education_review",
+      "question": "Education savings reviewed?",
+      "answer": "not_assessed",
+      "reason": "No education savings data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    }
+  ],
+  "changes_since_last_year": [],
+  "findings": [
+    {
+      "id": "F1",
+      "type": "retirement_contribution_review",
+      "category": "retirement",
+      "priority": "medium",
+      "headline": "Quinn could save more for retirement",
+      "explanation": "Quinn contributed $8,800 to a 401(k), 10.0% of $88,000 wages and 37% of the $23,500 limit.",
+      "dollar_impact": 14700,
+      "member": "Quinn Harper",
+      "person_id": "HH008-P1",
+      "action_label": "Discuss savings",
+      "check": "not_checked"
+    }
+  ],
+  "data_quality": {
+    "documents": 3,
+    "conflicts": [],
+    "low_confidence_fields": [],
+    "unchecked_values": 5,
+    "missing_documents": []
+  },
+  "errors": []
+}

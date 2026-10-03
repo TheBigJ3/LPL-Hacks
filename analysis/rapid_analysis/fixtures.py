@@ -29,3 +29,10 @@ def fixture_household_textract(household_id: str) -> dict[str, dict]:
         if response is not None:
             found[doc["name"]] = response
     return found
+
+
+def fixture_household_documents(household_id: str) -> dict:
+    """Redacted evidence documents for a fixture household, keyed by document name."""
+    from rapid_analysis.textract import evidence_from_textract
+
+    return {name: evidence_from_textract(response, name) for name, response in fixture_household_textract(household_id).items()}

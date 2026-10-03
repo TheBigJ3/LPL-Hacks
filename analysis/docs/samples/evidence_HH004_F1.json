@@ -1,0 +1,30 @@
+{
+  "household_id": "HH004",
+  "finding_id": "F1",
+  "headline": "Jordan's wages disagree between documents",
+  "check": "conflicted",
+  "values": [
+    {
+      "key": "HH004-P1.wages",
+      "field": "wages",
+      "label": "Wages",
+      "member": "Jordan Park",
+      "value": null,
+      "check": "conflicted",
+      "documents": [
+        {
+          "document": "jordan_w2_2025.pdf",
+          "page": 1,
+          "value": 120000,
+          "check": "verified"
+        },
+        {
+          "document": "hh004_1040_2025.pdf",
+          "page": 1,
+          "value": 165000,
+          "check": "verified"
+        }
+      ]
+    }
+  ]
+}

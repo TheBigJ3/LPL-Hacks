@@ -1,0 +1,184 @@
+{
+  "schema_version": "1.0",
+  "ruleset_version": "2025.1",
+  "household_id": "HH004",
+  "tax_year": 2025,
+  "status": "findings",
+  "priority": "high",
+  "checklist_label": "Flags for review, not advice",
+  "summary": {
+    "filing_status": "single",
+    "dependents": 0,
+    "dependents_check": "not_checked",
+    "agi": {
+      "value": 158000,
+      "check": "verified",
+      "source_document": "hh004_1040_2025.pdf",
+      "page": 1
+    },
+    "cash": {
+      "value": 40000,
+      "check": "not_checked",
+      "source_document": "hh004_bank_statement_2025.pdf",
+      "page": 1,
+      "months_of_income": 3.0
+    },
+    "mortgage_interest": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    }
+  },
+  "members": [
+    {
+      "person_id": "HH004-P1",
+      "name": "Jordan Park",
+      "employer": "Wingtip Sample Systems",
+      "numbers": [
+        {
+          "field": "wages",
+          "label": "Wages",
+          "value": null,
+          "check": "conflicted",
+          "source_document": null,
+          "page": null,
+          "context": null,
+          "candidates": [
+            {
+              "value": 120000,
+              "source_document": "jordan_w2_2025.pdf",
+              "page": 1
+            },
+            {
+              "value": 165000,
+              "source_document": "hh004_1040_2025.pdf",
+              "page": 1
+            }
+          ]
+        },
+        {
+          "field": "employee_401k_contribution",
+          "label": "401(k)",
+          "value": 15000,
+          "check": "verified",
+          "source_document": "jordan_w2_2025.pdf",
+          "page": 1,
+          "context": "64% of limit · $8,500 room left",
+          "candidates": null
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "id": "retirement_can_improve",
+      "question": "Can retirement savings be improved?",
+      "answer": "needs_data",
+      "reason": "Jordan's wages disagree between documents",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "tax_savings_possible",
+      "question": "Can tax savings be made?",
+      "answer": "no",
+      "reason": "No self-employment income, early distribution or under-withheld distribution",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "excess_cash",
+      "question": "Is there excess cash to put to work?",
+      "answer": "no",
+      "reason": "Cash covers 3.0 months of income, within 6 months",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "needs_documents",
+      "question": "Is more documentation needed?",
+      "answer": "yes",
+      "reason": "Jordan's wages disagree between documents",
+      "dollar_impact": null,
+      "finding_ids": [
+        "F1"
+      ]
+    },
+    {
+      "id": "major_changes",
+      "question": "Anything major changed since last year?",
+      "answer": "not_assessed",
+      "reason": "No prior year on file",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "insurance_review",
+      "question": "Insurance coverage reviewed?",
+      "answer": "not_assessed",
+      "reason": "No insurance data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "estate_review",
+      "question": "Estate plan reviewed?",
+      "answer": "not_assessed",
+      "reason": "No estate planning data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "education_review",
+      "question": "Education savings reviewed?",
+      "answer": "not_assessed",
+      "reason": "No education savings data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    }
+  ],
+  "changes_since_last_year": [],
+  "findings": [
+    {
+      "id": "F1",
+      "type": "source_conflict",
+      "category": "data_quality",
+      "priority": "high",
+      "headline": "Jordan's wages disagree between documents",
+      "explanation": "Jordan's wages: $120,000 on jordan_w2_2025.pdf and $165,000 on hh004_1040_2025.pdf. No value is used until this is resolved.",
+      "dollar_impact": null,
+      "member": "Jordan Park",
+      "person_id": "HH004-P1",
+      "action_label": "Resolve conflict",
+      "check": "conflicted"
+    }
+  ],
+  "data_quality": {
+    "documents": 3,
+    "conflicts": [
+      {
+        "field": "wages",
+        "label": "Wages",
+        "member": "Jordan Park",
+        "person_id": "HH004-P1",
+        "candidates": [
+          {
+            "value": 120000,
+            "source_document": "jordan_w2_2025.pdf",
+            "page": 1
+          },
+          {
+            "value": 165000,
+            "source_document": "hh004_1040_2025.pdf",
+            "page": 1
+          }
+        ]
+      }
+    ],
+    "low_confidence_fields": [],
+    "unchecked_values": 2,
+    "missing_documents": []
+  },
+  "errors": []
+}

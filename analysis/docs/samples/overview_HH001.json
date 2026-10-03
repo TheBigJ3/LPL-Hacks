@@ -1,0 +1,195 @@
+{
+  "schema_version": "1.0",
+  "ruleset_version": "2025.1",
+  "household_id": "HH001",
+  "tax_year": 2025,
+  "status": "findings",
+  "priority": "medium",
+  "checklist_label": "Flags for review, not advice",
+  "summary": {
+    "filing_status": "married_filing_jointly",
+    "dependents": 2,
+    "dependents_check": "verified",
+    "agi": {
+      "value": 185000,
+      "check": "verified",
+      "source_document": "hh001_1040_2025.pdf",
+      "page": 1
+    },
+    "cash": {
+      "value": 32216.56,
+      "check": "verified",
+      "source_document": "hh001_bank_statement_2025.pdf",
+      "page": 1,
+      "months_of_income": 2.1
+    },
+    "mortgage_interest": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    }
+  },
+  "members": [
+    {
+      "person_id": "HH001-P1",
+      "name": "John Sample",
+      "employer": "Contoso Sample Co",
+      "numbers": [
+        {
+          "field": "wages",
+          "label": "Wages",
+          "value": 120000,
+          "check": "verified",
+          "source_document": "john_w2_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "employee_401k_contribution",
+          "label": "401(k)",
+          "value": 8200,
+          "check": "verified",
+          "source_document": "john_w2_2025.pdf",
+          "page": 1,
+          "context": "6.8% of pay · 35% of limit · $15,300 room left",
+          "candidates": null
+        }
+      ]
+    },
+    {
+      "person_id": "HH001-P2",
+      "name": "Sarah Sample",
+      "employer": "Fabrikam Sample Inc",
+      "numbers": [
+        {
+          "field": "wages",
+          "label": "Wages",
+          "value": 65000,
+          "check": "verified",
+          "source_document": "sarah_w2_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "employee_401k_contribution",
+          "label": "401(k)",
+          "value": 4500,
+          "check": "verified",
+          "source_document": "sarah_w2_2025.pdf",
+          "page": 1,
+          "context": "6.9% of pay · 19% of limit · $19,000 room left",
+          "candidates": null
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "id": "retirement_can_improve",
+      "question": "Can retirement savings be improved?",
+      "answer": "yes",
+      "reason": "John uses 35% and Sarah uses 19% of the 401(k) limit",
+      "dollar_impact": 34300,
+      "finding_ids": [
+        "F1",
+        "F2"
+      ]
+    },
+    {
+      "id": "tax_savings_possible",
+      "question": "Can tax savings be made?",
+      "answer": "no",
+      "reason": "No self-employment income, early distribution or under-withheld distribution",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "excess_cash",
+      "question": "Is there excess cash to put to work?",
+      "answer": "no",
+      "reason": "Cash covers 2.1 months of income, within 6 months",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "needs_documents",
+      "question": "Is more documentation needed?",
+      "answer": "no",
+      "reason": "No conflicts, missing proof or mismatched values",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "major_changes",
+      "question": "Anything major changed since last year?",
+      "answer": "not_assessed",
+      "reason": "No prior year on file",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "insurance_review",
+      "question": "Insurance coverage reviewed?",
+      "answer": "not_assessed",
+      "reason": "No insurance data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "estate_review",
+      "question": "Estate plan reviewed?",
+      "answer": "not_assessed",
+      "reason": "No estate planning data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "education_review",
+      "question": "Education savings reviewed?",
+      "answer": "not_assessed",
+      "reason": "No education savings data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    }
+  ],
+  "changes_since_last_year": [],
+  "findings": [
+    {
+      "id": "F1",
+      "type": "retirement_contribution_review",
+      "category": "retirement",
+      "priority": "medium",
+      "headline": "John could save more for retirement",
+      "explanation": "John contributed $8,200 to a 401(k), 6.8% of $120,000 wages and 35% of the $23,500 limit.",
+      "dollar_impact": 15300,
+      "member": "John Sample",
+      "person_id": "HH001-P1",
+      "action_label": "Discuss savings",
+      "check": "verified"
+    },
+    {
+      "id": "F2",
+      "type": "retirement_contribution_review",
+      "category": "retirement",
+      "priority": "medium",
+      "headline": "Sarah could save more for retirement",
+      "explanation": "Sarah contributed $4,500 to a 401(k), 6.9% of $65,000 wages and 19% of the $23,500 limit.",
+      "dollar_impact": 19000,
+      "member": "Sarah Sample",
+      "person_id": "HH001-P2",
+      "action_label": "Discuss savings",
+      "check": "verified"
+    }
+  ],
+  "data_quality": {
+    "documents": 4,
+    "conflicts": [],
+    "low_confidence_fields": [],
+    "unchecked_values": 0,
+    "missing_documents": []
+  },
+  "errors": []
+}

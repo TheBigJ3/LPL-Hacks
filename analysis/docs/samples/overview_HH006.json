@@ -1,0 +1,221 @@
+{
+  "schema_version": "1.0",
+  "ruleset_version": "2025.1",
+  "household_id": "HH006",
+  "tax_year": 2025,
+  "status": "findings",
+  "priority": "high",
+  "checklist_label": "Flags for review, not advice",
+  "summary": {
+    "filing_status": "married_filing_jointly",
+    "dependents": 1,
+    "dependents_check": "not_checked",
+    "agi": {
+      "value": 152000,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    },
+    "cash": {
+      "value": 210000,
+      "check": "not_checked",
+      "source_document": "hh006_bank_statement_2025.pdf",
+      "page": 1,
+      "months_of_income": 16.6
+    },
+    "mortgage_interest": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    }
+  },
+  "members": [
+    {
+      "person_id": "HH006-P1",
+      "name": "Taylor Mock",
+      "employer": "Adventure Works Sample",
+      "numbers": [
+        {
+          "field": "wages",
+          "label": "Wages",
+          "value": 110000,
+          "check": "verified",
+          "source_document": "taylor_w2_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "employee_401k_contribution",
+          "label": "401(k)",
+          "value": 2000,
+          "check": "verified",
+          "source_document": "taylor_w2_2025.pdf",
+          "page": 1,
+          "context": "1.8% of pay · 9% of limit · $21,500 room left",
+          "candidates": null
+        }
+      ]
+    },
+    {
+      "person_id": "HH006-P2",
+      "name": "Sam Mock",
+      "employer": null,
+      "numbers": [
+        {
+          "field": "self_employment_income",
+          "label": "Self-employment income",
+          "value": 48000,
+          "check": "verified",
+          "source_document": "hh006_1040_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "id": "retirement_can_improve",
+      "question": "Can retirement savings be improved?",
+      "answer": "yes",
+      "reason": "Taylor uses 9% of the 401(k) limit",
+      "dollar_impact": 21500,
+      "finding_ids": [
+        "F1"
+      ]
+    },
+    {
+      "id": "tax_savings_possible",
+      "question": "Can tax savings be made?",
+      "answer": "yes",
+      "reason": "Sam has $48,000 of self-employment income",
+      "dollar_impact": null,
+      "finding_ids": [
+        "F2"
+      ]
+    },
+    {
+      "id": "excess_cash",
+      "question": "Is there excess cash to put to work?",
+      "answer": "yes",
+      "reason": "Cash covers 16.6 months of income",
+      "dollar_impact": 134000,
+      "finding_ids": [
+        "F3"
+      ]
+    },
+    {
+      "id": "needs_documents",
+      "question": "Is more documentation needed?",
+      "answer": "no",
+      "reason": "No conflicts, missing proof or mismatched values",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "major_changes",
+      "question": "Anything major changed since last year?",
+      "answer": "yes",
+      "reason": "Dependents increased from 0 to 1",
+      "dollar_impact": null,
+      "finding_ids": [
+        "F4"
+      ]
+    },
+    {
+      "id": "insurance_review",
+      "question": "Insurance coverage reviewed?",
+      "answer": "not_assessed",
+      "reason": "No insurance data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "estate_review",
+      "question": "Estate plan reviewed?",
+      "answer": "not_assessed",
+      "reason": "No estate planning data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "education_review",
+      "question": "Education savings reviewed?",
+      "answer": "not_assessed",
+      "reason": "No education savings data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    }
+  ],
+  "changes_since_last_year": [
+    {
+      "type": "new_dependent",
+      "text": "Dependents increased from 0 to 1"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "type": "retirement_contribution_review",
+      "category": "retirement",
+      "priority": "high",
+      "headline": "Taylor is saving very little for retirement",
+      "explanation": "Taylor contributed $2,000 to a 401(k), 1.8% of $110,000 wages and 9% of the $23,500 limit.",
+      "dollar_impact": 21500,
+      "member": "Taylor Mock",
+      "person_id": "HH006-P1",
+      "action_label": "Discuss savings",
+      "check": "verified"
+    },
+    {
+      "id": "F2",
+      "type": "self_employment_tax_review",
+      "category": "tax",
+      "priority": "high",
+      "headline": "Sam has self-employment income to plan around",
+      "explanation": "Sam reported $48,000 of self-employment income; quarterly estimates and self-employed retirement accounts are worth a look.",
+      "dollar_impact": null,
+      "member": "Sam Mock",
+      "person_id": "HH006-P2",
+      "action_label": "Review self-employment taxes",
+      "check": "verified"
+    },
+    {
+      "id": "F3",
+      "type": "excess_cash",
+      "category": "cash_management",
+      "priority": "high",
+      "headline": "Cash well above an emergency cushion",
+      "explanation": "The household holds $210,000 in cash, 16.6 months of income; $134,000 is above a 6-month cushion of $76,000.",
+      "dollar_impact": 134000,
+      "member": null,
+      "person_id": null,
+      "action_label": "Discuss putting cash to work",
+      "check": "not_checked"
+    },
+    {
+      "id": "F4",
+      "type": "new_dependent",
+      "category": "life_event",
+      "priority": "medium",
+      "headline": "Dependents increased from 0 to 1",
+      "explanation": "Dependents increased from 0 to 1 since last year.",
+      "dollar_impact": null,
+      "member": null,
+      "person_id": null,
+      "action_label": "Review life changes",
+      "check": "not_checked"
+    }
+  ],
+  "data_quality": {
+    "documents": 3,
+    "conflicts": [],
+    "low_confidence_fields": [],
+    "unchecked_values": 3,
+    "missing_documents": []
+  },
+  "errors": []
+}

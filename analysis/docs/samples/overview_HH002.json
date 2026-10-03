@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0",
+  "ruleset_version": "2025.1",
+  "household_id": "HH002",
+  "tax_year": 2025,
+  "status": "no_findings",
+  "priority": null,
+  "checklist_label": "Flags for review, not advice",
+  "summary": {
+    "filing_status": "single",
+    "dependents": 0,
+    "dependents_check": "not_checked",
+    "agi": {
+      "value": 74500,
+      "check": "not_checked",
+      "source_document": "hh002_1040_2025.pdf",
+      "page": 1
+    },
+    "cash": {
+      "value": 26000,
+      "check": "not_checked",
+      "source_document": "hh002_bank_statement_2025.pdf",
+      "page": 1,
+      "months_of_income": 4.2
+    },
+    "mortgage_interest": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    }
+  },
+  "members": [
+    {
+      "person_id": "HH002-P1",
+      "name": "Alex Rivera",
+      "employer": "Northwind Sample Traders",
+      "numbers": [
+        {
+          "field": "wages",
+          "label": "Wages",
+          "value": 98000,
+          "check": "not_checked",
+          "source_document": "alex_w2_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "employee_401k_contribution",
+          "label": "401(k)",
+          "value": 23500,
+          "check": "not_checked",
+          "source_document": "alex_w2_2025.pdf",
+          "page": 1,
+          "context": "24.0% of pay · 100% of limit · $0 room left",
+          "candidates": null
+        },
+        {
+          "field": "hsa_contribution",
+          "label": "HSA contribution",
+          "value": 4300,
+          "check": "not_checked",
+          "source_document": "alex_w2_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "hsa_eligible_health_plan",
+          "label": "HSA-eligible plan",
+          "value": true,
+          "check": "not_checked",
+          "source_document": "alex_hdhp_coverage_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "id": "retirement_can_improve",
+      "question": "Can retirement savings be improved?",
+      "answer": "no",
+      "reason": "Every wage earner contributes at least half of the 401(k) limit",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "tax_savings_possible",
+      "question": "Can tax savings be made?",
+      "answer": "no",
+      "reason": "No self-employment income, early distribution or under-withheld distribution",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "excess_cash",
+      "question": "Is there excess cash to put to work?",
+      "answer": "no",
+      "reason": "Cash covers 4.2 months of income, within 6 months",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "needs_documents",
+      "question": "Is more documentation needed?",
+      "answer": "no",
+      "reason": "No conflicts, missing proof or mismatched values",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "major_changes",
+      "question": "Anything major changed since last year?",
+      "answer": "not_assessed",
+      "reason": "No prior year on file",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "insurance_review",
+      "question": "Insurance coverage reviewed?",
+      "answer": "not_assessed",
+      "reason": "No insurance data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "estate_review",
+      "question": "Estate plan reviewed?",
+      "answer": "not_assessed",
+      "reason": "No estate planning data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "education_review",
+      "question": "Education savings reviewed?",
+      "answer": "not_assessed",
+      "reason": "No education savings data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    }
+  ],
+  "changes_since_last_year": [],
+  "findings": [],
+  "data_quality": {
+    "documents": 4,
+    "conflicts": [],
+    "low_confidence_fields": [],
+    "unchecked_values": 7,
+    "missing_documents": []
+  },
+  "errors": []
+}

@@ -1,0 +1,213 @@
+{
+  "schema_version": "1.0",
+  "ruleset_version": "2025.1",
+  "household_id": "HH005",
+  "tax_year": 2025,
+  "status": "findings",
+  "priority": "high",
+  "checklist_label": "Flags for review, not advice",
+  "summary": {
+    "filing_status": "married_filing_jointly",
+    "dependents": 1,
+    "dependents_check": "not_checked",
+    "agi": {
+      "value": 171000,
+      "check": "not_checked",
+      "source_document": "hh005_1040_2025.pdf",
+      "page": 1
+    },
+    "cash": {
+      "value": 22000,
+      "check": "not_checked",
+      "source_document": "hh005_bank_statement_2025.pdf",
+      "page": 1,
+      "months_of_income": 1.5
+    },
+    "mortgage_interest": {
+      "value": 14200,
+      "check": "not_checked",
+      "source_document": "hh005_1098_2025.pdf",
+      "page": 1
+    }
+  },
+  "members": [
+    {
+      "person_id": "HH005-P1",
+      "name": "Casey Brooks",
+      "employer": "Bluefin Sample LLC",
+      "numbers": [
+        {
+          "field": "wages",
+          "label": "Wages",
+          "value": 160000,
+          "check": "not_checked",
+          "source_document": "casey_w2_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "employee_401k_contribution",
+          "label": "401(k)",
+          "value": 16000,
+          "check": "not_checked",
+          "source_document": "casey_w2_2025.pdf",
+          "page": 1,
+          "context": "10.0% of pay · 68% of limit · $7,500 room left",
+          "candidates": null
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "id": "retirement_can_improve",
+      "question": "Can retirement savings be improved?",
+      "answer": "no",
+      "reason": "Every wage earner contributes at least half of the 401(k) limit",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "tax_savings_possible",
+      "question": "Can tax savings be made?",
+      "answer": "no",
+      "reason": "No self-employment income, early distribution or under-withheld distribution",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "excess_cash",
+      "question": "Is there excess cash to put to work?",
+      "answer": "no",
+      "reason": "Cash covers 1.5 months of income, within 6 months",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "needs_documents",
+      "question": "Is more documentation needed?",
+      "answer": "no",
+      "reason": "No conflicts, missing proof or mismatched values",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "major_changes",
+      "question": "Anything major changed since last year?",
+      "answer": "yes",
+      "reason": "Dependents increased from 0 to 1, Casey changed employer from Acme Sample Corp to Bluefin Sample LLC, Mortgage interest started ($14,200) and AGI rose 94% from $88,000 to $171,000",
+      "dollar_impact": null,
+      "finding_ids": [
+        "F1",
+        "F2",
+        "F3",
+        "F4"
+      ]
+    },
+    {
+      "id": "insurance_review",
+      "question": "Insurance coverage reviewed?",
+      "answer": "not_assessed",
+      "reason": "No insurance data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "estate_review",
+      "question": "Estate plan reviewed?",
+      "answer": "not_assessed",
+      "reason": "No estate planning data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "education_review",
+      "question": "Education savings reviewed?",
+      "answer": "not_assessed",
+      "reason": "No education savings data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    }
+  ],
+  "changes_since_last_year": [
+    {
+      "type": "new_dependent",
+      "text": "Dependents increased from 0 to 1"
+    },
+    {
+      "type": "new_employer",
+      "text": "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC"
+    },
+    {
+      "type": "new_mortgage",
+      "text": "Mortgage interest started ($14,200)"
+    },
+    {
+      "type": "large_income_increase",
+      "text": "AGI rose 94% from $88,000 to $171,000"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "type": "new_dependent",
+      "category": "life_event",
+      "priority": "high",
+      "headline": "Dependents increased from 0 to 1",
+      "explanation": "Dependents increased from 0 to 1 since last year. Several changes happened together.",
+      "dollar_impact": null,
+      "member": null,
+      "person_id": null,
+      "action_label": "Review life changes",
+      "check": "not_checked"
+    },
+    {
+      "id": "F2",
+      "type": "new_employer",
+      "category": "life_event",
+      "priority": "high",
+      "headline": "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC",
+      "explanation": "Casey changed employer from Acme Sample Corp to Bluefin Sample LLC since last year. Several changes happened together.",
+      "dollar_impact": null,
+      "member": "Casey Brooks",
+      "person_id": "HH005-P1",
+      "action_label": "Review life changes",
+      "check": "not_checked"
+    },
+    {
+      "id": "F3",
+      "type": "new_mortgage",
+      "category": "life_event",
+      "priority": "high",
+      "headline": "Mortgage interest started ($14,200)",
+      "explanation": "Mortgage interest started ($14,200) since last year. Several changes happened together.",
+      "dollar_impact": null,
+      "member": null,
+      "person_id": null,
+      "action_label": "Review life changes",
+      "check": "not_checked"
+    },
+    {
+      "id": "F4",
+      "type": "large_income_increase",
+      "category": "life_event",
+      "priority": "high",
+      "headline": "AGI rose 94% from $88,000 to $171,000",
+      "explanation": "AGI rose 94% from $88,000 to $171,000 since last year. Several changes happened together.",
+      "dollar_impact": null,
+      "member": null,
+      "person_id": null,
+      "action_label": "Review life changes",
+      "check": "not_checked"
+    }
+  ],
+  "data_quality": {
+    "documents": 4,
+    "conflicts": [],
+    "low_confidence_fields": [],
+    "unchecked_values": 6,
+    "missing_documents": []
+  },
+  "errors": []
+}

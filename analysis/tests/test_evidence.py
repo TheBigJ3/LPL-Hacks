@@ -49,6 +49,7 @@ TRUE_VALUES = [
     ("dependents", 2, "John Sample and Sarah Sample", "hh001_1040_2025.pdf", "verified"),
     ("cash_balance", 32216.56, "John Sample and Sarah Sample", "hh001_bank_statement_2025.pdf", "verified"),
     ("wages", 120000.0, "Jordan Park", "jordan_w2_2025.pdf", "verified"),
+    ("wages", 165000.0, "Jordan Park", "hh004_1040_2025.pdf", "verified"),
     ("hsa_contribution", 4300.0, "Morgan Lee", "morgan_w2_2025.pdf", "verified"),
 ]
 NEAR_MISSES = [

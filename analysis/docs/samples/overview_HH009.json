@@ -1,0 +1,204 @@
+{
+  "schema_version": "1.0",
+  "ruleset_version": "2025.1",
+  "household_id": "HH009",
+  "tax_year": 2025,
+  "status": "findings",
+  "priority": "high",
+  "checklist_label": "Flags for review, not advice",
+  "summary": {
+    "filing_status": "single",
+    "dependents": null,
+    "dependents_check": "not_checked",
+    "agi": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    },
+    "cash": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null,
+      "months_of_income": null
+    },
+    "mortgage_interest": {
+      "value": null,
+      "check": "not_checked",
+      "source_document": null,
+      "page": null
+    }
+  },
+  "members": [
+    {
+      "person_id": "HH009-P1",
+      "name": "Pat Rowe",
+      "employer": null,
+      "numbers": [
+        {
+          "field": "retirement_distribution",
+          "label": "Gross distribution",
+          "value": 12000,
+          "check": "verified",
+          "source_document": "pat_1099r_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "retirement_distribution_taxable",
+          "label": "Taxable distribution",
+          "value": 12000,
+          "check": "verified",
+          "source_document": "pat_1099r_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "federal_tax_withheld",
+          "label": "Federal withholding",
+          "value": 600,
+          "check": "verified",
+          "source_document": "pat_1099r_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "state_tax_withheld",
+          "label": "State withholding",
+          "value": 240,
+          "check": "verified",
+          "source_document": "pat_1099r_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "distribution_code",
+          "label": "Distribution code",
+          "value": "1",
+          "check": "verified",
+          "source_document": "pat_1099r_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "distribution_from_ira",
+          "label": "IRA distribution",
+          "value": false,
+          "check": "verified",
+          "source_document": "pat_1099r_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        },
+        {
+          "field": "distribution_date",
+          "label": "Distribution date",
+          "value": "2025-03-14",
+          "check": "verified",
+          "source_document": "pat_1099r_2025.pdf",
+          "page": 1,
+          "context": null,
+          "candidates": null
+        }
+      ]
+    }
+  ],
+  "checklist": [
+    {
+      "id": "retirement_can_improve",
+      "question": "Can retirement savings be improved?",
+      "answer": "not_assessed",
+      "reason": "No household member has wages",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "tax_savings_possible",
+      "question": "Can tax savings be made?",
+      "answer": "yes",
+      "reason": "Pat has a code 1 early distribution",
+      "dollar_impact": 1200,
+      "finding_ids": [
+        "F1"
+      ]
+    },
+    {
+      "id": "excess_cash",
+      "question": "Is there excess cash to put to work?",
+      "answer": "needs_data",
+      "reason": "Missing cash balance and adjusted gross income",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "needs_documents",
+      "question": "Is more documentation needed?",
+      "answer": "no",
+      "reason": "No conflicts, missing proof or mismatched values",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "major_changes",
+      "question": "Anything major changed since last year?",
+      "answer": "not_assessed",
+      "reason": "No prior year on file",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "insurance_review",
+      "question": "Insurance coverage reviewed?",
+      "answer": "not_assessed",
+      "reason": "No insurance data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "estate_review",
+      "question": "Estate plan reviewed?",
+      "answer": "not_assessed",
+      "reason": "No estate planning data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    },
+    {
+      "id": "education_review",
+      "question": "Education savings reviewed?",
+      "answer": "not_assessed",
+      "reason": "No education savings data or rules yet",
+      "dollar_impact": null,
+      "finding_ids": []
+    }
+  ],
+  "changes_since_last_year": [],
+  "findings": [
+    {
+      "id": "F1",
+      "type": "early_distribution",
+      "category": "tax",
+      "priority": "high",
+      "headline": "Pat took an early retirement distribution",
+      "explanation": "Pat's 1099-R shows code 1 (early distribution) on $12,000 taxable; the estimated additional tax is $1,200 unless an exception applies.",
+      "dollar_impact": 1200,
+      "member": "Pat Rowe",
+      "person_id": "HH009-P1",
+      "action_label": "Review early distribution",
+      "check": "verified"
+    }
+  ],
+  "data_quality": {
+    "documents": 1,
+    "conflicts": [],
+    "low_confidence_fields": [],
+    "unchecked_values": 0,
+    "missing_documents": []
+  },
+  "errors": []
+}
