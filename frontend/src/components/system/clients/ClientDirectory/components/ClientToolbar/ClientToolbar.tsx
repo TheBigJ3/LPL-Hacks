@@ -9,7 +9,7 @@ type ClientToolbarProps = {
 
 const ClientToolbar = ({ query, onQueryChange, onClear, onAdd }: ClientToolbarProps) =>
   <div className="client-toolbar flex w-full items-center">
-    <label data-onboarding="client-search" className="client-toolbar__searchflex h-11 min-w-0 flex-1 items-center gap-3 rounded-lg" role="search">
+    <label data-onboarding="client-search" className="client-toolbar__search flex h-11 min-w-0 flex-1 items-center gap-3 rounded-lg" role="search">
       <span className="material-symbols-outlined client-toolbar__icon flex-none" aria-hidden="true">search</span>
       <input
         type="search"
@@ -25,7 +25,7 @@ const ClientToolbar = ({ query, onQueryChange, onClear, onAdd }: ClientToolbarPr
         </button>}
     </label>
 
-    <button type="button" data-onboarding="client-add" className="client-toolbar__addflex h-11 flex-none items-center gap-2 rounded-lg px-3" onClick={onAdd}>
+    <button type="button" data-onboarding="client-add" className="client-toolbar__add flex h-11 flex-none items-center gap-2 rounded-lg px-3" onClick={onAdd}>
       <span className="material-symbols-outlined client-toolbar__add-icon" aria-hidden="true">person_add</span>
       <span className="client-toolbar__add-label">Add client</span>
     </button>

@@ -21,7 +21,7 @@ const SidebarClientSwitcher = ({ client, member, open, onExpand }: SidebarClient
   const switcher = useSidebarClientSwitcher(client, member, open, onExpand)
 
   return <div className="sidebar-client-switcher px-3 pb-4" data-open={open} data-active={!!switcher.selected}>
-    <div data-onboarding="client-switcher" className="sidebar-client-switcher__cardflex items-center rounded-lg">
+    <div data-onboarding="client-switcher" className="sidebar-client-switcher__card flex items-center rounded-lg">
       <button
         id={SIDEBAR_CLIENT_TRIGGER_ID}
         type="button"
