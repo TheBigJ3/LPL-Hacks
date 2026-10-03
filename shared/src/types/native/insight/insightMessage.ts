@@ -39,3 +39,9 @@ export type InsightConversation = {
   clientId: string;
   messages: InsightMessage[];
 };
+
+export type InsightConversationSummary = {
+  id: string;
+  title: string;
+  updatedAt: string;
+};

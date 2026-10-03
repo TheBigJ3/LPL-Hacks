@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router'
+import { useParams, useSearchParams } from 'react-router'
 import type { InsightMessage } from '@lpl-hacks/shared/src/types/native/insight/insightMessage'
 import type { Response as InsightGetResponse } from '@lpl-hacks/shared/src/types/native/api/v1/insight/get'
 import insightProgress from '@lpl-hacks/shared/src/types/native/sockets/insight/progress'
@@ -8,16 +8,33 @@ import insightWatch from '@lpl-hacks/shared/src/types/native/sockets/insight/wat
 import listClientsApi from '@api/clients/listClientsApi'
 import askInsightApi from '@api/insight/askInsightApi'
 import getInsightApi from '@api/insight/getInsightApi'
+import listInsightApi from '@api/insight/listInsightApi'
 import { apiPostRequest, useApiGetQuery } from '@features/apiLayer'
 import { queryClient } from '@features/queryClient'
 import { socketWatch, useSocketEvent } from '@stores/socketStore'
 import { INSIGHT_ERRORS } from '@typings/native/insight/errors'
 
+const INSIGHT_CHAT_PARAM = 'chat'
 const INSIGHT_OPEN_POLL_MS = 4_000
 const INSIGHT_SCROLL_FOLLOW_PX = 160
 
 function insightIsOpen(message: InsightMessage): boolean {
   return message.status === 'pending' || message.status === 'streaming'
+}
+
+export type InsightChatListItem = {
+  id: string
+  title: string
+  href: string
+  selected: boolean
+}
+
+function insightChatHref(searchParams: URLSearchParams, chatId: string | null): string {
+  const next = new URLSearchParams(searchParams)
+  if (chatId) next.set(INSIGHT_CHAT_PARAM, chatId)
+  else next.delete(INSIGHT_CHAT_PARAM)
+  const query = next.toString()
+  return query ? `?${query}` : '?'
 }
 
 function insightScrollParent(element: HTMLElement | null): HTMLElement | null {
@@ -28,19 +45,28 @@ export function useInsightChat() {
   const { clientId: clientSlug } = useParams()
   const clientsQuery = useApiGetQuery(listClientsApi)
   const client = clientsQuery.data?.clients.find((item) => item.slug === clientSlug) ?? null
-  const params = { clientId: client?.id ?? '' }
+  const [searchParams, setSearchParams] = useSearchParams()
+  const chatId = searchParams.get(INSIGHT_CHAT_PARAM)
+  const listParams = { clientId: client?.id ?? '' }
+  const params = { clientId: client?.id ?? '', conversationId: chatId ?? '' }
 
   const [live, setLive] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
+  const [viewedChatId, setViewedChatId] = useState(chatId)
+  if (chatId !== viewedChatId) {
+    setViewedChatId(chatId)
+    setError(null)
+  }
   const [end, setEnd] = useState<HTMLDivElement | null>(null)
   const [following, setFollowing] = useState(true)
 
+  const listQuery = useApiGetQuery(listInsightApi, listParams, { enabled: !!client })
   const conversationQuery = useApiGetQuery(getInsightApi, params, {
-    enabled: !!client,
+    enabled: !!client && !!chatId,
     refetchInterval: (query) => query.state.data?.conversation?.messages.some(insightIsOpen) ? INSIGHT_OPEN_POLL_MS : false,
   })
-  const conversation = conversationQuery.data?.conversation ?? null
+  const conversation = chatId ? conversationQuery.data?.conversation ?? null : null
   const conversationId = conversation?.id ?? null
 
   useEffect(() => {
@@ -56,6 +82,7 @@ export function useInsightChat() {
   useSocketEvent(insightSettled, (payload) => {
     if (payload.conversationId !== conversationId) return
     void queryClient.invalidateQueries({ queryKey: [getInsightApi.identifier, params] })
+    void queryClient.invalidateQueries({ queryKey: [listInsightApi.identifier, listParams] })
   })
 
   const messages = (conversation?.messages ?? []).map((message) => insightIsOpen(message) && live[message.id] !== undefined
@@ -92,20 +119,33 @@ export function useInsightChat() {
       setError(res.error.message)
       return false
     }
-    queryClient.setQueryData<InsightGetResponse>([getInsightApi.identifier, params], (current) => ({
+    const nextParams = { clientId: client.id, conversationId: res.data.conversationId }
+    queryClient.setQueryData<InsightGetResponse>([getInsightApi.identifier, nextParams], (current) => ({
       success: true,
       conversation: {
         id: res.data.conversationId,
         clientId: client.id,
-        messages: [...(current?.conversation?.id === res.data.conversationId ? current.conversation.messages : []), ...res.data.messages],
+        messages: [...(current?.conversation.messages ?? []), ...res.data.messages],
       },
     }))
+    void queryClient.invalidateQueries({ queryKey: [listInsightApi.identifier, listParams] })
+    if (res.data.conversationId !== chatId) setSearchParams(insightChatHref(searchParams, res.data.conversationId).slice(1))
     return true
   }
 
+  const chats: InsightChatListItem[] = (listQuery.data?.conversations ?? []).map((summary) => ({
+    id: summary.id,
+    title: summary.title,
+    href: insightChatHref(searchParams, summary.id),
+    selected: summary.id === chatId,
+  }))
+
   return {
     clientSelected: !!clientSlug,
-    loading: clientsQuery.isPending || (!!client && conversationQuery.isPending),
+    chats,
+    newChatHref: insightChatHref(searchParams, null),
+    newChatSelected: !chatId,
+    loading: clientsQuery.isPending || (!!client && !!chatId && conversationQuery.isPending),
     loadError: conversationQuery.isError ? INSIGHT_ERRORS.LOAD_FAILED.MESSAGE : null,
     error,
     messages,

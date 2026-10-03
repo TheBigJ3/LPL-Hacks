@@ -110,12 +110,20 @@ function insightNormalizeValue(text: string): string {
   return text.toLowerCase().replace(/[$,\s]/g, "");
 }
 
-// Verified when every field the answer actually quotes was confirmed by the advisor; with no quoted field, every field on the excerpt must be.
+// Only amounts count as quoted: form names and ids also contain digits, and matching "5498-SA" in the prose isn't quoting a value.
+function insightCheckAmount(normalized: string): boolean {
+  return /^-?\d+(\.\d+)?%?$/.test(normalized) && normalized.replace(/\D/g, "").length >= 2;
+}
+
+// Verified when every amount the answer quotes was confirmed by the advisor; with no quoted amount, every field on the excerpt must be.
 export function insightCheckVerified(source: InsightSource, answer: string): boolean {
   const fields = source.fields ?? [];
   if (fields.length === 0) return false;
   const normalized = insightNormalizeValue(answer);
-  const quoted = fields.filter((field) => /\d/.test(field.value) && insightNormalizeValue(field.value).length >= 3 && normalized.includes(insightNormalizeValue(field.value)));
+  const quoted = fields.filter((field) => {
+    const value = insightNormalizeValue(field.value);
+    return insightCheckAmount(value) && normalized.includes(value);
+  });
   return (quoted.length > 0 ? quoted : fields).every((field) => field.verified);
 }
 

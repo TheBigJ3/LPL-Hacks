@@ -1,7 +1,7 @@
-import { ParamsZod } from "@lpl-hacks/shared/src/types/zod/api/v1/insight/get.js";
-import type { Response } from "@lpl-hacks/shared/src/types/native/api/v1/insight/get.js";
+import { ParamsZod } from "@lpl-hacks/shared/src/types/zod/api/v1/insight/list.js";
+import type { Response } from "@lpl-hacks/shared/src/types/native/api/v1/insight/list.js";
 import { AppError } from "../../../modules/AppError.js";
-import { insightConversationGet } from "../../../services/insight/insightConversationMethods.js";
+import { insightConversationList } from "../../../services/insight/insightConversationMethods.js";
 import { GENERAL_ERRORS } from "../../../types/native/errors.js";
 import type { RouteConfig } from "../../../types/native/api/RouteConfig.js";
 import type { RouteHandler } from "../../../types/native/api/RouteHandler.js";
@@ -15,7 +15,7 @@ const handler: RouteHandler = async (req): Promise<Response> => {
   const params = ParamsZod.safeParse(req.query);
   if (!params.success) throw new AppError(GENERAL_ERRORS.BAD_REQUEST);
 
-  return { success: true, conversation: await insightConversationGet(req.user.userId, params.data.clientId, params.data.conversationId) };
+  return { success: true, conversations: await insightConversationList(req.user.userId, params.data.clientId) };
 };
 
 export default { config, handler };

@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, inArray, lt, sql } from "drizzle-orm";
-import type { InsightConversation, InsightMessage } from "@lpl-hacks/shared/src/types/native/insight/insightMessage.js";
+import type { InsightConversation, InsightConversationSummary, InsightMessage } from "@lpl-hacks/shared/src/types/native/insight/insightMessage.js";
 import { db } from "../../loaders/postgresLoader.js";
 import { AppError } from "../../modules/AppError.js";
 import { isUniqueViolation } from "../../modules/pgError.js";
@@ -9,7 +9,7 @@ import { insightConversations, insightMessages } from "../../schemas/insight.js"
 import { CLIENT_ERRORS } from "../../types/native/clients/errors.js";
 import { INSIGHT_ERRORS } from "../../types/native/insight/errors.js";
 
-const { STALE_ANSWER_MS } = requireSettings("INSIGHT");
+const { STALE_ANSWER_MS, LIST_LIMIT, TITLE_MAX_CHARS } = requireSettings("INSIGHT");
 
 type InsightMessageRecord = typeof insightMessages.$inferSelect;
 
@@ -31,20 +31,39 @@ export function insightMessageToView(record: InsightMessageRecord): InsightMessa
   };
 }
 
-export async function insightConversationGet(advisorId: string, clientId: string): Promise<InsightConversation | null> {
-  const [conversation] = await db.select({ id: insightConversations.id })
+export async function insightConversationList(advisorId: string, clientId: string): Promise<InsightConversationSummary[]> {
+  const records = await db.select({
+    id: insightConversations.id,
+    updatedAt: insightConversations.updatedAt,
+    // Drizzle drops table names from columns in a single-table select, so the subquery qualifies its own.
+    title: sql<string | null>`(select first_question.text from ${insightMessages} as first_question where first_question.conversation_id = ${insightConversations}.id and first_question.role = 'user' order by first_question.created_at limit 1)`,
+  })
     .from(insightConversations)
     .where(and(eq(insightConversations.clientId, clientId), eq(insightConversations.advisorId, advisorId)))
-    .orderBy(desc(insightConversations.createdAt))
-    .limit(1);
-  if (!conversation) return null;
+    .orderBy(desc(insightConversations.updatedAt))
+    .limit(LIST_LIMIT);
 
-  const messages = await db.select()
-    .from(insightMessages)
-    .where(eq(insightMessages.conversationId, conversation.id))
+  return records.map((record) => ({
+    id: record.id,
+    title: insightConversationTitle(record.title ?? ""),
+    updatedAt: record.updatedAt.toISOString(),
+  }));
+}
+
+function insightConversationTitle(question: string): string {
+  const flat = question.replace(/\s+/g, " ").trim();
+  return flat.length > TITLE_MAX_CHARS ? `${flat.slice(0, TITLE_MAX_CHARS).trimEnd()}…` : flat || "New chat";
+}
+
+export async function insightConversationGet(advisorId: string, clientId: string, conversationId: string): Promise<InsightConversation> {
+  const records = await db.select({ message: insightMessages })
+    .from(insightConversations)
+    .leftJoin(insightMessages, eq(insightMessages.conversationId, insightConversations.id))
+    .where(and(eq(insightConversations.id, conversationId), eq(insightConversations.clientId, clientId), eq(insightConversations.advisorId, advisorId)))
     .orderBy(asc(insightMessages.createdAt), asc(insightMessages.role));
+  if (records.length === 0) throw new AppError(INSIGHT_ERRORS.CONVERSATION_NOT_FOUND);
 
-  return { id: conversation.id, clientId, messages: messages.map(insightMessageToView) };
+  return { id: conversationId, clientId, messages: records.flatMap((record) => record.message ? [insightMessageToView(record.message)] : []) };
 }
 
 // One question at a time per conversation: the harness session answers turns in order, so a second ask waits for the first.
@@ -90,9 +109,9 @@ async function insightConversationReleaseStale(conversationId: string): Promise<
 
 function insightConversationInsertTurn(advisorId: string, clientId: string, conversationId: string | null, message: string): Promise<InsightAskResult> {
   return db.transaction(async (tx) => {
-    const id = conversationId ?? (await tx.insert(insightConversations)
-      .values({ clientId, advisorId })
-      .returning({ id: insightConversations.id }))[0]!.id;
+    const id = conversationId
+      ? (await tx.update(insightConversations).set({ updatedAt: new Date() }).where(eq(insightConversations.id, conversationId)).returning({ id: insightConversations.id }))[0]!.id
+      : (await tx.insert(insightConversations).values({ clientId, advisorId }).returning({ id: insightConversations.id }))[0]!.id;
 
     const askedAt = new Date();
     const records = await tx.insert(insightMessages)

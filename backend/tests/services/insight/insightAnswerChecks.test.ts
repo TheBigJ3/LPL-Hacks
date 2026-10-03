@@ -126,6 +126,11 @@ describe("insightResolveCitations", () => {
     expect(insightResolveCitations("Withholding was $27,410.33 [S1].", sources).citations[0]!.verified).toBe(false);
   });
 
+  it("ignores form names and ids when deciding what the answer quoted", () => {
+    const form = insightBuildSources([chunk({ text: "Fields:\n- Total contributions: $ 4,150.00 [verified]\n- FORM: 5498-SA [unverified, 99% confidence]\n- TIN: 00-0000000 [unverified, 99% confidence]" })], 1, 600);
+    expect(insightResolveCitations("Dana contributed $4,150.00 on her Form 5498-SA [S1].", form).citations[0]!.verified).toBe(true);
+  });
+
   it("falls back to every field on the excerpt when the answer quotes none of them", () => {
     expect(insightResolveCitations("Adam has a W-2 on file [S1].", sources).citations[0]!.verified).toBe(false);
   });

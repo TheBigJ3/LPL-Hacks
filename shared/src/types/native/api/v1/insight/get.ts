@@ -6,5 +6,5 @@ export type Params = z.infer<typeof ParamsZod>;
 
 export type Response = {
   success: true;
-  conversation: InsightConversation | null;
+  conversation: InsightConversation;
 };
