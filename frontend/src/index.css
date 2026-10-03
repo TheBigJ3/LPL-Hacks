@@ -19,6 +19,7 @@
 @theme {
   --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, Consolas, monospace;
+  --font-serif: 'DM Serif Display', Georgia, serif;
 
   --color-main-white: #FAFAFA;
   --color-main-black: #09090B;
@@ -35,6 +36,11 @@
   --color-accent-blue: #062C7E;
   --color-accent-blue-light: #BBCFFC;
   --color-focus-ring: #062C7E;
+  --color-heading: #062C7E;
+  --color-review: #FACC4B;
+  --color-review-soft: #FFF3C4;
+  --color-review-text: #8A5A00;
+  --color-error: #C4314B;
 
   --spacing: 4px;
   --spacing-gutter: clamp(16px, 1.5vw + 10px, 24px);
@@ -111,6 +117,10 @@ html {
   --color-accent-blue: #183E8F;
   --color-accent-blue-light: #CCDCFD;
   --color-focus-ring: #BBCFFC;
+  --color-heading: #BBCFFC;
+  --color-review-soft: #3A2F0B;
+  --color-review-text: #FACC4B;
+  --color-error: #FF6B81;
   --shadow-100: 0 1px 4px #00000066;
   --shadow-200: 0 1px 4px #00000080, 0 1px 4px #00000066;
   color-scheme: dark;

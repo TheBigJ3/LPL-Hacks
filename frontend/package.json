@@ -16,6 +16,7 @@
     "@tanstack/react-query": "5.100.6",
     "axios": "^1.19.0",
     "motion": "^13.1.0",
+    "pdfjs-dist": "^5.7.284",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router": "^8.3.0",

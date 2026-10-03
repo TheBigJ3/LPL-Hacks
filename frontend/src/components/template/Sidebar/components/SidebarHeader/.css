@@ -1,15 +1,12 @@
 .sidebar-header {
   --sidebar-header-padding-left: 24px;
-  --sidebar-header-logo-filter: none;
+  /* The panel is navy in both themes, so the dark logo is always inverted. */
+  --sidebar-header-logo-filter: invert(1);
   padding: 12px 12px 12px var(--sidebar-header-padding-left);
 }
 
 .sidebar-header[data-open="false"] {
   --sidebar-header-padding-left: 12px;
-}
-
-:root[data-theme="dark"] .sidebar-header {
-  --sidebar-header-logo-filter: invert(1);
 }
 
 .sidebar-header img {

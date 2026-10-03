@@ -43,6 +43,7 @@ export const SIDEBAR_GROUPS: SidebarTabGroup[] = [
     label: 'Tools',
     tabs: [
       { label: 'Upload', icon: 'upload_file', path: '/upload' },
+      { label: 'Extract', icon: 'document_scanner', path: '/extract' },
       { label: 'Assistant', icon: 'auto_awesome', path: '/assistant' },
     ],
   },
@@ -137,6 +138,7 @@ const sidebarClientGetGroups = (client: SidebarClient, member: SidebarClientMemb
       label: 'Tools',
       tabs: [
         { label: 'Upload', icon: 'upload_file', path: `${base}/upload${search}` },
+        { label: 'Extract', icon: 'document_scanner', path: `${base}/extract${search}` },
         { label: 'Assistant', icon: 'auto_awesome', path: `${base}/assistant${search}` },
       ],
     },
