@@ -18,6 +18,16 @@
   transform: rotate(-40.25deg);
 }
 
+.empty-state__icon {
+  left: 117px;
+  top: 33px;
+  width: 48px;
+  height: 48px;
+  color: var(--color-main-gray);
+  font-size: 48px;
+  line-height: 1;
+}
+
 .empty-state__title {
   color: var(--color-dark-gray);
   font-size: 20px;

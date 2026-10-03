@@ -32,7 +32,7 @@ const InsightChat = () => {
           {chat.loadError && <p className="insight-chat__error w-full rounded-lg px-4 py-3" role="alert">{chat.loadError}</p>}
           {!chat.loading && !chat.loadError && !chat.messages.length &&
             <div className="flex flex-1 items-center justify-center pb-33">
-              <EmptyState title="Ask anything" subtitle="Get insight into this household" />
+              <EmptyState title="Ask anything" subtitle="Get insight into this household" icon="query_stats" />
             </div>}
           {!!chat.messages.length &&
             <ol className="insight-chat__thread flex w-full flex-col" aria-label="Conversation" aria-live="polite">
