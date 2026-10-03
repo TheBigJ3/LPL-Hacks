@@ -44,19 +44,14 @@
 }
 
 .document-section__grid {
-  --document-section-columns: 5;
-  --document-section-gap: 20px;
+  --document-section-columns: 4;
+  --document-section-gap: 24px;
   grid-template-columns: repeat(var(--document-section-columns), minmax(0, 1fr));
   gap: var(--document-section-gap);
 }
 
-.document-section__grid[data-wide="true"] {
-  --document-section-gap: 36px;
-}
-
 .document-section__grid[data-columns="2"] { --document-section-columns: 2; }
 .document-section__grid[data-columns="3"] { --document-section-columns: 3; }
-.document-section__grid[data-columns="4"] { --document-section-columns: 4; }
 
 .document-section__shown {
   color: var(--color-dark-gray);

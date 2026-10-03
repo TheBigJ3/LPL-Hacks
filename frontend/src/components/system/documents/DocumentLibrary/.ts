@@ -104,12 +104,12 @@ const DOCUMENT_DEMO_RECORDS: DocumentRecord[] = DOCUMENT_TAGS.flatMap((tag, tagI
 
 const DOCUMENT_DATE_FORMAT = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
 
-const DOCUMENT_CARD_MIN_WIDTH = 168
+const DOCUMENT_CARD_MIN_WIDTH = 200
 const DOCUMENT_WIDE_WIDTH = 900
-const DOCUMENT_GAP_WIDE = 36
-const DOCUMENT_GAP_NARROW = 20
+const DOCUMENT_GAP_WIDE = 24
+const DOCUMENT_GAP_NARROW = 24
 const DOCUMENT_MIN_COLUMNS = 2
-const DOCUMENT_MAX_COLUMNS = 5
+const DOCUMENT_MAX_COLUMNS = 4
 
 let documentPreviewReady = false
 
