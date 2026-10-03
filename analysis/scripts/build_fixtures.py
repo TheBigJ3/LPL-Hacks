@@ -7,9 +7,17 @@ Re-run after editing:  .venv/Scripts/python scripts/build_fixtures.py
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
-OUT = Path(__file__).resolve().parents[1] / "fixtures" / "households"
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from rapid_analysis.textract_factory import textract_1040, textract_1099r, textract_statement, textract_w2  # noqa: E402
+
+OUT = ROOT / "fixtures" / "households"
+DOCS_OUT = ROOT / "fixtures" / "documents"
+REAL_1099R_LOG = ROOT.parent / "backend" / "logs" / "textract" / "2026-10-03T01-42-33-695Z.json"
 MARK = "SYNTHETIC TEST DATA - invented people and documents, not for filing"
 
 
@@ -210,6 +218,31 @@ def main() -> None:
         body = {"_synthetic": MARK, **household}
         (OUT / f"{household['household_id']}.json").write_text(json.dumps(body, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {len(HOUSEHOLDS)} fixtures to {OUT}")
+
+    DOCS_OUT.mkdir(parents=True, exist_ok=True)
+    for name, response in documents().items():
+        body = {"_synthetic": MARK, **response}
+        (DOCS_OUT / f"{name}.json").write_text(json.dumps(body, indent=1) + "\n", encoding="utf-8")
+    # The real Textract response for the synthetic Alex Example 1099-R, logged by backend/api/v1/extraction/analyze.
+    real = json.loads(REAL_1099R_LOG.read_text(encoding="utf-8"))
+    body = {"_synthetic": MARK + " (real AWS Textract output of a synthetic form)", **real}
+    (DOCS_OUT / "alex_example_1099r_2026.pdf.json").write_text(json.dumps(body) + "\n", encoding="utf-8")
+    print(f"wrote {len(documents()) + 1} document fixtures to {DOCS_OUT}")
+
+
+def documents() -> dict[str, dict]:
+    return {
+        "john_w2_2025.pdf": textract_w2("John Sample", "Contoso Sample Co", "120,000.00", "18,400.00", ["D 8,200.00"], "5,940.00"),
+        "sarah_w2_2025.pdf": textract_w2("Sarah Sample", "Fabrikam Sample Inc", "65,000.00", "7,150.00", ["D 4,500.00"], "3,217.50"),
+        "hh001_1040_2025.pdf": textract_1040("John Sample and Sarah Sample", "185,000.00", "185,000.00", "2"),
+        "hh001_bank_statement_2025.pdf": textract_statement("John Sample and Sarah Sample", "$32,216.56"),
+        "jordan_w2_2025.pdf": textract_w2("Jordan Park", "Wingtip Sample Systems", "120,000.00", "19,800.00", ["D 15,000.00"]),
+        "hh004_1040_2025.pdf": textract_1040("Jordan Park", "165,000.00", "158,000.00", "0"),
+        "morgan_w2_2025.pdf": textract_w2("Morgan Lee", "Tailspin Sample Toys", "92,000.00", "12,880.00", ["D 18,500.00", "W 4,300.00"]),
+        "taylor_w2_2025.pdf": textract_w2("Taylor Mock", "Adventure Works Sample", "110,000.00", "14,300.00", ["D 2,000.00"]),
+        "hh006_1040_2025.pdf": textract_1040("Taylor Mock and Sam Mock", "110,000.00", "152,000.00", "1", business_income="48,000.00"),
+        "pat_1099r_2025.pdf": textract_1099r("Pat Rowe", "$ 12,000.00", "$ 12,000.00", "$ 600.00", "1", "$ 240.00", "03/14/2025"),
+    }
 
 
 if __name__ == "__main__":

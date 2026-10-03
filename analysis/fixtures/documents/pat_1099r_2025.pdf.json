@@ -1,0 +1,2073 @@
+{
+ "_synthetic": "SYNTHETIC TEST DATA - invented people and documents, not for filing",
+ "DocumentMetadata": {
+  "Pages": 1
+ },
+ "Blocks": [
+  {
+   "BlockType": "PAGE",
+   "Id": "page-1",
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": []
+    }
+   ]
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-1",
+   "Text": "SYNTHETIC TEST DATA - NOT FOR FILING",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-2",
+   "Text": "2025 FORM 1099-R",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-3",
+   "Text": "Distributions From Pensions, Annuities, Retirement or Profit-Sharing Plans, IRAs, Insurance Contracts, etc.",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-6",
+   "Text": "Example",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-7",
+   "Text": "Retirement",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-8",
+   "Text": "Plan",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-9",
+   "Text": "Services",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-10",
+   "Text": "LLC",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-11",
+   "Text": "100",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-12",
+   "Text": "Test",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-13",
+   "Text": "Plaza,",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-14",
+   "Text": "Suite",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-15",
+   "Text": "200,",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-16",
+   "Text": "Sacramento,",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-17",
+   "Text": "CA",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-18",
+   "Text": "95814",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-19",
+   "Text": "PAYER'S",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-20",
+   "Text": "name",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-5",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-6",
+      "word-7",
+      "word-8",
+      "word-9",
+      "word-10",
+      "word-11",
+      "word-12",
+      "word-13",
+      "word-14",
+      "word-15",
+      "word-16",
+      "word-17",
+      "word-18"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-4",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-19",
+      "word-20"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-5"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-23",
+   "Text": "00-0000000",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-24",
+   "Text": "PAYER'S",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-25",
+   "Text": "TIN",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-22",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-23"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-21",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-24",
+      "word-25"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-22"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-28",
+   "Text": "000-00-0000",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-29",
+   "Text": "RECIPIENT'S",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-30",
+   "Text": "TIN",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-27",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-28"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-26",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-29",
+      "word-30"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-27"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-33",
+   "Text": "Pat",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-34",
+   "Text": "Rowe",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-35",
+   "Text": "RECIPIENT'S",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-36",
+   "Text": "name",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-32",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-33",
+      "word-34"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-31",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-35",
+      "word-36"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-32"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-39",
+   "Text": "456",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-40",
+   "Text": "Sample",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-41",
+   "Text": "Street,",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-42",
+   "Text": "Apt.",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-43",
+   "Text": "5B",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-44",
+   "Text": "Street",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-45",
+   "Text": "address",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-38",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-39",
+      "word-40",
+      "word-41",
+      "word-42",
+      "word-43"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-37",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-44",
+      "word-45"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-38"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-48",
+   "Text": "Long",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-49",
+   "Text": "Beach",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-50",
+   "Text": "City",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-51",
+   "Text": "or",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-52",
+   "Text": "town",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-47",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-48",
+      "word-49"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-46",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-50",
+      "word-51",
+      "word-52"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-47"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-55",
+   "Text": "CA",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-56",
+   "Text": "/",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-57",
+   "Text": "USA",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-58",
+   "Text": "/",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-59",
+   "Text": "90802",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-60",
+   "Text": "State",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-61",
+   "Text": "/",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-62",
+   "Text": "Country",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-63",
+   "Text": "/",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-64",
+   "Text": "ZIP",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-54",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-55",
+      "word-56",
+      "word-57",
+      "word-58",
+      "word-59"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-53",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-60",
+      "word-61",
+      "word-62",
+      "word-63",
+      "word-64"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-54"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-67",
+   "Text": "TEST-1099R-0001",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-68",
+   "Text": "Account",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-69",
+   "Text": "number",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-70",
+   "Text": "(see",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-71",
+   "Text": "instructions)",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-66",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-67"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-65",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-68",
+      "word-69",
+      "word-70",
+      "word-71"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-66"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-74",
+   "Text": "$",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-75",
+   "Text": "12,000.00",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-76",
+   "Text": "1",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-77",
+   "Text": "Gross",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-78",
+   "Text": "distribution",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-73",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-74",
+      "word-75"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-72",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-76",
+      "word-77",
+      "word-78"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-73"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-81",
+   "Text": "$",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-82",
+   "Text": "12,000.00",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-83",
+   "Text": "2a",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-84",
+   "Text": "Taxable",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-85",
+   "Text": "amount",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-80",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-81",
+      "word-82"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-79",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-83",
+      "word-84",
+      "word-85"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-80"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "SELECTION_ELEMENT",
+   "Id": "sel-88",
+   "Confidence": 95.2,
+   "Page": 1,
+   "SelectionStatus": "NOT_SELECTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-89",
+   "Text": "2b",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-90",
+   "Text": "Taxable",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-91",
+   "Text": "amount",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-92",
+   "Text": "not",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-93",
+   "Text": "determined",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-87",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "sel-88"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-86",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-89",
+      "word-90",
+      "word-91",
+      "word-92",
+      "word-93"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-87"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "SELECTION_ELEMENT",
+   "Id": "sel-96",
+   "Confidence": 95.2,
+   "Page": 1,
+   "SelectionStatus": "SELECTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-97",
+   "Text": "Total",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-98",
+   "Text": "distribution",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-95",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "sel-96"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-94",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-97",
+      "word-98"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-95"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-101",
+   "Text": "$",
+   "Confidence": 75.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-102",
+   "Text": "3",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-103",
+   "Text": "Capital",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-104",
+   "Text": "gain",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-105",
+   "Text": "(included",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-106",
+   "Text": "in",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-107",
+   "Text": "box",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-108",
+   "Text": "2a)",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-100",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 75.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-101"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-99",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 75.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-102",
+      "word-103",
+      "word-104",
+      "word-105",
+      "word-106",
+      "word-107",
+      "word-108"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-100"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-111",
+   "Text": "$",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-112",
+   "Text": "600.00",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-113",
+   "Text": "4",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-114",
+   "Text": "Federal",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-115",
+   "Text": "income",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-116",
+   "Text": "tax",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-117",
+   "Text": "withheld",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-110",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-111",
+      "word-112"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-109",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-113",
+      "word-114",
+      "word-115",
+      "word-116",
+      "word-117"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-110"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-120",
+   "Text": "1",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-121",
+   "Text": "7a",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-122",
+   "Text": "Dist.",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-123",
+   "Text": "code(s)",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-119",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-120"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-118",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-121",
+      "word-122",
+      "word-123"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-119"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "SELECTION_ELEMENT",
+   "Id": "sel-126",
+   "Confidence": 95.2,
+   "Page": 1,
+   "SelectionStatus": "NOT_SELECTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-127",
+   "Text": "7b",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-128",
+   "Text": "IRA/SEP/SIMPLE",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-125",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "sel-126"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-124",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-127",
+      "word-128"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-125"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-131",
+   "Text": "03/14/2025",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-132",
+   "Text": "13",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-133",
+   "Text": "Date",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-134",
+   "Text": "of",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-135",
+   "Text": "payment",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-130",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-131"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-129",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-132",
+      "word-133",
+      "word-134",
+      "word-135"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-130"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-138",
+   "Text": "$",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-139",
+   "Text": "240.00",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-140",
+   "Text": "14",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-141",
+   "Text": "State",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-142",
+   "Text": "tax",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-143",
+   "Text": "withheld",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-137",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-138",
+      "word-139"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-136",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-140",
+      "word-141",
+      "word-142",
+      "word-143"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-137"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-146",
+   "Text": "CA",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-147",
+   "Text": "/",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-148",
+   "Text": "TEST-000001",
+   "Confidence": 95.2,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-149",
+   "Text": "15",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-150",
+   "Text": "State/Payer's",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-151",
+   "Text": "state",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-152",
+   "Text": "no.",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-145",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-146",
+      "word-147",
+      "word-148"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-144",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 95.2,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-149",
+      "word-150",
+      "word-151",
+      "word-152"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-145"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-155",
+   "Text": "1099-R",
+   "Confidence": 86.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "WORD",
+   "Id": "word-156",
+   "Text": "Form",
+   "Confidence": 99.0,
+   "Page": 1,
+   "TextType": "PRINTED"
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "value-154",
+   "EntityTypes": [
+    "VALUE"
+   ],
+   "Confidence": 86.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-155"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "KEY_VALUE_SET",
+   "Id": "key-153",
+   "EntityTypes": [
+    "KEY"
+   ],
+   "Confidence": 86.0,
+   "Page": 1,
+   "Relationships": [
+    {
+     "Type": "CHILD",
+     "Ids": [
+      "word-156"
+     ]
+    },
+    {
+     "Type": "VALUE",
+     "Ids": [
+      "value-154"
+     ]
+    }
+   ]
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-157",
+   "Text": "PAYER'S name",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-158",
+   "Text": "PAYER'S TIN",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-159",
+   "Text": "RECIPIENT'S TIN",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-160",
+   "Text": "RECIPIENT'S name",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-161",
+   "Text": "Street address",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-162",
+   "Text": "City or town",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-163",
+   "Text": "State / Country / ZIP",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-164",
+   "Text": "Account number (see instructions)",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-165",
+   "Text": "1 Gross distribution",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-166",
+   "Text": "2a Taxable amount",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-167",
+   "Text": "2b Taxable amount not determined",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-168",
+   "Text": "Total distribution",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-169",
+   "Text": "3 Capital gain (included in box 2a)",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-170",
+   "Text": "4 Federal income tax withheld",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-171",
+   "Text": "7a Dist. code(s)",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-172",
+   "Text": "7b IRA/SEP/SIMPLE",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-173",
+   "Text": "13 Date of payment",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-174",
+   "Text": "14 State tax withheld",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-175",
+   "Text": "15 State/Payer's state no.",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-176",
+   "Text": "Form",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-177",
+   "Text": "Example Retirement Plan Services LLC 100 Test Plaza, Suite 200, Sacramento, CA 95814",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-178",
+   "Text": "00-0000000",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-179",
+   "Text": "000-00-0000",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-180",
+   "Text": "Pat Rowe",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-181",
+   "Text": "456 Sample Street, Apt. 5B",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-182",
+   "Text": "Long Beach",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-183",
+   "Text": "CA / USA / 90802",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-184",
+   "Text": "TEST-1099R-0001",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-185",
+   "Text": "$ 12,000.00",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-186",
+   "Text": "$ 12,000.00",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-187",
+   "Text": "$",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-188",
+   "Text": "$ 600.00",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-189",
+   "Text": "1",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-190",
+   "Text": "03/14/2025",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-191",
+   "Text": "$ 240.00",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-192",
+   "Text": "CA / TEST-000001",
+   "Confidence": 99.0,
+   "Page": 1
+  },
+  {
+   "BlockType": "LINE",
+   "Id": "line-193",
+   "Text": "1099-R",
+   "Confidence": 99.0,
+   "Page": 1
+  }
+ ]
+}
