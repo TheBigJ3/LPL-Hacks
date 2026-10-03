@@ -23,22 +23,23 @@ const Sidebar = () => {
 
       <nav className="sidebar__panel" aria-label="Main navigation" inert={sidebar.hidden}>
         <SidebarHeader open={sidebar.open} onToggle={sidebar.toggle} />
-        <SidebarClientSwitcher client={sidebar.client} member={sidebar.member} open={sidebar.open} onExpand={sidebar.expand} />
-        <div className="relative px-3 pb-6">
+        <div className="sidebar__context relative">
           <AnimatePresence mode="popLayout" initial={false} custom={sidebar.contextDirection}>
             <motion.div
               key={sidebar.contextKey}
-              className="flex flex-col gap-6"
               custom={sidebar.contextDirection}
               variants={SIDEBAR_CONTEXT_VARIANTS}
               initial="enter"
               animate="center"
               exit="exit"
             >
-              {sidebar.members && <SidebarClientMembers members={sidebar.members} selectedId={sidebar.member?.slug ?? null} open={sidebar.open} />}
-              {sidebar.groups.map((group) =>
-                <SidebarGroup key={group.label} group={group} open={sidebar.open} onNavigate={sidebar.closeIfFloating} />
-              )}
+              <SidebarClientSwitcher client={sidebar.client} member={sidebar.member} open={sidebar.open} onExpand={sidebar.expand} />
+              <div className="flex flex-col gap-6 px-3 pb-6">
+                {sidebar.members && <SidebarClientMembers members={sidebar.members} selectedId={sidebar.member?.slug ?? null} open={sidebar.open} />}
+                {sidebar.groups.map((group) =>
+                  <SidebarGroup key={group.label} group={group} open={sidebar.open} onNavigate={sidebar.closeIfFloating} />
+                )}
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>

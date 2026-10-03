@@ -22,19 +22,21 @@ export type SidebarTabGroup = {
 export const SIDEBAR_CLIENT_MEMBER_PARAM = 'member'
 
 const SIDEBAR_EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const
-const SIDEBAR_CONTEXT_SHIFT = 40
+const SIDEBAR_CONTEXT_SHIFT = 64
+const SIDEBAR_CONTEXT_ENTER_DELAY = 0.08
 
 export const SIDEBAR_CONTEXT_VARIANTS: Variants = {
   enter: (direction: number) => ({ x: direction * SIDEBAR_CONTEXT_SHIFT, opacity: 0 }),
   center: {
     x: 0,
     opacity: 1,
-    transition: { duration: 0.32, ease: SIDEBAR_EASE_OUT_EXPO, staggerChildren: 0.04, delayChildren: 0.06 },
+    // Starts once the outgoing context has mostly faded, so the two never read as one overlapping card.
+    transition: { duration: 0.32, ease: SIDEBAR_EASE_OUT_EXPO, delay: SIDEBAR_CONTEXT_ENTER_DELAY, staggerChildren: 0.04, delayChildren: SIDEBAR_CONTEXT_ENTER_DELAY + 0.06 },
   },
   exit: (direction: number) => ({
     x: direction * -SIDEBAR_CONTEXT_SHIFT,
     opacity: 0,
-    transition: { duration: 0.18, ease: 'easeIn' },
+    transition: { duration: 0.14, ease: 'easeIn' },
   }),
 }
 

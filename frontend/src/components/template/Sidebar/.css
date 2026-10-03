@@ -56,7 +56,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: none;
-  /* Navy panel in both themes: remap the tokens children read to light-on-navy. */
+  /* Navy panel: remap the tokens children read to light-on-navy. */
   --color-surface: var(--color-navy);
   --color-surface-hover: var(--color-navy-hover);
   --color-border: rgba(255, 255, 255, .12);
