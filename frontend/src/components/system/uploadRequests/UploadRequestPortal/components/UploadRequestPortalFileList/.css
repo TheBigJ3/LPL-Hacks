@@ -1,0 +1,79 @@
+.upload-request-portal-file-list {
+  border: 1px solid var(--color-border);
+}
+
+.upload-request-portal-file-list__item {
+  --upload-request-portal-file-list-tone: var(--color-dark-gray);
+  min-height: 56px;
+  padding: 8px 8px 8px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.upload-request-portal-file-list__item:last-child {
+  border-bottom: none;
+}
+
+.upload-request-portal-file-list__item[data-status="uploading"] {
+  --upload-request-portal-file-list-tone: var(--color-heading);
+}
+
+.upload-request-portal-file-list__item[data-status="uploaded"] {
+  --upload-request-portal-file-list-tone: var(--color-success);
+}
+
+.upload-request-portal-file-list__item[data-status="invalid"],
+.upload-request-portal-file-list__item[data-status="failed"] {
+  --upload-request-portal-file-list-tone: var(--color-error);
+}
+
+.upload-request-portal-file-list__icon {
+  color: var(--upload-request-portal-file-list-tone);
+  font-size: 20px;
+}
+
+.upload-request-portal-file-list__item[data-status="uploading"] .upload-request-portal-file-list__icon {
+  animation: upload-request-portal-file-list-spin 900ms linear infinite;
+}
+
+@keyframes upload-request-portal-file-list-spin {
+  to { transform: rotate(360deg); }
+}
+
+.upload-request-portal-file-list__name {
+  color: var(--color-text-default);
+  font-size: 14px;
+}
+
+.upload-request-portal-file-list__detail {
+  color: var(--color-dark-gray);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.upload-request-portal-file-list__item[data-status="invalid"] .upload-request-portal-file-list__detail,
+.upload-request-portal-file-list__item[data-status="failed"] .upload-request-portal-file-list__detail {
+  color: var(--color-error);
+}
+
+.upload-request-portal-file-list__remove {
+  width: 32px;
+  height: 32px;
+  color: var(--color-dark-gray);
+  font-size: 18px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.upload-request-portal-file-list__remove:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-default);
+}
+
+.upload-request-portal-file-list__remove:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upload-request-portal-file-list__item[data-status="uploading"] .upload-request-portal-file-list__icon { animation: none; }
+  .upload-request-portal-file-list__remove { transition: none; }
+}

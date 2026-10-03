@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useParams, useSearchParams } from 'react-router'
 import type { Variants } from 'motion/react'
-import { SIDEBAR_DEMO_CLIENTS, type SidebarClient } from '@components/template/Sidebar/.ts'
+import type { Client } from '@lpl-hacks/shared/src/types/native/clients/client'
+import listClientsApi from '@api/clients/listClientsApi'
+import { useApiGetQuery } from '@features/apiLayer'
 
 export type NoteColor = 'yellow' | 'pink' | 'mint' | 'blue' | 'mauve' | 'gray'
 
@@ -131,10 +133,10 @@ const NOTE_DEMO_RECORDS: NoteRecord[] = Array.from({ length: NOTE_DEMO_OWNERS.le
 
 const noteFormatDate = (date: Date) => `${NOTE_DATE_FORMAT.format(date)} ${NOTE_TIME_FORMAT.format(date).replace(' ', '').toLowerCase()}`
 
-const noteGetMemberLabel = (record: NoteRecord, client: SidebarClient | null) =>
-  client?.members.find((member) => member.id === record.memberId)?.name ?? client?.name ?? 'Household'
+const noteGetMemberLabel = (record: NoteRecord, client: Client | null) =>
+  client?.members.find((member) => member.slug === record.memberId)?.name ?? client?.name ?? 'Household'
 
-const noteBuildCard = (record: NoteRecord, client: SidebarClient | null): NoteCardView => {
+const noteBuildCard = (record: NoteRecord, client: Client | null): NoteCardView => {
   const member = noteGetMemberLabel(record, client)
   return {
     id: record.id,
@@ -147,7 +149,7 @@ const noteBuildCard = (record: NoteRecord, client: SidebarClient | null): NoteCa
   }
 }
 
-const noteMatchesQuery = (record: NoteRecord, client: SidebarClient | null, needle: string) =>
+const noteMatchesQuery = (record: NoteRecord, client: Client | null, needle: string) =>
   [record.title, record.body, noteGetMemberLabel(record, client)].some((field) => field.toLowerCase().includes(needle))
 
 export function useNoteLibrary() {
@@ -155,7 +157,8 @@ export function useNoteLibrary() {
   const [searchParams, setSearchParams] = useSearchParams()
   const memberId = searchParams.get('member')
   const query = (searchParams.get(NOTE_SEARCH_PARAM) ?? '').trim()
-  const client = SIDEBAR_DEMO_CLIENTS.find((item) => item.id === clientId) ?? null
+  const clientsQuery = useApiGetQuery(listClientsApi)
+  const client = clientsQuery.data?.clients.find((item) => item.slug === clientId) ?? null
   const view: NoteView = searchParams.get(NOTE_VIEW_PARAM) === 'list' ? 'list' : 'grid'
 
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -271,7 +274,7 @@ export function useNoteLibrary() {
       },
       members: <NoteMemberOption[]>[
         { id: null, label: client?.name ?? 'Household' },
-        ...(client?.members.map((member) => ({ id: member.id, label: member.name })) ?? []),
+        ...(client?.members.map((member) => ({ id: member.slug, label: member.name })) ?? []),
       ],
       save: saveNote,
       close: () => setEditorOpen(false),

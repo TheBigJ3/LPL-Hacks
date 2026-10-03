@@ -1,10 +1,11 @@
 import './.css'
 import { motion } from 'motion/react'
-import { SIDEBAR_SWAP_TRANSITION, SIDEBAR_TAB_VARIANTS, type SidebarClientMember } from '../../.ts'
+import type { ClientMember } from '@lpl-hacks/shared/src/types/native/clients/client'
+import { SIDEBAR_SWAP_TRANSITION, SIDEBAR_TAB_VARIANTS } from '../../.ts'
 import { SIDEBAR_CLIENT_MEMBERS_HIGHLIGHT_ID, useSidebarClientMembers } from './.ts'
 
 type SidebarClientMembersProps = {
-  members: SidebarClientMember[]
+  members: ClientMember[]
   selectedId: string | null
   open: boolean
 }

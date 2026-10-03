@@ -1,6 +1,9 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { useMatch, useSearchParams } from 'react-router'
 import type { Transition, Variants } from 'motion/react'
+import type { Client, ClientMember } from '@lpl-hacks/shared/src/types/native/clients/client'
+import listClientsApi from '@api/clients/listClientsApi'
+import { useApiGetQuery } from '@features/apiLayer'
 
 export type SidebarLayout = 'docked' | 'rail' | 'drawer'
 
@@ -14,20 +17,6 @@ export type SidebarTab = {
 export type SidebarTabGroup = {
   label: string
   tabs: SidebarTab[]
-}
-
-export type SidebarClientKind = 'household' | 'individual'
-
-export type SidebarClientMember = {
-  id: string
-  name: string
-}
-
-export type SidebarClient = {
-  id: string
-  name: string
-  kind: SidebarClientKind
-  members: SidebarClientMember[]
 }
 
 export const SIDEBAR_GROUPS: SidebarTabGroup[] = [
@@ -48,53 +37,6 @@ export const SIDEBAR_GROUPS: SidebarTabGroup[] = [
       { label: 'Assistant', icon: 'auto_awesome', path: '/assistant' },
     ],
   },
-]
-
-export const SIDEBAR_DEMO_CLIENTS: SidebarClient[] = [
-  {
-    id: 'johnson',
-    name: 'Johnson Household',
-    kind: 'household',
-    members: [
-      { id: 'jess', name: 'Jess' },
-      { id: 'michelle', name: 'Michelle' },
-      { id: 'adam', name: 'Adam' },
-      { id: 'kim', name: 'Kim' },
-    ],
-  },
-  { id: 'dana-whitfield', name: 'Dana Whitfield', kind: 'individual', members: [] },
-  {
-    id: 'patel',
-    name: 'Patel Household',
-    kind: 'household',
-    members: [
-      { id: 'raj', name: 'Raj' },
-      { id: 'priya', name: 'Priya' },
-      { id: 'anika', name: 'Anika' },
-    ],
-  },
-  {
-    id: 'nguyen',
-    name: 'Nguyen Household',
-    kind: 'household',
-    members: [
-      { id: 'linh', name: 'Linh' },
-      { id: 'minh', name: 'Minh' },
-      { id: 'bao', name: 'Bao' },
-    ],
-  },
-  { id: 'marcus-reed', name: 'Marcus Reed', kind: 'individual', members: [] },
-  {
-    id: 'garcia',
-    name: 'Garcia Household',
-    kind: 'household',
-    members: [
-      { id: 'sofia', name: 'Sofia' },
-      { id: 'mateo', name: 'Mateo' },
-    ],
-  },
-  { id: 'elena-rossi', name: 'Elena Rossi', kind: 'individual', members: [] },
-  { id: 'kenji-sato', name: 'Kenji Sato', kind: 'individual', members: [] },
 ]
 
 export const SIDEBAR_CLIENT_MEMBER_PARAM = 'member'
@@ -123,9 +65,9 @@ export const SIDEBAR_TAB_VARIANTS: Variants = {
 
 export const SIDEBAR_SWAP_TRANSITION: Transition = { duration: 0.28, ease: SIDEBAR_EASE_OUT_EXPO }
 
-const sidebarClientGetGroups = (client: SidebarClient, member: SidebarClientMember | null): SidebarTabGroup[] => {
-  const base = `/clients/${client.id}`
-  const search = member ? `?${SIDEBAR_CLIENT_MEMBER_PARAM}=${member.id}` : ''
+const sidebarClientGetGroups = (client: Client, member: ClientMember | null): SidebarTabGroup[] => {
+  const base = `/clients/${client.slug}`
+  const search = member ? `?${SIDEBAR_CLIENT_MEMBER_PARAM}=${member.slug}` : ''
   return [
     {
       label: 'Client',
@@ -186,9 +128,11 @@ export function useSidebar() {
   const clientMatch = useMatch('/clients/:clientId/*')
   const [searchParams] = useSearchParams()
 
-  const client = SIDEBAR_DEMO_CLIENTS.find((item) => item.id === clientMatch?.params.clientId) ?? null
-  const memberId = searchParams.get(SIDEBAR_CLIENT_MEMBER_PARAM)
-  const member = client?.members.find((item) => item.id === memberId) ?? null
+  const clientsQuery = useApiGetQuery(listClientsApi)
+
+  const client = clientsQuery.data?.clients.find((item) => item.slug === clientMatch?.params.clientId) ?? null
+  const memberSlug = searchParams.get(SIDEBAR_CLIENT_MEMBER_PARAM)
+  const member = client?.members.find((item) => item.slug === memberSlug) ?? null
 
   const docked = layout === 'docked'
   const open = docked ? dockedOpen : floatingOpen
@@ -218,7 +162,7 @@ export function useSidebar() {
     member,
     members: client?.kind === 'household' ? client.members : null,
     groups: client ? sidebarClientGetGroups(client, member) : SIDEBAR_GROUPS,
-    contextKey: client?.id ?? 'workspace',
+    contextKey: client?.slug ?? 'workspace',
     contextDirection: client ? 1 : -1,
     toggle: () => setOpen(!open),
     expand: () => setOpen(true),

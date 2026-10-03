@@ -15,6 +15,13 @@
       "when": 1791015686468,
       "tag": "0001_documents_drop_textract_job",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791017275157,
+      "tag": "0002_clients",
+      "breakpoints": true
     }
   ]
 }

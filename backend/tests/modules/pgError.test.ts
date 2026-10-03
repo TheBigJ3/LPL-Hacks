@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isUniqueViolation } from "../../modules/pgError.js";
+import { isForeignKeyViolation, isUniqueViolation } from "../../modules/pgError.js";
 
 describe("isUniqueViolation", () => {
   it("reads the code off a raw driver error", () => {
@@ -19,5 +19,15 @@ describe("isUniqueViolation", () => {
   it("ignores a value that is not an error", () => {
     expect(isUniqueViolation(null)).toBe(false);
     expect(isUniqueViolation("23505")).toBe(false);
+  });
+});
+
+describe("isForeignKeyViolation", () => {
+  it("reads the code through the error Drizzle wraps the driver's in", () => {
+    expect(isForeignKeyViolation(Object.assign(new Error("Failed query"), { cause: { code: "23503" } }))).toBe(true);
+  });
+
+  it("ignores a unique violation", () => {
+    expect(isForeignKeyViolation({ code: "23505" })).toBe(false);
   });
 });

@@ -1,0 +1,93 @@
+.extraction-mode-picker {
+  --extraction-mode-picker-columns: minmax(0, 1fr);
+  max-width: 1237px;
+  grid-template-columns: var(--extraction-mode-picker-columns);
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .extraction-mode-picker {
+    --extraction-mode-picker-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.extraction-mode-picker__option {
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.extraction-mode-picker__option:hover {
+  background: var(--color-surface-hover);
+}
+
+.extraction-mode-picker__option[aria-checked="true"] {
+  border-color: var(--color-accent-blue);
+  box-shadow: inset 0 0 0 1px var(--color-accent-blue);
+  background: var(--color-surface);
+}
+
+.extraction-mode-picker__option:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.extraction-mode-picker__icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  background: var(--color-surface-hover);
+  color: var(--color-dark-gray);
+  font-size: 20px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.extraction-mode-picker__option[aria-checked="true"] .extraction-mode-picker__icon {
+  background: color-mix(in srgb, var(--color-accent-blue-light) 45%, transparent);
+  color: var(--color-heading);
+}
+
+.extraction-mode-picker__title {
+  color: var(--color-text-default);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.extraction-mode-picker__hint {
+  color: var(--color-dark-gray);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.extraction-mode-picker__radio {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--color-border);
+  transition: border-color 150ms ease;
+}
+
+.extraction-mode-picker__radio::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-accent-blue);
+  transform: scale(0);
+  transition: transform 150ms ease;
+}
+
+.extraction-mode-picker__option[aria-checked="true"] .extraction-mode-picker__radio {
+  border-color: var(--color-accent-blue);
+}
+
+.extraction-mode-picker__option[aria-checked="true"] .extraction-mode-picker__radio::after {
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .extraction-mode-picker__option,
+  .extraction-mode-picker__icon,
+  .extraction-mode-picker__radio,
+  .extraction-mode-picker__radio::after { transition: none; }
+}

@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import type { Readable } from "stream";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { and, eq, inArray } from "drizzle-orm";
 import type { Document } from "@lpl-hacks/shared/src/types/native/documents/document.js";
@@ -7,9 +8,11 @@ import documentsExtractionSettled from "@lpl-hacks/shared/src/types/native/socke
 import { db } from "../../loaders/postgresLoader.js";
 import { S3_DOCUMENTS_BUCKET, s3_client } from "../../loaders/s3Loader.js";
 import { AppError } from "../../modules/AppError.js";
+import { isForeignKeyViolation } from "../../modules/pgError.js";
 import type { UploadRequest } from "../../modules/readUploadRequest.js";
 import { socketRoom } from "../../modules/socketRoom.js";
 import { documents } from "../../schemas/documents.js";
+import { CLIENT_ERRORS } from "../../types/native/clients/errors.js";
 import { DOCUMENT_ERRORS } from "../../types/native/documents/errors.js";
 import { EXTRACTION_ERRORS } from "../../types/native/extraction/errors.js";
 import { extractedFieldAnalyze, type ExtractedFieldResult } from "../extraction/extractedFieldMethods.js";
@@ -17,7 +20,15 @@ import { realtimeNotifyRooms } from "../realtime/realtimeMethods.js";
 
 type DocumentUpload = UploadRequest & {
   fileName: string;
+  clientId?: string;
+  uploadRequestId?: string;
 };
+
+// The file streams to S3. Textract's sync API takes 10 MB per call; PDFs are analyzed a page at a time, so only images and TIFFs hit that cap.
+export const DOCUMENT_UPLOAD_RULES = {
+  mimeTypes: ["application/pdf", "image/png", "image/jpeg", "image/tiff"],
+  maxBytes: 50 * 1024 * 1024,
+} as const;
 
 type DocumentRecord = typeof documents.$inferSelect;
 
@@ -36,11 +47,27 @@ export async function documentCreate(upload: DocumentUpload): Promise<Document> 
     ContentLength: upload.contentLength,
   }));
 
-  const [record] = await db.insert(documents)
-    .values({ id, fileName: upload.fileName, contentType: upload.contentType, s3Key })
-    .returning();
+  try {
+    const [record] = await db.insert(documents)
+      .values({ id, fileName: upload.fileName, contentType: upload.contentType, s3Key, clientId: upload.clientId, uploadRequestId: upload.uploadRequestId })
+      .returning();
 
-  return documentToView(record!);
+    return documentToView(record!);
+  } catch (err) {
+    if (isForeignKeyViolation(err)) throw new AppError(CLIENT_ERRORS.CLIENT_NOT_FOUND);
+    throw err;
+  }
+}
+
+export async function documentGetContent(documentId: string): Promise<{ contentType: string; body: Readable }> {
+  const [record] = await db.select({ contentType: documents.contentType, s3Key: documents.s3Key })
+    .from(documents)
+    .where(eq(documents.id, documentId))
+    .limit(1);
+  if (!record) throw new AppError(DOCUMENT_ERRORS.DOCUMENT_NOT_FOUND);
+
+  const object = await s3_client.send(new GetObjectCommand({ Bucket: S3_DOCUMENTS_BUCKET, Key: record.s3Key }));
+  return { contentType: record.contentType, body: object.Body as Readable };
 }
 
 export async function documentGet(documentId: string): Promise<{ document: Document; extraction: ExtractedAnalysis | null }> {

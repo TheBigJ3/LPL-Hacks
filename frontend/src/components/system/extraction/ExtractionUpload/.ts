@@ -1,22 +1,22 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type CSSProperties } from 'react'
+import { useParams, useSearchParams } from 'react-router'
 import type { ExtractedAnalysis } from '@lpl-hacks/shared/src/types/native/extraction/extractedAnalysis'
 import type { ExtractedBox } from '@lpl-hacks/shared/src/types/native/extraction/extractedBox'
 import type { ExtractedTable } from '@lpl-hacks/shared/src/types/native/extraction/extractedTable'
 import type { ExtractedConfidenceLevel, ExtractedValue } from '@lpl-hacks/shared/src/types/native/extraction/extractedValue'
 import documentsExtractionSettled from '@lpl-hacks/shared/src/types/native/sockets/documents/extractionSettled'
 import documentsWatch from '@lpl-hacks/shared/src/types/native/sockets/documents/watch'
+import listClientsApi from '@api/clients/listClientsApi'
 import getDocumentApi from '@api/documents/getDocumentApi'
+import getDocumentContentApi from '@api/documents/getDocumentContentApi'
 import uploadDocumentApi from '@api/documents/uploadDocumentApi'
-import { apiGetRequest, apiUploadRequest } from '@features/apiLayer'
+import { apiGetRequest, apiUploadRequest, useApiGetQuery } from '@features/apiLayer'
+import { DOCUMENT_UPLOAD_ACCEPT, DOCUMENT_UPLOAD_HINT, documentUploadCheckFile } from '@features/documentUploadCheck'
 import { documentPreviewRelease, documentPreviewRender, type DocumentPreviewPage } from '@features/documentPreview'
 import { fileDownloadJson } from '@features/fileDownload'
 import { socketAwait, socketLayer, socketWatch } from '@stores/socketStore'
 import { EXTRACTION_ERRORS } from '@typings/native/extraction/errors'
 
-export const EXTRACTION_UPLOAD_MIME_TYPES = ['application/pdf', 'image/png', 'image/jpeg', 'image/tiff']
-export const EXTRACTION_UPLOAD_MAX_BYTES = 50 * 1024 * 1024
-export const EXTRACTION_UPLOAD_IMAGE_MAX_BYTES = 10 * 1024 * 1024
-const EXTRACTION_UPLOAD_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg', 'image/tiff']
 export const EXTRACTION_EMPTY_VALUE_LABEL = '—'
 export const EXTRACTION_EDITOR_DOM_ID = 'extraction-review-editor'
 export const EXTRACTION_PANEL_DOM_ID = 'extraction-review-panel'
@@ -31,13 +31,24 @@ const EXTRACTION_WAIT_MAX_MS = 20 * 60 * 1000
 const EXTRACTION_CHECK_CONNECTED_MS = 10_000
 const EXTRACTION_CHECK_DISCONNECTED_MS = 3_000
 
-export type ExtractionPhase = 'idle' | 'uploading' | 'extracting'
+export type ExtractionPhase = 'idle' | 'uploading' | 'opening' | 'extracting'
 
 const EXTRACTION_PHASE_LABELS: Record<ExtractionPhase, string> = {
   idle: 'Choose a PDF or image',
   uploading: 'Uploading…',
+  opening: 'Opening document…',
   extracting: 'Extracting…',
 }
+
+export type ExtractionMode = 'self' | 'request'
+
+const EXTRACTION_MODE_PARAM = 'mode'
+const EXTRACTION_DOCUMENT_PARAM = 'document'
+
+export const EXTRACTION_MODE_OPTIONS: { mode: ExtractionMode, icon: string, title: string, hint: string }[] = [
+  { mode: 'self', icon: 'upload_file', title: 'Upload files myself', hint: 'Extract and review a document now' },
+  { mode: 'request', icon: 'add_link', title: 'Request from client', hint: 'Send a link they can upload one set of files with' },
+]
 
 export type ExtractionEditValue = string | boolean
 
@@ -477,8 +488,8 @@ async function extractionWaitForDocument(documentId: string, signal: AbortSignal
   }
 }
 
-async function extractionUploadAndWait(file: File, signal: AbortSignal, onUploaded: () => void): Promise<ExtractionWaitResult | null> {
-  const res = await apiUploadRequest(uploadDocumentApi, { fileName: file.name }, file)
+async function extractionUploadAndWait(file: File, clientId: string | undefined, signal: AbortSignal, onUploaded: () => void): Promise<ExtractionWaitResult | null> {
+  const res = await apiUploadRequest(uploadDocumentApi, { fileName: file.name, clientId }, file)
   if (signal.aborted) return null
   if (!res.success) return { success: false, message: res.error.message }
 
@@ -486,7 +497,25 @@ async function extractionUploadAndWait(file: File, signal: AbortSignal, onUpload
   return extractionWaitForDocument(res.data.document.id, signal)
 }
 
+async function extractionFetchDocumentFile(documentId: string, signal: AbortSignal): Promise<{ success: true, file: File } | { success: false, message: string } | null> {
+  const [content, details] = await Promise.all([
+    apiGetRequest(getDocumentContentApi, { documentId }, { responseType: 'blob', signal }),
+    apiGetRequest(getDocumentApi, { documentId }, { signal }),
+  ])
+  if (signal.aborted) return null
+  if (!content.success) return { success: false, message: content.error.message }
+  if (!details.success) return { success: false, message: details.error.message }
+  return { success: true, file: new File([content.data], details.data.document.fileName, { type: content.data.type }) }
+}
+
 export function useExtractionUpload() {
+  const { clientId: clientSlug } = useParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const clientsQuery = useApiGetQuery(listClientsApi)
+  const client = clientsQuery.data?.clients.find((item) => item.slug === clientSlug) ?? null
+  const mode: ExtractionMode = searchParams.get(EXTRACTION_MODE_PARAM) === 'request' ? 'request' : 'self'
+  const openDocumentId = searchParams.get(EXTRACTION_DOCUMENT_PARAM)
+
   const [phase, setPhase] = useState<ExtractionPhase>('idle')
   const [error, setError] = useState<string | null>(null)
   const [analysis, setAnalysis] = useState<ExtractionAnalysis | null>(null)
@@ -501,6 +530,13 @@ export function useExtractionUpload() {
   }, [previews])
 
   useEffect(() => () => uploadAbort.current?.abort(), [])
+
+  useEffect(() => {
+    if (!openDocumentId) return
+    const abort = extractionStart()
+    setPhase('opening')
+    void extractionOpen(openDocumentId, abort.signal)
+  }, [openDocumentId])
 
   const result = useMemo(() => {
     if (!analysis) return null
@@ -518,37 +554,17 @@ export function useExtractionUpload() {
     }
   }, [analysis, previews, edits, confirmed, selectedId])
 
-  async function upload(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
-    event.target.value = ''
-    if (!file) return
-
-    if (!EXTRACTION_UPLOAD_MIME_TYPES.includes(file.type)) {
-      setError(EXTRACTION_ERRORS.FILE_TYPE_INVALID.MESSAGE)
-      return
-    }
-    if (file.size > EXTRACTION_UPLOAD_MAX_BYTES) {
-      setError(EXTRACTION_ERRORS.FILE_TOO_LARGE.MESSAGE)
-      return
-    }
-    if (EXTRACTION_UPLOAD_IMAGE_MIME_TYPES.includes(file.type) && file.size > EXTRACTION_UPLOAD_IMAGE_MAX_BYTES) {
-      setError(EXTRACTION_ERRORS.IMAGE_TOO_LARGE.MESSAGE)
-      return
-    }
-
+  function extractionStart() {
     uploadAbort.current?.abort()
     const abort = new AbortController()
     uploadAbort.current = abort
-
     setError(null)
     setAnalysis(null)
     setPreviews(null)
-    setPhase('uploading')
-    const [result, pages] = await Promise.all([
-      extractionUploadAndWait(file, abort.signal, () => setPhase('extracting')),
-      documentPreviewRender(file),
-    ])
+    return abort
+  }
 
+  function extractionShow(file: File, result: ExtractionWaitResult | null, pages: DocumentPreviewPage[] | null) {
     if (!result || !result.success) {
       if (pages) documentPreviewRelease(pages)
       if (!result) return
@@ -562,6 +578,69 @@ export function useExtractionUpload() {
     setSelectedId(null)
     setPreviews(pages)
     setAnalysis({ documentId: result.documentId, fileName: file.name, pageCount: result.pageCount, data: result.data })
+  }
+
+  async function extractionOpen(documentId: string, signal: AbortSignal) {
+    const fetched = await extractionFetchDocumentFile(documentId, signal)
+    if (!fetched) return
+    if (!fetched.success) {
+      setPhase('idle')
+      setError(fetched.message)
+      return
+    }
+    setPhase('extracting')
+    const [result, pages] = await Promise.all([
+      extractionWaitForDocument(documentId, signal),
+      documentPreviewRender(fetched.file),
+    ])
+    extractionShow(fetched.file, result, pages)
+  }
+
+  async function upload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    const invalid = documentUploadCheckFile(file)
+    if (invalid) {
+      setError(invalid.MESSAGE)
+      return
+    }
+
+    if (openDocumentId) extractionClearDocumentParam()
+    const abort = extractionStart()
+    setPhase('uploading')
+    const [result, pages] = await Promise.all([
+      extractionUploadAndWait(file, client?.id, abort.signal, () => setPhase('extracting')),
+      documentPreviewRender(file),
+    ])
+    extractionShow(file, result, pages)
+  }
+
+  function extractionClearDocumentParam() {
+    setSearchParams((params) => {
+      const next = new URLSearchParams(params)
+      next.delete(EXTRACTION_DOCUMENT_PARAM)
+      return next
+    })
+  }
+
+  function selectMode(next: ExtractionMode) {
+    setSearchParams((params) => {
+      const updated = new URLSearchParams(params)
+      if (next === 'request') updated.set(EXTRACTION_MODE_PARAM, next)
+      else updated.delete(EXTRACTION_MODE_PARAM)
+      return updated
+    })
+  }
+
+  function reviewDocument(documentId: string) {
+    setSearchParams((params) => {
+      const next = new URLSearchParams(params)
+      next.delete(EXTRACTION_MODE_PARAM)
+      next.set(EXTRACTION_DOCUMENT_PARAM, documentId)
+      return next
+    })
   }
 
   function edit(id: string, value: ExtractionEditValue) {
@@ -619,6 +698,12 @@ export function useExtractionUpload() {
     focusItem,
     focusNext,
     confirmExport,
-    accept: EXTRACTION_UPLOAD_MIME_TYPES.join(','),
+    accept: DOCUMENT_UPLOAD_ACCEPT,
+    hint: DOCUMENT_UPLOAD_HINT,
+    mode,
+    modes: EXTRACTION_MODE_OPTIONS.map((option) => ({ ...option, selected: option.mode === mode })),
+    selectMode,
+    client,
+    reviewDocument,
   }
 }

@@ -2,6 +2,7 @@ import { Readable } from "stream";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AppError } from "../../../modules/AppError.js";
+import { CLIENT_ERRORS } from "../../../types/native/clients/errors.js";
 import { DOCUMENT_ERRORS } from "../../../types/native/documents/errors.js";
 import { EXTRACTION_ERRORS } from "../../../types/native/extraction/errors.js";
 
@@ -38,6 +39,7 @@ const {
   documentCreate,
   documentExtract,
   documentGet,
+  documentGetContent,
   documentMarkFailed,
 } = await import("../../../services/documents/documentMethods.js");
 
@@ -96,6 +98,34 @@ describe("documentCreate", () => {
 
     await expect(documentCreate({ fileName: "a.pdf", contentType: "application/pdf", contentLength: 4, body: Readable.from(["%PDF"]) })).rejects.toThrow("AccessDenied");
     expect(db.insert).not.toHaveBeenCalled();
+  });
+});
+
+describe("documentCreate client link", () => {
+  it("reports an unknown client instead of a database error", async () => {
+    db.insert.mockImplementationOnce(() => ({
+      values: () => ({ returning: async () => { throw Object.assign(new Error("Failed query"), { cause: { code: "23503" } }); } }),
+    }));
+
+    await expect(documentCreate({ fileName: "a.pdf", clientId: "missing", contentType: "application/pdf", contentLength: 4, body: Readable.from(["%PDF"]) }))
+      .rejects.toMatchObject({ _status: CLIENT_ERRORS.CLIENT_NOT_FOUND.STATUS });
+  });
+});
+
+describe("documentGetContent", () => {
+  it("throws the not-found AppError for an unknown id without touching S3", async () => {
+    await expect(documentGetContent(DOCUMENT_ID)).rejects.toMatchObject({ _status: DOCUMENT_ERRORS.DOCUMENT_NOT_FOUND.STATUS });
+    expect(s3Send).not.toHaveBeenCalled();
+  });
+
+  it("streams the stored object with the document's type", async () => {
+    const body = Readable.from(["%PDF"]);
+    rows.selected = [{ contentType: "application/pdf", s3Key: `documents/${DOCUMENT_ID}` }];
+    s3Send.mockResolvedValue({ Body: body });
+
+    await expect(documentGetContent(DOCUMENT_ID)).resolves.toEqual({ contentType: "application/pdf", body });
+    expect(s3Send.mock.calls[0]![0]).toBeInstanceOf(GetObjectCommand);
+    expect(s3Send.mock.calls[0]![0].input).toEqual({ Bucket: "documents-bucket", Key: `documents/${DOCUMENT_ID}` });
   });
 });
 

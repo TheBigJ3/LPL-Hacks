@@ -8,11 +8,13 @@ import SplashScreen from '@components/template/SplashScreen/SplashScreen'
 import DocumentLibrary from '@components/system/documents/DocumentLibrary/DocumentLibrary'
 import NoteLibrary from '@components/system/notes/NoteLibrary/NoteLibrary'
 import ExtractionUpload from '@components/system/extraction/ExtractionUpload/ExtractionUpload'
+import UploadRequestPortal from '@components/system/uploadRequests/UploadRequestPortal/UploadRequestPortal'
 
 socketLayer.init()
 themeLayer.init()
 
 const router = createBrowserRouter([
+  { path: 'request/:token', element: <UploadRequestPortal /> },
   {
     element: <AppLayout />,
     children: [

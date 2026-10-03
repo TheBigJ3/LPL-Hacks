@@ -3,7 +3,10 @@ import { GENERAL_ERRORS } from "../../../../types/native/errors.js";
 
 const { documentCreate, extractProducer } = vi.hoisted(() => ({ documentCreate: vi.fn(), extractProducer: vi.fn() }));
 
-vi.mock("../../../../services/documents/documentMethods.js", () => ({ documentCreate }));
+vi.mock("../../../../services/documents/documentMethods.js", () => ({
+  documentCreate,
+  DOCUMENT_UPLOAD_RULES: { mimeTypes: ["application/pdf", "image/png", "image/jpeg", "image/tiff"], maxBytes: 50 * 1024 * 1024 },
+}));
 vi.mock("../../../../mq/jobs/documents/documentExtract.js", () => ({ default: { producer: extractProducer } }));
 
 const { default: upload } = await import("../../../../api/v1/documents/upload.js");
